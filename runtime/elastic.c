@@ -364,6 +364,7 @@ void platform_guarantee_activate_worker(platform_program * p, int cpu_id) {
             } else if (p->g->workers[cpu_id]->l->elastic_s!=EXIT_SWITCHING0 && 
                 p->g->workers[cpu_id]->l->elastic_s!=EXIT_SWITCHING1 && 
                 p->g->workers[cpu_id]->l->elastic_s!=EXIT_SWITCHING2 && 
+                p->g->workers[cpu_id]->l->elastic_s!=DO_MUGGING  && 
                 p->g->workers[cpu_id]->l->elastic_s!=ACTIVATE_REQUESTED && 
                 p->g->workers[cpu_id]->l->elastic_s!=ACTIVATING &&
                 p->g->workers[cpu_id]->l->elastic_s!=ACTIVE) {
