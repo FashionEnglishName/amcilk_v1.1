@@ -1082,50 +1082,56 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                             elastic_core_lock(w);
                             int victim = elastic_get_worker_id_sleeping_active_deque(w);
                             if (w->self!=victim && victim!=-1) {
-                                if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
-                                    //printf("TEST[%d]: set worker[%d] goto SLEEPING_MUGGING_DEQUE state, E:%p, current_stack_frame:%p\n", w->self, victim, w->exc, w->current_stack_frame);
-                                    deque_lock_self(w);
-                                    Closure *cl;
-                                    cl = deque_xtract_bottom(w, w->self);
-                                    if (cl!=NULL) {
-                                        if (cl->status==CLOSURE_RETURNING) { //give up
-                                            cl = return_value(w, cl);
-                                            if (cl!=NULL) {
-                                                deque_add_bottom(w, cl, w->self);
-                                                setup_for_execution(w, cl);
-                                                __sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE);
-                                                //printf("TEST[%d]: again, request worker[%d] goto SLEEPING_ACTIVE_DEQUE state, exc:%p\n", w->self, victim, w->exc);
-                                                deque_unlock_self(w);
-                                                elastic_core_unlock(w);
-                                                printf("GIVE UP MUGGING\n");
-                                                longjmp_to_user_code(w, cl);
+                                if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVE, DO_MUGGING)) {
+                                    if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
+                                        //printf("TEST[%d]: set worker[%d] goto SLEEPING_MUGGING_DEQUE state, E:%p, current_stack_frame:%p\n", w->self, victim, w->exc, w->current_stack_frame);
+                                        deque_lock_self(w);
+                                        Closure *cl;
+                                        cl = deque_xtract_bottom(w, w->self);
+                                        if (cl!=NULL) {
+                                            if (cl->status==CLOSURE_RETURNING) { //give up
+                                                cl = return_value(w, cl);
+                                                if (cl!=NULL) {
+                                                    deque_add_bottom(w, cl, w->self);
+                                                    setup_for_execution(w, cl);
+                                                    __sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE);
+                                                    //printf("TEST[%d]: again, request worker[%d] goto SLEEPING_ACTIVE_DEQUE state, exc:%p\n", w->self, victim, w->exc);
+                                                    deque_unlock_self(w);
+                                                    elastic_core_unlock(w);
+                                                    if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
+                                                        printf("GIVE UP MUGGING\n");
+                                                        longjmp_to_user_code(w, cl);
+                                                    }
+                                                } else {
+                                                    deque_unlock_self(w);
+                                                }
                                             } else {
+                                                printf("BUG: wrong cl status at bottom [%d] when mugging\n", cl->status);
                                                 deque_unlock_self(w);
+                                                abort();
                                             }
                                         } else {
-                                            printf("BUG: wrong cl status at bottom [%d] when mugging\n", cl->status);
                                             deque_unlock_self(w);
-                                            abort();
                                         }
-                                    } else {
-                                        deque_unlock_self(w);
-                                    }
 
-                                    elastic_mugging(w, victim);
-                                    w->g->elastic_core->ptr_sleeping_inactive_deque--;
-                                    int tmp_victim_cpu_state_group_pos = w->g->workers[victim]->l->elastic_pos_in_cpu_state_group;
-                                    elastic_do_exchange_state_group(w->g->workers[victim], w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
-                                    elastic_do_exchange_state_group(w->g->workers[w->g->elastic_core->cpu_state_group[tmp_victim_cpu_state_group_pos]], w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque]]);
-                                    w->g->elastic_core->ptr_sleeping_active_deque--;
-                                    print_cpu_state_group(w->g->program);
-                                    //printf("\t(A: p %d)(ptr_sleeping_active_deque %d)\n", w->g->program->control_uid, w->g->elastic_core->ptr_sleeping_active_deque);
-                                    elastic_core_unlock(w);
-                                    //printf("steal whole deque: w is %d, victim is %d\n", w->self, victim);
-                                    w->g->elastic_core->test_thief = w->self;
-                                    if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {    
-                                        //printf("TEST[%d]: set worker[%d] goto SLEEPING_INACTIVE_DEQUE state, E:%p, current_stack_frame:%p\n", w->self, victim, w->exc, w->current_stack_frame);
-                                        //printf("TEST[%d]: thief jumps to usercode, E:%p, current_stack_frame:%p\n", w->self, w->exc, w->current_stack_frame);
-                                        sysdep_longjmp_to_sf(w->current_stack_frame);
+                                        elastic_mugging(w, victim);
+                                        w->g->elastic_core->ptr_sleeping_inactive_deque--;
+                                        int tmp_victim_cpu_state_group_pos = w->g->workers[victim]->l->elastic_pos_in_cpu_state_group;
+                                        elastic_do_exchange_state_group(w->g->workers[victim], w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
+                                        elastic_do_exchange_state_group(w->g->workers[w->g->elastic_core->cpu_state_group[tmp_victim_cpu_state_group_pos]], w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque]]);
+                                        w->g->elastic_core->ptr_sleeping_active_deque--;
+                                        print_cpu_state_group(w->g->program);
+                                        //printf("\t(A: p %d)(ptr_sleeping_active_deque %d)\n", w->g->program->control_uid, w->g->elastic_core->ptr_sleeping_active_deque);
+                                        elastic_core_unlock(w);
+                                        //printf("steal whole deque: w is %d, victim is %d\n", w->self, victim);
+                                        w->g->elastic_core->test_thief = w->self;
+                                        if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {    
+                                            //printf("TEST[%d]: set worker[%d] goto SLEEPING_INACTIVE_DEQUE state, E:%p, current_stack_frame:%p\n", w->self, victim, w->exc, w->current_stack_frame);
+                                            //printf("TEST[%d]: thief jumps to usercode, E:%p, current_stack_frame:%p\n", w->self, w->exc, w->current_stack_frame);
+                                            if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
+                                                sysdep_longjmp_to_sf(w->current_stack_frame);
+                                            }
+                                        }
                                     }
                                 }
                             } else {
