@@ -1078,7 +1078,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                     }
                     //elastic_all_worker_frame_num_test(w);
                     if (elastic_safe(w)) {
-                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVE, DO_MUGGING)) { //steal whole deque if has any, DO_MUGGING
+                        if (w->l->elastic_s==ACTIVE) { //steal whole deque if has any, DO_MUGGING
                             elastic_core_lock(w);
                             int victim = elastic_get_worker_id_sleeping_active_deque(w);
                             if (w->self!=victim && victim!=-1) {
@@ -1098,9 +1098,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 deque_unlock_self(w);
                                                 elastic_core_unlock(w);
                                                 printf("GIVE UP MUGGING\n");
-                                                if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
-                                                    longjmp_to_user_code(w, cl);
-                                                }
+                                                longjmp_to_user_code(w, cl);
                                             } else {
                                                 deque_unlock_self(w);
                                             }
@@ -1127,9 +1125,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                     if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {    
                                         //printf("TEST[%d]: set worker[%d] goto SLEEPING_INACTIVE_DEQUE state, E:%p, current_stack_frame:%p\n", w->self, victim, w->exc, w->current_stack_frame);
                                         //printf("TEST[%d]: thief jumps to usercode, E:%p, current_stack_frame:%p\n", w->self, w->exc, w->current_stack_frame);
-                                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
-                                            sysdep_longjmp_to_sf(w->current_stack_frame);
-                                        }
+                                        sysdep_longjmp_to_sf(w->current_stack_frame);
                                     }
                                 }
                             } else {
