@@ -1135,7 +1135,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                     } else {
                                         elastic_core_unlock(w);
                                     }
-                                    __sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE);
                                 } else {
                                     elastic_core_unlock(w);
                                 }
