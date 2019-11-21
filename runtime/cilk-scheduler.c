@@ -1250,9 +1250,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                     printf("ERROR: SLEEPING_ADAPTING_DEQUE is changed by others\n");
                                     abort();
                                 }
-                            } else {
-                                printf("ERROR: h<=t and is not going to sleep but it is in runtime\n");
-                                abort();
                             }
                         } else { //deque is empty
                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), TO_SLEEP, SLEEPING_ADAPTING_DEQUE)) {
