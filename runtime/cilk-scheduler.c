@@ -1153,7 +1153,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                     w = __cilkrts_get_tls_worker();
 
                                     //waken up
-                                    if (w->head >= w->tail) { //must be mugged
+                                    if (w->head > w->tail) { //must be mugged
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) { //Zhe: update
                                             //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
                                             elastic_core_lock(w);
@@ -1169,7 +1169,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         printf("ERROR! current_frame==NULL while h<t\n");
                                         abort();
 
-                                    } else { //h<t && curr_stack==NULL
+                                    } else { //h<=t && curr_stack==NULL || h==t
                                         //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
                                         deque_lock_self(w);
                                         Closure *cl = deque_peek_bottom(w, w->self);
@@ -1203,6 +1203,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 deque_unlock_self(w);
                                             }
                                         } else { //be mugged
+                                            if (w->head > w->tail)
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) { //Zhe: update
                                                 elastic_core_lock(w);
                                                 elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
