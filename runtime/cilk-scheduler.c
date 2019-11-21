@@ -1150,9 +1150,9 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                 if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
                                     //printf("TEST[%d]: goto SLEEPING_ACTIVE_DEQUE state (deque is not empty), E:%p, current_stack_frame:%p, state:%d\n", w->self, w->exc, w->current_stack_frame, w->l->elastic_s);
                                     elastic_do_cond_sleep(w);
-                                    w = __cilkrts_get_tls_worker();
 
                                     //waken up
+                                    w = __cilkrts_get_tls_worker();
                                     if (w->head > w->tail) { //must be mugged
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) { //Zhe: update
                                             //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
@@ -1165,11 +1165,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             }
                                         }
 
-                                    } else if (w->head < w->tail && w->current_stack_frame!=NULL) { //never happens
-                                        printf("ERROR! current_frame==NULL while h<t\n");
-                                        abort();
-
-                                    } else { //h<=t && curr_stack==NULL || h==t
+                                    } else { //h<=t
                                         //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
                                         deque_lock_self(w);
                                         Closure *cl = deque_peek_bottom(w, w->self);
@@ -1251,11 +1247,10 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                     w->g->elastic_core->ptr_sleeping_inactive_deque--;
                                     elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
                                     elastic_core_unlock(w); //Zhe: Change
-
                                     //printf("TEST[%d]: goto SLEEPING_INACTIVE_DEQUE state, E:%p, current_stack_frame:%p, state:%d, head:%p, tail:%p\n", w->self, w->exc, w->current_stack_frame, w->l->elastic_s, w->head, w->tail);
                                     elastic_do_cond_sleep(w);
+                                    
                                     w = __cilkrts_get_tls_worker();
-
                                     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
                                         //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
                                         elastic_core_lock(w);
