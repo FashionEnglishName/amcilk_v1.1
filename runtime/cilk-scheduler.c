@@ -1165,7 +1165,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             }
                                         }
 
-                                    } else if (w->current_stack_frame!=NULL) { //never happens
+                                    } else if (w->current_stack_frame!=NULL) { //never happens, w->head < w->tail && w->current_stack_frame!=NULL
                                         printf("ERROR! current_frame==NULL while h<t\n");
                                         abort();
 
