@@ -1078,7 +1078,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                     }
                     //elastic_all_worker_frame_num_test(w);
                     if (elastic_safe(w)) {
-                        if (w->l->elastic_s==ACTIVE) { //steal whole deque if has any, DO_MUGGING
+                        if (w->l->elastic_s==ACTIVE) { //steal whole deque if has any
                             elastic_core_lock(w);
                             int victim = elastic_get_worker_id_sleeping_active_deque(w);
                             if (w->self!=victim && victim!=-1) {
@@ -1135,6 +1135,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                     } else {
                                         elastic_core_unlock(w);
                                     }
+                                    __sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE);
                                 } else {
                                     elastic_core_unlock(w);
                                 }
