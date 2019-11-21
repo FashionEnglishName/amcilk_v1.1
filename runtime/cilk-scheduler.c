@@ -1203,7 +1203,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 deque_unlock_self(w);
                                             }
                                         } else { //be mugged
-                                            if (w->head > w->tail)
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) { //Zhe: update
                                                 elastic_core_lock(w);
                                                 elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
