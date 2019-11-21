@@ -1,0 +1,5 @@
+bing_I.c: interArrivalTime ->1.25
+bing_m.c: interArrivalTime-> 1, 
+finance_h.c: interArrivalTime->1, double localEnd = 30000, change to the finance workload
+finance_m.c: interArrivalTime -> 1.111, double localEnd = 30000, change to the finance workload
+finance_l.c: interArrivalTime -> 1.25, double localEnd = 30000, change to the finance workload
