@@ -1094,13 +1094,19 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 if (cl!=NULL) {
                                                     deque_add_bottom(w, cl, w->self);
                                                     setup_for_execution(w, cl);
-                                                    __sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE);
-                                                    //printf("TEST[%d]: again, request worker[%d] goto SLEEPING_ACTIVE_DEQUE state, exc:%p\n", w->self, victim, w->exc);
-                                                    deque_unlock_self(w);
-                                                    elastic_core_unlock(w);
-                                                    if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
-                                                        printf("GIVE UP MUGGING\n");
-                                                        longjmp_to_user_code(w, cl);
+                                                    if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
+                                                        //printf("TEST[%d]: again, request worker[%d] goto SLEEPING_ACTIVE_DEQUE state, exc:%p\n", w->self, victim, w->exc);
+                                                        deque_unlock_self(w);
+                                                        elastic_core_unlock(w);
+                                                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
+                                                            printf("GIVE UP MUGGING\n");
+                                                            longjmp_to_user_code(w, cl);
+                                                        }
+                                                    } else {
+                                                        deque_unlock_self(w);
+                                                        elastic_core_unlock(w);
+                                                        printf("ERROR: SLEEPING_MUGGING_DEQUE1 is changed by others\n");
+                                                        abort();
                                                     }
                                                 } else {
                                                     deque_unlock_self(w);
@@ -1130,10 +1136,18 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             //printf("TEST[%d]: thief jumps to usercode, E:%p, current_stack_frame:%p\n", w->self, w->exc, w->current_stack_frame);
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                                 sysdep_longjmp_to_sf(w->current_stack_frame);
+                                            } else {
+                                                printf("ERROR: DO_MUGGING is changed by others\n");
+                                                abort();
                                             }
+                                        } else {
+                                            printf("ERROR: SLEEPING_MUGGING_DEQUE2 is changed by others\n");
+                                            abort();
                                         }
                                     } else {
                                         elastic_core_unlock(w);
+                                        printf("ERROR: mugging which is not in SLEEPING_ACTIVE_DEQUE (inconsistency between cpu_state and elastic_s)\n");
+                                        abort();
                                     }
                                 } else {
                                     elastic_core_unlock(w);
@@ -1166,7 +1180,13 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             elastic_core_unlock(w);
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
                                                 res = NULL;
+                                            } else {
+                                                printf("ERROR: ACTIVATING1 is changed by others\n");
+                                                abort();
                                             }
+                                        } else {
+                                            printf("ERROR: activated without requested1\n");
+                                            abort();
                                         }
 
                                     } else { //h<=t
@@ -1192,15 +1212,19 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                             abort();
                                                         }
                                                     } else {
-                                                        printf("ERROR: error cl status %d\n", cl->status);
                                                         deque_unlock_self(w);
+                                                        printf("ERROR: error cl status %d\n", cl->status);
                                                         abort();
                                                     }
                                                 } else {
                                                     deque_unlock_self(w);
+                                                    printf("ERROR: ACTIVATING2 is changed by others\n");
+                                                    abort();
                                                 }
                                             } else {
                                                 deque_unlock_self(w);
+                                                printf("ERROR: activated without requested2\n");
+                                                abort();
                                             }
                                         } else { //be mugged
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) { //Zhe: update
@@ -1211,12 +1235,24 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 elastic_core_unlock(w);
                                                 if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
                                                     res = NULL;
+                                                } else {
+                                                    printf("ERROR: ACTIVATING3 is changed by others\n");
+                                                    abort();
                                                 }
+                                            } else {
+                                                printf("ERROR: activated without requested3\n");
+                                                abort();
                                             }
                                             deque_unlock_self(w);
                                         }
                                     }
+                                } else {
+                                    printf("ERROR: SLEEPING_ADAPTING_DEQUE is changed by others\n");
+                                    abort();
                                 }
+                            } else {
+                                printf("ERROR: h<=t and is not going to sleep but it is in runtime\n");
+                                abort();
                             }
                         } else { //deque is empty
                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), TO_SLEEP, SLEEPING_ADAPTING_DEQUE)) {
@@ -1264,7 +1300,13 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
                                             //printf("Activated!\n");
                                             res = NULL;
+                                        } else {
+                                            printf("ERROR: ACTIVATING4 is changed by others\n");
+                                            abort();
                                         }
+                                    } else {
+                                        printf("ERROR: activated without requested4\n");
+                                        abort();
                                     }
                                 }
                             }
