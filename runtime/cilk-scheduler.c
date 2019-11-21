@@ -1203,8 +1203,8 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 elastic_core_unlock(w);
                                                 if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
                                                     if (cl->status==CLOSURE_RUNNING) {
-                                                        deque_unlock_self(w);
                                                         if (w->current_stack_frame!=NULL) {
+                                                            deque_unlock_self(w);
                                                             sysdep_longjmp_to_sf(w->current_stack_frame);
                                                         } else {
                                                             deque_unlock_self(w);
