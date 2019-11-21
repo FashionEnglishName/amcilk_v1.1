@@ -324,7 +324,7 @@ void platform_guarantee_sleep_worker(platform_program * p, int cpu_id) {
                 count++;
             }
             usleep(TIME_MAKE_SURE_TO_SLEEP);
-            if (count>10000) {
+            if (count>100000) {
                 printf("ERROR! check sleep failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
                 abort();
             }
