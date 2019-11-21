@@ -1132,7 +1132,11 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 sysdep_longjmp_to_sf(w->current_stack_frame);
                                             }
                                         }
+                                    } else {
+                                        elastic_core_unlock(w);
                                     }
+                                } else {
+                                    elastic_core_unlock(w);
                                 }
                             } else {
                                 elastic_core_unlock(w);
@@ -1196,6 +1200,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                     deque_unlock_self(w);
                                                 }
                                             } else {
+                                                elastic_core_unlock(w);
                                                 deque_unlock_self(w);
                                             }
                                         } else { //be mugged
