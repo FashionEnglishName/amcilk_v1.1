@@ -1153,7 +1153,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                     w = __cilkrts_get_tls_worker();
 
                                     //waken up
-                                    if (w->head > w->tail) { //must be mugged
+                                    if (w->head >= w->tail) { //must be mugged
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) { //Zhe: update
                                             //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
                                             elastic_core_lock(w);
@@ -1169,7 +1169,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         printf("ERROR! current_frame==NULL while h<t\n");
                                         abort();
 
-                                    } else { //h<=t && curr_stack==NULL || h==t
+                                    } else { //h<t && curr_stack==NULL
                                         //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
                                         deque_lock_self(w);
                                         Closure *cl = deque_peek_bottom(w, w->self);
@@ -1184,7 +1184,13 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
                                                     if (cl->status==CLOSURE_RUNNING) {
                                                         deque_unlock_self(w);
-                                                        sysdep_longjmp_to_sf(w->current_stack_frame);
+                                                        if (w->current_stack_frame!=NULL) {
+                                                            sysdep_longjmp_to_sf(w->current_stack_frame);
+                                                        } else {
+                                                            deque_unlock_self(w);
+                                                            printf("ERROR: w->current_stack_frame==NULL when being activated (be not mugged case)\n");
+                                                            abort();
+                                                        }
                                                     } else {
                                                         printf("ERROR: error cl status %d\n", cl->status);
                                                         deque_unlock_self(w);
@@ -1196,7 +1202,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             } else {
                                                 deque_unlock_self(w);
                                             }
-                                        } else {
+                                        } else { //be mugged
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) { //Zhe: update
                                                 elastic_core_lock(w);
                                                 elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
