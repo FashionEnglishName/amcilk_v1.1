@@ -1152,7 +1152,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                     elastic_do_cond_sleep(w);
                                     w = __cilkrts_get_tls_worker();
 
-                                    //be waken up
+                                    //waken up
                                     if (w->head > w->tail) { //must be mugged
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) { //Zhe: update
                                             //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
@@ -1165,7 +1165,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             }
                                         }
 
-                                    } else if (w->head < w->tail && w->current_stack_frame!=NULL) { //never happens
+                                    } else if (w->head < w->tail && w->current_stack_frame==NULL) { //never happens
                                         printf("ERROR! current_frame==NULL while h<t\n");
                                         abort();
 
