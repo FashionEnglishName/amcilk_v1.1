@@ -1078,7 +1078,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                     }
                     //elastic_all_worker_frame_num_test(w);
                     if (elastic_safe(w)) {
-                        if (w->l->elastic_s==ACTIVE) { //steal whole deque if has any
+                        if (w->l->elastic_s==ACTIVE) { //steal whole deque if has any, DO_MUGGING
                             elastic_core_lock(w);
                             int victim = elastic_get_worker_id_sleeping_active_deque(w);
                             if (w->self!=victim && victim!=-1) {
@@ -1132,11 +1132,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 sysdep_longjmp_to_sf(w->current_stack_frame);
                                             }
                                         }
-                                    } else {
-                                        elastic_core_unlock(w);
                                     }
-                                } else {
-                                    elastic_core_unlock(w);
                                 }
                             } else {
                                 elastic_core_unlock(w);
@@ -1200,7 +1196,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                     deque_unlock_self(w);
                                                 }
                                             } else {
-                                                elastic_core_unlock(w);
                                                 deque_unlock_self(w);
                                             }
                                         } else { //be mugged
