@@ -1096,10 +1096,10 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                     setup_for_execution(w, cl);
                                                     __sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE);
                                                     //printf("TEST[%d]: again, request worker[%d] goto SLEEPING_ACTIVE_DEQUE state, exc:%p\n", w->self, victim, w->exc);
-                                                    deque_unlock_self(w);
-                                                    elastic_core_unlock(w);
                                                     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                                         printf("GIVE UP MUGGING\n");
+                                                        deque_unlock_self(w);
+                                                        elastic_core_unlock(w);
                                                         longjmp_to_user_code(w, cl);
                                                     }
                                                 } else {
@@ -1132,7 +1132,11 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 sysdep_longjmp_to_sf(w->current_stack_frame);
                                             }
                                         }
+                                    } else {
+                                        elastic_core_unlock(w);
                                     }
+                                } else {
+                                    elastic_core_unlock(w);
                                 }
                             } else {
                                 elastic_core_unlock(w);
