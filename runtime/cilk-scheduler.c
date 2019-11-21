@@ -1137,7 +1137,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                                 sysdep_longjmp_to_sf(w->current_stack_frame);
                                             } else {
-                                                printf("ERROR: DO_MUGGING is changed by others\n");
+                                                printf("ERROR: DO_MUGGING1 is changed by others, recover failed\n");
                                                 abort();
                                             }
                                         } else {
@@ -1146,7 +1146,10 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         }
                                     } else {
                                         elastic_core_unlock(w);
-                                        __sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE);
+                                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
+                                            printf("ERROR: DO_MUGGING2 is changed by others, recover failed\n");
+                                            abort();
+                                        }
                                     }
                                 }
                             }
