@@ -1165,11 +1165,11 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             }
                                         }
 
-                                    } else if (w->current_stack_frame!=NULL) { //never happens, w->head < w->tail && w->current_stack_frame!=NULL
+                                    } else if (w->head < w->tail && w->current_stack_frame!=NULL) { //never happens
                                         printf("ERROR! current_frame==NULL while h<t\n");
                                         abort();
 
-                                    } else { //h<=t && curr_stack==NULL || h==t && curr_stack==NULL || h==t && curr_stack!=NULL
+                                    } else { //h<=t && curr_stack==NULL || h==t
                                         //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
                                         deque_lock_self(w);
                                         Closure *cl = deque_peek_bottom(w, w->self);
