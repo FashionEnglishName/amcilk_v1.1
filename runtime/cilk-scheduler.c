@@ -1078,19 +1078,17 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                     }
                     //elastic_all_worker_frame_num_test(w);
                     if (elastic_safe(w)) {
-                        if (w->l->elastic_s==ACTIVE) { //steal whole deque if has any
+                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVE, DO_MUGGING)) { //steal whole deque if has any, DO_MUGGING
                             elastic_core_lock(w);
                             int victim = elastic_get_worker_id_sleeping_active_deque(w);
                             if (w->self!=victim && victim!=-1) {
-                                //printf("\tSTEAL WHOLE DEQUE, %d\n", w->g->program->control_uid);
                                 if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
                                     //printf("TEST[%d]: set worker[%d] goto SLEEPING_MUGGING_DEQUE state, E:%p, current_stack_frame:%p\n", w->self, victim, w->exc, w->current_stack_frame);
-                                    //give up
                                     deque_lock_self(w);
                                     Closure *cl;
                                     cl = deque_xtract_bottom(w, w->self);
                                     if (cl!=NULL) {
-                                        if (cl->status==CLOSURE_RETURNING) {
+                                        if (cl->status==CLOSURE_RETURNING) { //give up
                                             cl = return_value(w, cl);
                                             if (cl!=NULL) {
                                                 deque_add_bottom(w, cl, w->self);
@@ -1100,7 +1098,9 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 deque_unlock_self(w);
                                                 elastic_core_unlock(w);
                                                 printf("GIVE UP MUGGING\n");
-                                                longjmp_to_user_code(w, cl);
+                                                if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
+                                                    longjmp_to_user_code(w, cl);
+                                                }
                                             } else {
                                                 deque_unlock_self(w);
                                             }
@@ -1214,8 +1214,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                 Closure *cl;
                                 cl = deque_xtract_bottom(w, w->self);
                                 if (cl!=NULL) {
-                                    if (cl->status==CLOSURE_RETURNING) {
-                                        //printf("3!!!!!!!!jijijijiji\n");
+                                    if (cl->status==CLOSURE_RETURNING) { //give up
                                         cl = return_value(w, cl);
                                         if (cl!=NULL) {
                                             deque_add_bottom(w, cl, w->self);
@@ -1226,7 +1225,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             deque_unlock_self(w);
                                             longjmp_to_user_code(w, cl);
                                         } else {
-                                            //printf("3!!!!!!!!cl is null. no need to request again\n");
                                             deque_unlock_self(w);
                                         }
                                     } else {

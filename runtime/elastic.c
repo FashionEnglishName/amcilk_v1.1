@@ -298,7 +298,8 @@ void platform_try_sleep_worker(platform_program * p, int cpu_id) {
         } else if (p->g->workers[cpu_id]->l->elastic_s!=SLEEP_REQUESTED && 
             p->g->workers[cpu_id]->l->elastic_s!=EXIT_SWITCHING0 && 
             p->g->workers[cpu_id]->l->elastic_s!=EXIT_SWITCHING1 && 
-            p->g->workers[cpu_id]->l->elastic_s!=EXIT_SWITCHING2) {
+            p->g->workers[cpu_id]->l->elastic_s!=EXIT_SWITCHING2 && 
+            p->g->workers[cpu_id]->l->elastic_s!=DO_MUGGING) {
             printf("ERROR! set sleep immediately failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
             abort();
         }
@@ -319,7 +320,7 @@ void platform_guarantee_sleep_worker(platform_program * p, int cpu_id) {
                 printf("\t check sleep %d worker %d is in ACTIVE state, set as SLEEP_REQUESTED\n", p->control_uid, cpu_id);
             }
             p->g->workers[cpu_id]->exc = p->g->workers[cpu_id]->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
-            if (p->is_switching==0) {
+            if (p->is_switching==0 || p->g->workers[cpu_id]->l==DO_MUGGING) {
                 count++;
             }
             usleep(TIME_MAKE_SURE_TO_SLEEP);
