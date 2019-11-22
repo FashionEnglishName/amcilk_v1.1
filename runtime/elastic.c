@@ -318,15 +318,15 @@ void platform_guarantee_sleep_worker(platform_program * p, int cpu_id) {
             p->g->workers[cpu_id]->l->elastic_s!=SLEEPING_ADAPTING_DEQUE && 
             p->g->workers[cpu_id]->l->elastic_s!=SLEEPING_MUGGING_DEQUE)) {
             if (__sync_bool_compare_and_swap(&(p->g->workers[cpu_id]->l->elastic_s), ACTIVE, SLEEP_REQUESTED)) {
-                printf("\t check sleep %d worker %d is in ACTIVE state, set as SLEEP_REQUESTED\n", p->control_uid, cpu_id);
+                printf("\t guarantee %d worker %d is in ACTIVE state, set as SLEEP_REQUESTED\n", p->control_uid, cpu_id);
             }
             p->g->workers[cpu_id]->exc = p->g->workers[cpu_id]->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
             if (p->is_switching==0 && p->g->workers[cpu_id]->l->elastic_s!=DO_MUGGING) {
                 count++;
             }
             usleep(TIME_MAKE_SURE_TO_SLEEP);
-            if (count>1000) {
-                printf("ERROR! check sleep failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
+            if (count>100) {
+                printf("ERROR! guarantee sleep failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
                 abort();
             }
             Cilk_fence();
@@ -348,14 +348,14 @@ void platform_guarantee_sleep_inactive_deque_worker(platform_program * p, int cp
                 count++;
             }
             usleep(TIME_MAKE_SURE_TO_SLEEP);
-            if (count>1000) {
-                printf("ERROR! check sleep_inactive_deque failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
+            if (count>100) {
+                printf("ERROR! guarantee sleep_inactive_deque failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
                 abort();
             }
             Cilk_fence();
         }
     } else {
-        printf("ERROR! %d, SLEEP CHECK FAILED, elastic unsafe! worker is %d\n", p->control_uid, cpu_id);
+        printf("ERROR! %d, SLEEP GUARANTEE FAILED, elastic unsafe! worker is %d\n", p->control_uid, cpu_id);
         abort();
     }
 }
@@ -374,13 +374,13 @@ void platform_guarantee_activate_worker(platform_program * p, int cpu_id) {
                 p->g->workers[cpu_id]->l->elastic_s!=ACTIVATE_REQUESTED && 
                 p->g->workers[cpu_id]->l->elastic_s!=ACTIVATING &&
                 p->g->workers[cpu_id]->l->elastic_s!=ACTIVE) {
-                printf("ERROR! activate a (p:%d) worker %d in e state %d, not in SLEEPING_INACTIVE_DEQUE state\n", p->control_uid, cpu_id, p->g->workers[cpu_id]->l->elastic_s);
+                printf("ERROR! guarantee activate a (p:%d) worker %d in e state %d, not in SLEEPING_INACTIVE_DEQUE state\n", p->control_uid, cpu_id, p->g->workers[cpu_id]->l->elastic_s);
                 abort();
             }
             count++;
             usleep(TIME_MAKE_SURE_TO_ACTIVATE);
-            if (count>1000) {
-                printf("ERROR! activate failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
+            if (count>100) {
+                printf("ERROR! guarantee activate failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
                 abort();
             }
             Cilk_fence();
@@ -425,7 +425,7 @@ void platform_guarantee_cancel_worker_sleep(platform_program * p, int cpu_id) {
             }
             count++;
             usleep(TIME_MAKE_SURE_TO_ACTIVATE);
-            if (count>1000) {
+            if (count>100) {
                 printf("ERROR! cancel sleep failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
                 abort();
             }
