@@ -325,7 +325,7 @@ void platform_guarantee_sleep_worker(platform_program * p, int cpu_id) {
                 count++;
             }
             usleep(TIME_MAKE_SURE_TO_SLEEP);
-            if (count>100) {
+            if (count>GUARANTEE_PREMPT_WAITING_TIME) {
                 printf("ERROR! guarantee sleep failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
                 abort();
             }
@@ -348,7 +348,7 @@ void platform_guarantee_sleep_inactive_deque_worker(platform_program * p, int cp
                 count++;
             }
             usleep(TIME_MAKE_SURE_TO_SLEEP);
-            if (count>100) {
+            if (count>GUARANTEE_PREMPT_WAITING_TIME) {
                 printf("ERROR! guarantee sleep_inactive_deque failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
                 abort();
             }
@@ -379,7 +379,7 @@ void platform_guarantee_activate_worker(platform_program * p, int cpu_id) {
             }
             count++;
             usleep(TIME_MAKE_SURE_TO_ACTIVATE);
-            if (count>100) {
+            if (count>GUARANTEE_PREMPT_WAITING_TIME) {
                 printf("ERROR! guarantee activate failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
                 abort();
             }
@@ -425,7 +425,7 @@ void platform_guarantee_cancel_worker_sleep(platform_program * p, int cpu_id) {
             }
             count++;
             usleep(TIME_MAKE_SURE_TO_ACTIVATE);
-            if (count>100) {
+            if (count>GUARANTEE_PREMPT_WAITING_TIME) {
                 printf("ERROR! cancel sleep failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
                 abort();
             }
