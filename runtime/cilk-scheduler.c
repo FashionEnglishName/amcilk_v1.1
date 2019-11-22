@@ -1493,6 +1493,9 @@ normal_point: //normal part, can not be preempted
         w = __cilkrts_get_tls_worker();
         if(!t) {
             // try to get work from our local queue
+            if (w->g->program->job_finish==1) {
+                goto job_finish_point;
+            }
             deque_lock_self(w);
             t = deque_xtract_bottom(w, w->self);
             deque_unlock_self(w);
@@ -1552,9 +1555,12 @@ normal_point: //normal part, can not be preempted
         CILK_START_TIMING(w, INTERVAL_SCHED);
         w = __cilkrts_get_tls_worker();
         if (!w->g->done) {
+            if (w->g->program->job_finish==1) {
+                goto job_finish_point;
+            }
             t = do_what_it_says(w, t);
             if (w->g->program->job_finish==1) {
-                t = NULL;
+                goto job_finish_point;
             }
         }
         if (t!=NULL) {
