@@ -1335,13 +1335,10 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
             deque_lock_self(w);
             tmp_cl = deque_peek_bottom(w, w->self);
             if (tmp_cl!=NULL) {
-                deque_unlock_self(w);
                 printf("[PLATFORM]: switching, BAD behaviour!!!!!!!\n");
                 abort();
-            } else {
-                //printf("[PLATFORM]: invariant %d all correct! state of last is %d\n", w->self, w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s);
-                deque_unlock_self(w);
             }
+            deque_unlock_self(w);
             if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING0, EXIT_SWITCHING1)) {
                 //printf("\tinv %d mugging %d begin\n", w->self, w->g->program->last_do_exit_worker_id);
                 elastic_mugging(w, w->g->program->last_do_exit_worker_id);
@@ -1396,8 +1393,9 @@ void do_exit_blocking_container_handling(__cilkrts_worker *w) {
         //printf("\t%d 1worker_scheduler, w %d done, state %d\n", w->g->program->control_uid, w->self, w->l->elastic_s);
         elastic_do_cond_sleep(w);
         //printf("\t%d 1worker_scheduler, w %d wake up\n", w->g->program->control_uid, w->self);
-        w = __cilkrts_get_tls_worker();
 
+        //activated
+        w = __cilkrts_get_tls_worker();
         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
             //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
             elastic_core_lock(w);
@@ -1416,8 +1414,9 @@ void do_exit_blocking_container_handling(__cilkrts_worker *w) {
         //printf("\t%d 1worker_scheduler, w %d done, state %d\n", w->g->program->control_uid, w->self, w->l->elastic_s);
         elastic_do_cond_sleep(w);
         //printf("\t%d 1worker_scheduler, w %d wake up\n", w->g->program->control_uid, w->self);
-        w = __cilkrts_get_tls_worker();
 
+        //activated
+        w = __cilkrts_get_tls_worker();
         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
             //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
             elastic_core_lock(w);
@@ -1440,6 +1439,7 @@ void worker_sleep_handling(__cilkrts_worker *w) {
         elastic_core_unlock(w);
         elastic_do_cond_sleep(w);
 
+        //activated
         w = __cilkrts_get_tls_worker();
         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
             //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
