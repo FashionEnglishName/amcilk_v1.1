@@ -291,6 +291,7 @@ void print_worker_deque(__cilkrts_worker *w) {
 
 void platform_try_sleep_worker(platform_program * p, int cpu_id) {
     if (elastic_safe(p->g->workers[cpu_id])) {
+        Cilk_fence();
         if (__sync_bool_compare_and_swap(&(p->g->workers[cpu_id]->l->elastic_s), ACTIVE, SLEEP_REQUESTED)) {
             p->g->workers[cpu_id]->exc = p->g->workers[cpu_id]->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
         } else if (p->g->workers[cpu_id]->l->elastic_s!=SLEEP_REQUESTED && 
@@ -301,6 +302,7 @@ void platform_try_sleep_worker(platform_program * p, int cpu_id) {
             printf("ERROR! set sleep immediately failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
             abort();
         }
+        Cilk_fence();
     } else {
         printf("ERROR! %d, SLEEP FAILED, elastic unsafe! worker is %d\n", p->control_uid, cpu_id);
         abort();
@@ -310,6 +312,7 @@ void platform_try_sleep_worker(platform_program * p, int cpu_id) {
 void platform_guarantee_sleep_worker(platform_program * p, int cpu_id) {
     int count = 0;
     if (elastic_safe(p->g->workers[cpu_id])) {
+        Cilk_fence();
         while((p->g->workers[cpu_id]->l->elastic_s!=SLEEPING_ACTIVE_DEQUE && 
             p->g->workers[cpu_id]->l->elastic_s!=SLEEPING_INACTIVE_DEQUE && 
             p->g->workers[cpu_id]->l->elastic_s!=SLEEPING_ADAPTING_DEQUE && 
@@ -326,6 +329,7 @@ void platform_guarantee_sleep_worker(platform_program * p, int cpu_id) {
                 printf("ERROR! check sleep failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
                 abort();
             }
+            Cilk_fence();
         }
     } else {
         printf("ERROR! %d, SLEEP CHECK FAILED, elastic unsafe! worker is %d\n", p->control_uid, cpu_id);
@@ -336,6 +340,7 @@ void platform_guarantee_sleep_worker(platform_program * p, int cpu_id) {
 void platform_guarantee_sleep_inactive_deque_worker(platform_program * p, int cpu_id) {
     int count = 0;
     if (elastic_safe(p->g->workers[cpu_id])) {
+        Cilk_fence();
         while(p->g->workers[cpu_id]->l->elastic_s!=SLEEPING_INACTIVE_DEQUE) {
             __sync_bool_compare_and_swap(&(p->g->workers[cpu_id]->l->elastic_s), ACTIVE, SLEEP_REQUESTED);
             p->g->workers[cpu_id]->exc = p->g->workers[cpu_id]->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
@@ -347,6 +352,7 @@ void platform_guarantee_sleep_inactive_deque_worker(platform_program * p, int cp
                 printf("ERROR! check sleep_inactive_deque failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
                 abort();
             }
+            Cilk_fence();
         }
     } else {
         printf("ERROR! %d, SLEEP CHECK FAILED, elastic unsafe! worker is %d\n", p->control_uid, cpu_id);
@@ -357,6 +363,7 @@ void platform_guarantee_sleep_inactive_deque_worker(platform_program * p, int cp
 void platform_guarantee_activate_worker(platform_program * p, int cpu_id) {
     int count = 0;
     if (elastic_safe(p->g->workers[cpu_id])) {
+        Cilk_fence();
         while(p->g->workers[cpu_id]->l->elastic_s!=ACTIVE) {
             if (__sync_bool_compare_and_swap(&(p->g->workers[cpu_id]->l->elastic_s), SLEEPING_INACTIVE_DEQUE, ACTIVATE_REQUESTED)) {
                 elastic_do_cond_activate(p->g->workers[cpu_id]);
@@ -376,6 +383,7 @@ void platform_guarantee_activate_worker(platform_program * p, int cpu_id) {
                 printf("ERROR! activate failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
                 abort();
             }
+            Cilk_fence();
         }
     } else {
         printf("ERROR! %d, ACTIVATE FAILED, elastic unsafe! worker is %d\n", p->control_uid, cpu_id);
@@ -385,12 +393,14 @@ void platform_guarantee_activate_worker(platform_program * p, int cpu_id) {
 
 void platform_try_activate_worker(platform_program * p, int cpu_id) {
     if (elastic_safe(p->g->workers[cpu_id])) {
+        Cilk_fence();
         if (__sync_bool_compare_and_swap(&(p->g->workers[cpu_id]->l->elastic_s), SLEEPING_INACTIVE_DEQUE, ACTIVATE_REQUESTED)) {
             elastic_do_cond_activate(p->g->workers[cpu_id]);
         } else {
             printf("ERROR! try activate failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
             abort();
         }
+        Cilk_fence();
     } else {
         printf("ERROR! %d, TRY ACTIVATE FAILED, elastic unsafe! worker is %d\n", p->control_uid, cpu_id);
         abort();
@@ -400,6 +410,7 @@ void platform_try_activate_worker(platform_program * p, int cpu_id) {
 void platform_guarantee_cancel_worker_sleep(platform_program * p, int cpu_id) {
     int count = 0;
     if (elastic_safe(p->g->workers[cpu_id])) {
+        Cilk_fence();
         while(p->g->workers[cpu_id]->l->elastic_s!=ACTIVE) {
             if (__sync_bool_compare_and_swap(&(p->g->workers[cpu_id]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, ACTIVATE_REQUESTED)) {
                 elastic_do_cond_activate(p->g->workers[cpu_id]);
@@ -418,6 +429,7 @@ void platform_guarantee_cancel_worker_sleep(platform_program * p, int cpu_id) {
                 printf("ERROR! cancel sleep failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
                 abort();
             }
+            Cilk_fence();
         }
     } else {
         printf("ERROR! %d, CANCEL SLEEP FAILED, elastic unsafe! worker is %d\n", p->control_uid, cpu_id);
