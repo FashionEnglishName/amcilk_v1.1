@@ -1468,14 +1468,14 @@ job_finish_point:
         if (w->g->program->job_finish==1) { //job_finish must compare with 1 since it may set as -1
             do_exit_switching_for_invariant_handling(w);
             reset_exception_pointer(w, t);
-            t = NULL;
+            //t = NULL;
         }
 stop_container_point:
         w = __cilkrts_get_tls_worker();
         if (w->g->program->hint_stop_container==1) {
             do_exit_blocking_container_handling(w);
             reset_exception_pointer(w, t);
-            t = NULL;
+            //t = NULL;
         }
 worker_sleep_point:
         w = __cilkrts_get_tls_worker();
@@ -1567,13 +1567,13 @@ normal_point: //normal part, can not be preempted
         CILK_START_TIMING(w, INTERVAL_SCHED);
         w = __cilkrts_get_tls_worker();
         if (!w->g->done) {
-            if (w->g->program->job_finish==1) {
+            /*if (w->g->program->job_finish==1) {
                 goto job_finish_point;
-            }
+            }*/
             t = do_what_it_says(w, t);
-            if (w->g->program->job_finish==1) {
+            /*if (w->g->program->job_finish==1) {
                 goto job_finish_point;
-            }
+            }*/
         }
         if (t!=NULL) {
             goto normal_point;
