@@ -258,7 +258,7 @@ void print_num_ancestor() {
         count_call++;
         cl = cl->call_parent;
     }
-    //printf("\tprint_num_ancestor: spawn parent: %d, call parent: %d\n", count_spawn, count_call);
+    printf("\tprint_num_ancestor: spawn parent: %d, call parent: %d\n", count_spawn, count_call);
 }
 
 //Choice 1

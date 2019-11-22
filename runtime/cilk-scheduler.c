@@ -1553,6 +1553,9 @@ normal_point: //normal part, can not be preempted
         w = __cilkrts_get_tls_worker();
         if (!w->g->done) {
             t = do_what_it_says(w, t);
+            if (w->g->program->job_finish==1) {
+                t = NULL;
+            }
         }
         if (t!=NULL) {
             goto normal_point;
