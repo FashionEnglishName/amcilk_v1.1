@@ -355,6 +355,7 @@ void platform_guarantee_sleep_inactive_deque_worker(platform_program * p, int cp
 }
 
 void platform_guarantee_activate_worker(platform_program * p, int cpu_id) {
+    int count = 0;
     if (elastic_safe(p->g->workers[cpu_id])) {
         while(p->g->workers[cpu_id]->l->elastic_s!=ACTIVE) {
             if (__sync_bool_compare_and_swap(&(p->g->workers[cpu_id]->l->elastic_s), SLEEPING_INACTIVE_DEQUE, ACTIVATE_REQUESTED)) {
@@ -369,7 +370,12 @@ void platform_guarantee_activate_worker(platform_program * p, int cpu_id) {
                 printf("ERROR! activate a (p:%d) worker %d in e state %d, not in SLEEPING_INACTIVE_DEQUE state\n", p->control_uid, cpu_id, p->g->workers[cpu_id]->l->elastic_s);
                 abort();
             }
+            count++;
             usleep(TIME_MAKE_SURE_TO_ACTIVATE);
+            if (count>1000) {
+                printf("ERROR! activate failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
+                abort();
+            }
         }
     } else {
         printf("ERROR! %d, ACTIVATE FAILED, elastic unsafe! worker is %d\n", p->control_uid, cpu_id);
@@ -392,6 +398,7 @@ void platform_try_activate_worker(platform_program * p, int cpu_id) {
 }
 
 void platform_guarantee_cancel_worker_sleep(platform_program * p, int cpu_id) {
+    int count = 0;
     if (elastic_safe(p->g->workers[cpu_id])) {
         while(p->g->workers[cpu_id]->l->elastic_s!=ACTIVE) {
             if (__sync_bool_compare_and_swap(&(p->g->workers[cpu_id]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, ACTIVATE_REQUESTED)) {
@@ -405,7 +412,12 @@ void platform_guarantee_cancel_worker_sleep(platform_program * p, int cpu_id) {
                 printf("ERROR! try canel sleep failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
                 abort();
             }
+            count++;
             usleep(TIME_MAKE_SURE_TO_ACTIVATE);
+            if (count>1000) {
+                printf("ERROR! cancel sleep failed in worker %d in e state %d (p:%d, last:%d)\n", cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
+                abort();
+            }
         }
     } else {
         printf("ERROR! %d, CANCEL SLEEP FAILED, elastic unsafe! worker is %d\n", p->control_uid, cpu_id);
