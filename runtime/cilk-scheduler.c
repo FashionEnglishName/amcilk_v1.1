@@ -1086,7 +1086,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                 if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVE, DO_MUGGING)) {
                                     if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
                                         //printf("TEST[%d]: set worker[%d] goto SLEEPING_MUGGING_DEQUE state, E:%p, current_stack_frame:%p\n", w->self, victim, w->exc, w->current_stack_frame);
-                                        elastic_core_lock(w);
                                         deque_lock_self(w);
                                         Closure *cl;
                                         cl = deque_xtract_bottom(w, w->self);
@@ -1099,14 +1098,12 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                     if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
                                                         //printf("TEST[%d]: again, request worker[%d] goto SLEEPING_ACTIVE_DEQUE state, exc:%p\n", w->self, victim, w->exc);
                                                         deque_unlock_self(w);
-                                                        elastic_core_unlock(w);
                                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                                             printf("GIVE UP MUGGING\n");
                                                             longjmp_to_user_code(w, cl);
                                                         }
                                                     } else {
                                                         deque_unlock_self(w);
-                                                        elastic_core_unlock(w);
                                                         printf("ERROR: SLEEPING_MUGGING_DEQUE1 is changed by others\n");
                                                         abort();
                                                     }
@@ -1114,14 +1111,14 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                     deque_unlock_self(w);
                                                 }
                                             } else {
-                                                printf("BUG: wrong cl status at bottom [%d] when mugging\n", cl->status);
+                                                printf("ERROR: wrong cl status at bottom [%d] when mugging\n", cl->status);
                                                 deque_unlock_self(w);
                                                 abort();
                                             }
                                         } else {
                                             deque_unlock_self(w);
                                         }
-
+                                        elastic_core_lock(w);
                                         elastic_mugging(w, victim);
                                         w->g->elastic_core->ptr_sleeping_inactive_deque--;
                                         int tmp_victim_cpu_state_group_pos = w->g->workers[victim]->l->elastic_pos_in_cpu_state_group;
@@ -1274,7 +1271,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             deque_unlock_self(w);
                                         }
                                     } else {
-                                        printf("BUG: wrong cl status at bottom [%d] when deque is empty and go to sleep\n", cl->status);
+                                        printf("ERROR: wrong cl status at bottom [%d] when deque is empty and go to sleep\n", cl->status);
                                         deque_unlock_self(w);
                                         abort();
                                     }
