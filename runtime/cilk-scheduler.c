@@ -1493,9 +1493,11 @@ normal_point: //normal part, can not be preempted
         w = __cilkrts_get_tls_worker();
         if(!t) {
             // try to get work from our local queue
-            if (w->g->program->job_finish==1) { //directly goto sleep before grab the lock will reduce overhead of preemption
+            if (w->g->program->job_finish==1) {
                 goto job_finish_point;
-            } else if (w->l->elastic_s==SLEEP_REQUESTED) { //directly goto sleep before grab the lock will reduce overhead of preemption
+            } else if (w->g->program->hint_stop_container==1) {
+                goto stop_container_point;
+            } else if (w->l->elastic_s==SLEEP_REQUESTED) {
                 goto worker_sleep_point;
             }
             deque_lock_self(w);
