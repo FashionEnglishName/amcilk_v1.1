@@ -1097,27 +1097,23 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                     setup_for_execution(w, cl);
                                                     if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
                                                         //printf("TEST[%d]: again, request worker[%d] goto SLEEPING_ACTIVE_DEQUE state, exc:%p\n", w->self, victim, w->exc);
-                                                        deque_unlock_self(w);
                                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                                             printf("GIVE UP MUGGING\n");
+                                                            deque_unlock_self(w);
                                                             longjmp_to_user_code(w, cl);
                                                         }
                                                     } else {
-                                                        deque_unlock_self(w);
                                                         printf("ERROR: SLEEPING_MUGGING_DEQUE1 is changed by others\n");
                                                         abort();
                                                     }
-                                                } else {
-                                                    deque_unlock_self(w);
                                                 }
                                             } else {
                                                 printf("ERROR: wrong cl status at bottom [%d] when mugging\n", cl->status);
-                                                deque_unlock_self(w);
                                                 abort();
                                             }
-                                        } else {
-                                            deque_unlock_self(w);
                                         }
+                                        deque_unlock_self(w);
+
                                         elastic_core_lock(w);
                                         elastic_mugging(w, victim);
                                         w->g->elastic_core->ptr_sleeping_inactive_deque--;
@@ -1199,8 +1195,8 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque]]);
                                                 w->g->elastic_core->ptr_sleeping_active_deque--;
                                                 print_cpu_state_group(w->g->program);
-                                                //printf("\t(D: p %d)(ptr_sleeping_active_deque %d)\n", w->g->program->control_uid, w->g->elastic_core->ptr_sleeping_active_deque);
                                                 elastic_core_unlock(w);
+                                                //printf("\t(D: p %d)(ptr_sleeping_active_deque %d)\n", w->g->program->control_uid, w->g->elastic_core->ptr_sleeping_active_deque);
                                                 if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
                                                     if (cl->status==CLOSURE_RUNNING) {
                                                         if (w->current_stack_frame!=NULL) {
@@ -1226,8 +1222,8 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 elastic_core_lock(w);
                                                 elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
                                                 w->g->elastic_core->ptr_sleeping_inactive_deque++;
-                                                //printf("(E: p %d)(ptr_sleeping_active_deque %d)\n", w->g->program->control_uid, w->g->elastic_core->ptr_sleeping_active_deque);
                                                 elastic_core_unlock(w);
+                                                //printf("(E: p %d)(ptr_sleeping_active_deque %d)\n", w->g->program->control_uid, w->g->elastic_core->ptr_sleeping_active_deque);
                                                 if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
                                                     res = NULL;
                                                 } else {
@@ -1261,17 +1257,13 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             //printf("TEST[%d]: request worker[%d] goto SLEEP_REQUESTED state, exc:%p\n", w->self, w->self, w->exc);
                                             deque_unlock_self(w);
                                             longjmp_to_user_code(w, cl);
-                                        } else {
-                                            deque_unlock_self(w);
                                         }
                                     } else {
                                         printf("ERROR: wrong cl status at bottom [%d] when deque is empty and go to sleep\n", cl->status);
-                                        deque_unlock_self(w);
                                         abort();
                                     }
-                                } else {
-                                    deque_unlock_self(w);
                                 }
+                                deque_unlock_self(w);
 
                                 if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_INACTIVE_DEQUE)) { 
                                     elastic_core_lock(w); //Zhe: Change
