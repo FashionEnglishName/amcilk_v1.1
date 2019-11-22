@@ -1522,10 +1522,12 @@ normal_point: //normal part, can not be preempted
             //choice 2
             //Best choice among the three
             w = __cilkrts_get_tls_worker();
-            int victim = rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque; // w->g->options.nproc;
-            int victim_worker_id = w->g->elastic_core->cpu_state_group[victim];
-            if(victim_worker_id != w->self && (w->l->elastic_s==ACTIVE )) {
-                t = Closure_steal(w, victim_worker_id);
+            if (w->l->elastic_s==ACTIVE) {
+                int victim = rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque;
+                int victim_worker_id = w->g->elastic_core->cpu_state_group[victim];
+                if(victim_worker_id != w->self) {
+                    t = Closure_steal(w, victim_worker_id);
+                }
             }
 
             //choice 3
