@@ -340,12 +340,10 @@ void container_plugin_enable_run_cycle(__cilkrts_worker * w) {
         platform_scheduling(w->g->program->G, w->g->program, EXIT_PROGRAM);
     }
 
-    int invoke_from_block;
-    invoke_from_block = 0;
     platform_program_request * first_request;
 new_point:
     //usleep(TIME_RESPONSE_NEW);
-    //printf("[RUN CONTAINER %d]: ***new a program*** %d\n", w->g->program->control_uid, invoke_from_block);
+    //printf("[RUN CONTAINER %d]: ***new a program***\n", w->g->program->control_uid);
     //printf("\t%d platform_pop_first_request todo\n", w->g->program->control_uid);
     first_request = platform_pop_first_request(w->g->program->G, w->g->program->control_uid);
     //printf("%p\n", first_request);
@@ -365,7 +363,6 @@ new_point:
         } else {
             //printf("[BLOCK CONTAINER %d] no request, enter block\n", w->g->program->control_uid);
             container_block(w);
-            invoke_from_block = 1;
             goto new_point;
         }
     } else {

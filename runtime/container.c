@@ -218,13 +218,13 @@ void container_do_elastic_adaption(platform_program * p) {
         printf("[PLATFORM ERROR]: a program is set to run on core 1, abort it\n");
         abort();
     }
-    //printf("\t%d %d container_do_elastic_adaption, get ptr done\n", p->control_uid, p->input);
+    printf("\t%d %d container_do_elastic_adaption, get ptr done\n", p->control_uid, p->input);
     for (i=2; i<p->g->options.nproc; i++) {
         if (p->g->workers[i]->l->elastic_pos_in_cpu_state_group>=active_worker_id_begin && p->g->workers[i]->l->elastic_pos_in_cpu_state_group<=active_worker_id_end && p->cpu_mask[i]==0 && p->g->workers[i]->l->elastic_s==ACTIVE) { //currently, cpu i is active and need to be inactive
             platform_try_sleep_worker(p, i);
         }
     }
-    //printf("\t%d(%d) scheduling request sleep first attempts done\n", p->control_uid, p->input);
+    printf("\t%d(%d) scheduling request sleep first attempts done\n", p->control_uid, p->input);
     t2 = micro_get_clock();
     for (i=2; i<p->g->options.nproc; i++) {
         if (p->g->workers[i]->l->elastic_pos_in_cpu_state_group>=active_worker_id_begin && p->g->workers[i]->l->elastic_pos_in_cpu_state_group<=active_worker_id_end && p->cpu_mask[i]==0) { //currently, cpu i is active and need to be inactive
@@ -232,7 +232,7 @@ void container_do_elastic_adaption(platform_program * p) {
         }
     }
     t3 = micro_get_clock();
-    //printf("\t%d(%d) scheduling check sleeping cores done\n", p->control_uid, p->input);
+    printf("\t%d(%d) scheduling check sleeping cores done\n", p->control_uid, p->input);
     for (i=2; i<p->g->options.nproc; i++) {
         if (p->g->workers[i]->l->elastic_pos_in_cpu_state_group<active_worker_id_begin && p->cpu_mask[i]==1) { //currently, cpu i is inactive and need to be active
             platform_guarantee_cancel_worker_sleep(p, i);
@@ -241,7 +241,7 @@ void container_do_elastic_adaption(platform_program * p) {
         }
     }
     t4 = micro_get_clock();
-    //printf("\t%d %d scheduling activating cores done\n", p->control_uid, p->input);
+    printf("\t%d %d scheduling activating cores done\n", p->control_uid, p->input);
     print_cpu_state_group(p);
     //printf("%f, %f, %f, %f\n", (t1-t0)/1000/1000/1000.0, (t2-t1)/1000/1000/1000.0, (t3-t2)/1000/1000/1000.0, (t4-t3)/1000/1000/1000.0);
 }

@@ -157,6 +157,7 @@ void platform_scheduling(platform_global_state * G, platform_program * p, enum P
         abort();
     }
 }
+
 void platform_preemption(platform_global_state * G, platform_program * p, enum PLATFORM_SCHEDULER_TYPE run_type) {
     //printf("[SCHEDULING %d]: do scheduling in run_type: %d\n", p->control_uid, run_type);
     platform_determine_scheduling(G, run_type);

@@ -179,11 +179,9 @@ void elastic_all_worker_frame_num_test(__cilkrts_worker *w) {
 void elastic_mugging(__cilkrts_worker *w, int victim){
     deque_lock(w, victim);
     deque_lock_self(w);
-    deque_assert_ownership(w, victim);
-    deque_assert_ownership(w, w->self);
     
     ReadyDeque * tmp = w->g->deques[w->self];
-    w->g->deques[w->self] = w->g->deques[victim]; //Chen: replace stealer's deque with victim's deque
+    w->g->deques[w->self] = w->g->deques[victim];
     w->g->deques[victim] = tmp;
   
     __cilkrts_stack_frame * volatile *tail_tmp = w->tail;
