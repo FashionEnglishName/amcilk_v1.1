@@ -353,13 +353,11 @@ new_point:
         if (first_request!=NULL) {
             printf("[NEW CONTAINER %d] input: %d\n", w->g->program->control_uid, w->g->program->input);
             container_setup_to_run(w->g->program, first_request);
-            //if (invoke_from_block==1) {
             program_set_activate_container_time_ns(w->g->program);
             //printf("\t%d do scheduling when new %d, elastic safe: %d, hint_stop: %d\n", w->g->program->control_uid, w->g->program->self, elastic_safe(w), w->g->program->hint_stop_container);
             platform_scheduling(w->g->program->G, w->g->program, NEW_PROGRAM);
             program_set_core_assignment_time_when_run_ns(w->g->program);
             platform_preemption(w->g->program->G, w->g->program, NEW_PROGRAM);
-            //}
         } else {
             //printf("[BLOCK CONTAINER %d] no request, enter block\n", w->g->program->control_uid);
             container_block(w);
@@ -367,12 +365,10 @@ new_point:
         }
     } else {
         container_setup_to_run(w->g->program, first_request);
-        //if (invoke_from_block==1) {
         program_set_activate_container_time_ns(w->g->program);
         //printf("\t%d do scheduling when new %d, elastic safe: %d, hint_stop: %d\n", w->g->program->control_uid, w->g->program->self, elastic_safe(w), w->g->program->hint_stop_container);
         platform_scheduling(w->g->program->G, w->g->program, NEW_PROGRAM);
         program_set_core_assignment_time_when_run_ns(w->g->program);
-        
         platform_preemption(w->g->program->G, w->g->program, NEW_PROGRAM);
     }
     //pthread_spin_unlock(&(w->g->program->G->lock));
