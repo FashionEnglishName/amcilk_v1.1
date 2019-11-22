@@ -1537,15 +1537,15 @@ normal_point: //normal part, can not be preempted
             //choice 2
             //Best choice among the three
             w = __cilkrts_get_tls_worker();
-            elastic_core_lock(w);
             if (w->l->elastic_s==ACTIVE) {
+                elastic_core_lock(w);
                 int victim = rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque;
                 int victim_worker_id = w->g->elastic_core->cpu_state_group[victim];
                 if(victim_worker_id != w->self) {
                     t = Closure_steal(w, victim_worker_id);
                 }
+                elastic_core_unlock(w);
             }
-            elastic_core_unlock(w);
 
             //choice 3
             /*
