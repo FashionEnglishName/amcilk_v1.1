@@ -476,8 +476,9 @@ static void* scheduler_thread_proc(void * arg) {
                     elastic_core_unlock(w);
                     //printf("TEST[%d]: goto SLEEPING_INACTIVE_DEQUE state, E:%p, current_stack_frame:%p, state:%d, head:%p, tail:%p\n", w->self, w->exc, w->current_stack_frame, w->l->elastic_s, w->head, w->tail);
                     elastic_do_cond_sleep(w);
-                    w = __cilkrts_get_tls_worker(); //Chen
 
+                    //activated
+                    w = __cilkrts_get_tls_worker();
                     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
                         //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
                         elastic_core_lock(w);

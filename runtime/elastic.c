@@ -95,8 +95,8 @@ void elastic_do_cond_activate_poll_pipe(__cilkrts_worker *w) {
 }
 
 void elastic_do_cond_sleep(__cilkrts_worker *w) {
-    //elastic_do_cond_sleep_poll_pipe(w);
-    elastic_do_cond_sleep_pthread_mutex(w);
+    elastic_do_cond_sleep_poll_pipe(w);
+    //elastic_do_cond_sleep_pthread_mutex(w);
     if (w->l->elastic_s!=ACTIVATE_REQUESTED) {
         printf("[ERROR]: failed to sleep!\n");
         abort();
@@ -104,8 +104,8 @@ void elastic_do_cond_sleep(__cilkrts_worker *w) {
 }
 
 void elastic_do_cond_activate(__cilkrts_worker *w) {
-    //elastic_do_cond_activate_poll_pipe(w);
-    elastic_do_cond_activate_pthread_mutex(w);
+    elastic_do_cond_activate_poll_pipe(w);
+    //elastic_do_cond_activate_pthread_mutex(w);
 }
 
 void elastic_do_cond_activate_for_exit(__cilkrts_worker *w) {
