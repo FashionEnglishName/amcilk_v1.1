@@ -327,7 +327,7 @@ void platform_guarantee_sleep_worker(platform_program * p, int cpu_id) {
             }
             usleep(TIME_MAKE_SURE_TO_SLEEP);
             if (count>GUARANTEE_PREMPT_WAITING_TIME) {
-                printf("ERROR! (p:%d w:%d) guarantee sleep failed in worker %d in e state %d (p:%d, last:%d)\n", w->g->program->control_uid, w->self, cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
+                printf("ERROR! (p:%d w:%d) guarantee sleep failed in (p:%d w:%d last:%d) in e state %d\n", w->g->program->control_uid, w->self, p->control_uid, cpu_id, p->last_do_exit_worker_id, p->g->workers[cpu_id]->l->elastic_s);
                 abort();
             }
             Cilk_fence();
@@ -351,7 +351,7 @@ void platform_guarantee_sleep_inactive_deque_worker(platform_program * p, int cp
             }
             usleep(TIME_MAKE_SURE_TO_SLEEP);
             if (count>GUARANTEE_PREMPT_WAITING_TIME) {
-                printf("ERROR! (p:%d w:%d) guarantee sleep_inactive_deque failed in worker %d in e state %d (p:%d, last:%d)\n", w->g->program->control_uid, w->self, cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
+                printf("ERROR! (p:%d w:%d) guarantee sleep_inactive_deque failed in (p:%d w:%d last:%d) in e state %d)\n", w->g->program->control_uid, w->self, p->control_uid, cpu_id, p->last_do_exit_worker_id, p->g->workers[cpu_id]->l->elastic_s);
                 abort();
             }
             Cilk_fence();
@@ -383,7 +383,7 @@ void platform_guarantee_activate_worker(platform_program * p, int cpu_id) {
             count++;
             usleep(TIME_MAKE_SURE_TO_ACTIVATE);
             if (count>GUARANTEE_PREMPT_WAITING_TIME) {
-                printf("ERROR! (p:%d w:%d) guarantee activate failed in (p:%d) worker %d in e state %d (p:%d, last:%d)\n", w->g->program->control_uid, w->self, p->control_uid, cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
+                printf("ERROR! (p:%d w:%d) guarantee activate failed in (p:%d w:%d last:%d) in e state %d\n", w->g->program->control_uid, w->self, p->control_uid, cpu_id, p->last_do_exit_worker_id, p->g->workers[cpu_id]->l->elastic_s);
                 abort();
             }
             Cilk_fence();
@@ -430,7 +430,7 @@ void platform_guarantee_cancel_worker_sleep(platform_program * p, int cpu_id) {
             count++;
             usleep(TIME_MAKE_SURE_TO_ACTIVATE);
             if (count>GUARANTEE_PREMPT_WAITING_TIME) {
-                printf("ERROR! (p:%d w:%d) guarantee cancel sleep failed in worker %d in e state %d (p:%d, last:%d)\n", w->g->program->control_uid, w->self, cpu_id, p->g->workers[cpu_id]->l->elastic_s, p->control_uid, p->last_do_exit_worker_id);
+                printf("ERROR! (p:%d w:%d) guarantee cancel sleep failed in (p:%d w:%d last:%d) in e state %d\n", w->g->program->control_uid, w->self, p->control_uid, cpu_id, p->last_do_exit_worker_id, p->g->workers[cpu_id]->l->elastic_s);
                 abort();
             }
             Cilk_fence();
