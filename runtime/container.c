@@ -108,7 +108,7 @@ void container_setup_to_run(platform_program * p, platform_program_request* pr) 
     platform_deinit_program_request(pr);
     p->G->new_program = p;
     p->run_times++; //must before platform_register_program
-    platform_register_program(p); //becomes an instance
+    //platform_register_program(p); //becomes an instance//1122
     p->done_one = 0;
     //printf("!!!!!p e is %f", p->elastic_coefficient);
 }
