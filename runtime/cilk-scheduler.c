@@ -1493,14 +1493,20 @@ normal_point: //normal part, can not be preempted
         w = __cilkrts_get_tls_worker();
         if(!t) {
             // try to get work from our local queue
-            if (w->g->program->job_finish==1) {
-                goto job_finish_point;
-            } else if (w->g->program->hint_stop_container==1) {
-                goto stop_container_point;
-            } else if (w->l->elastic_s==SLEEP_REQUESTED) {
-                goto worker_sleep_point;
+            //deque_lock_self(w);
+            while(1) {
+                if (deque_trylock(w, w->self)==1) {
+                    break;
+                } else {
+                    if (w->g->program->job_finish==1) {
+                        goto job_finish_point;
+                    } else if (w->g->program->hint_stop_container==1) {
+                        goto stop_container_point;
+                    } else if (w->l->elastic_s==SLEEP_REQUESTED) {
+                        goto worker_sleep_point;
+                    }
+                }
             }
-            deque_lock_self(w);
             t = deque_xtract_bottom(w, w->self);
             deque_unlock_self(w);
         }
