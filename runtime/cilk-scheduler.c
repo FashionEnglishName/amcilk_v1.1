@@ -1495,8 +1495,6 @@ normal_point: //normal part, can not be preempted
             // try to get work from our local queue
             if (w->g->program->job_finish==1) { //directly goto job_finish before grab the lock will reduce overhead of preemption
                 goto job_finish_point;
-            } else if (w->l->elastic_s==SLEEP_REQUESTED) { //directly goto sleep before grab the lock will reduce overhead of preemption
-                goto worker_sleep_point;
             }
             deque_lock_self(w);
             t = deque_xtract_bottom(w, w->self);
