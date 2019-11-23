@@ -102,6 +102,7 @@ platform_global_state * platform_global_state_init(int argc, char* argv[]) {
     G->macro_test_acc_run_time = 0;
     G->macro_test_acc_latency = 0;
     G->macro_test_acc_flow_time = 0;
+    G->macro_test_num_scheduling_revision = 0;
     return G;
 }
 

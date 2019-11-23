@@ -28,7 +28,8 @@ void platform_determine_scheduling(platform_global_state * G, enum PLATFORM_SCHE
     tmp_p = G->program_head->next;
     while(tmp_p!=NULL) {
         if (tmp_p->try_num_cpu==0) {
-            printf("[WARNING]: p%d revise 0 core allocation\n", tmp_p->control_uid);
+            //printf("[WARNING]: p%d revise 0 core allocation\n", tmp_p->control_uid);
+            tmp_p->G->macro_test_num_scheduling_revision++;
             tmp_p->try_cpu_mask[tmp_p->invariant_running_worker_id] = 1;
             tmp_p->try_num_cpu = 1;
             tmp_p2 = G->program_head->next;
