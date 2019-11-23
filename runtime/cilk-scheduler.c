@@ -103,16 +103,8 @@ static void setup_for_execution(__cilkrts_worker * w, Closure *t) {
     w->tail = (__cilkrts_stack_frame **) w->l->shadow_stack;
 
     /* push the first frame on the current_stack_frame */
-    /*if (w->self==1) {
-                    printf("TEST[%d]: enter runtime normal 500!, current_stack_frame:%p, t->frame:%p\n", w->self, w->current_stack_frame, t->frame);
-                }*/
     w->current_stack_frame = t->frame;	
-    /*if (w->self==1) {
-                    printf("TEST[%d]: enter runtime normal 501!, current_stack_frame:%p, t->frame:%p\n", w->self, w->current_stack_frame, t->frame);
-                }*/
-    /*if (w->self==1 || w->self==3 || w->self==5) {
-        printf("ALERT[%d]: in reset_exception_pointer (setup_for_execution)\n", w->self);
-    }*/
+
     reset_exception_pointer(w, t);
 }
 
