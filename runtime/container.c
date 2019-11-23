@@ -153,7 +153,6 @@ void container_block(__cilkrts_worker * w) {
 
             //activated
             w = __cilkrts_get_tls_worker();
-            usleep(10);
             pthread_mutex_lock(&(w->g->program->G->lock));
             //pthread_spin_lock(&(w->g->program->G->lock));
             //printf("[G LOCK]: %d GET the G_lock\n", w->g->program->control_uid);
@@ -175,6 +174,7 @@ void container_block(__cilkrts_worker * w) {
         w->g->elastic_core->ptr_sleeping_inactive_deque++;
         elastic_core_unlock(w);
         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
+            usleep(10);
             w->g->program->hint_stop_container = 0;
             //printf("Activated!\n");
         }
