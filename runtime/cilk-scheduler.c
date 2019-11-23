@@ -1537,7 +1537,10 @@ normal_point: //normal part, can not be preempted
                 w->g->workers[victim_worker_id]->l->elastic_s==TO_SLEEP)) {
                 t = Closure_steal(w, victim_worker_id);
             } else if (victim_worker_id != w->self) {
-                printf("s%d w%d, %d\n", w->self, victim_worker_id, w->g->workers[victim_worker_id]->l->elastic_s);
+                //printf("s%d w%d, %d\n", w->self, victim_worker_id, w->g->workers[victim_worker_id]->l->elastic_s);
+                //pass
+            } else {
+                //pass
             }
 
             //choice 3
