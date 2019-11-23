@@ -23,7 +23,7 @@ void container_do_elastic_adaption(platform_program * p);
 void container_set_init_run(platform_program * p);
 void container_print_result(__cilkrts_worker * w);
 void container_setup_to_run(platform_program * p, platform_program_request* pr);
-void container_block(__cilkrts_worker * w);
+void container_block(__cilkrts_worker * w, int run_request_before_block);
 platform_program * get_container(platform_global_state *G, int uid);
 platform_program * get_container_by_control_uid(platform_global_state * G, int control_uid);
 
