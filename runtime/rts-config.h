@@ -28,7 +28,7 @@
 //server end spec
 #define CONTAINER_COUNT 14
 #define TIME_MAKE_SURE_TO_SLEEP 100//100 //important! depends of the size of a single frame
-#define TIME_MAKE_SURE_TO_ACTIVATE 1000//100 //important! depends of implementation of block/activate mechanism
+#define TIME_MAKE_SURE_TO_ACTIVATE 10000//100 //important! depends of implementation of block/activate mechanism
 #define TIME_EXIT_CTX_SWITCH 100 //important! can not be too small for the efficiency
 #define TIME_REQUEST_RECEIVE_INTERVAL 35000//Bing: 50000, 45000, 75301; Finance:
 #define TIME_CONTAINER_TRIGGER_INTERVAL TIME_REQUEST_RECEIVE_INTERVAL/2 //important! when workload is high
