@@ -153,7 +153,7 @@ void container_block(__cilkrts_worker * w) {
 
             //activated
             w = __cilkrts_get_tls_worker();
-            usleep(1000);
+            usleep(10);
             pthread_mutex_lock(&(w->g->program->G->lock));
             //pthread_spin_lock(&(w->g->program->G->lock));
             //printf("[G LOCK]: %d GET the G_lock\n", w->g->program->control_uid);
