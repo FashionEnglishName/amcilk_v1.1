@@ -216,6 +216,7 @@ struct platform_program {
     volatile int job_finish;
     volatile int last_do_exit_worker_id;
     volatile int is_switching;
+    volatile int run_request_before_block;
 
     struct platform_program * next;
     struct platform_program * prev;

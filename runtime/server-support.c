@@ -331,6 +331,7 @@ new_point:
         first_request = platform_pop_first_request(w->g->program->G, 0);
         if (first_request!=NULL) {
             printf("[NEW CONTAINER %d] input: %d\n", w->g->program->control_uid, w->g->program->input);
+            w->g->program->run_request_before_block = 1;
             platform_activate_container(w->g->program);//1122
             container_setup_to_run(w->g->program, first_request);
             program_set_activate_container_time_ns(w->g->program);
@@ -339,7 +340,8 @@ new_point:
             platform_preemption(w->g->program->G, w->g->program, NEW_PROGRAM);
         } else {
             //printf("[BLOCK CONTAINER %d] no request, enter block\n", w->g->program->control_uid);
-            container_block(w);
+            container_block(w, w->g->program->run_request_before_block);
+            w->g->program->run_request_before_block = 0;
             goto new_point;
         }
     } else {
