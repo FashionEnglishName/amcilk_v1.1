@@ -967,7 +967,8 @@ __attribute__((noreturn)) void longjmp_to_runtime(__cilkrts_worker * w) {
     CILK_STOP_TIMING(w, INTERVAL_WORK);
     CILK_START_TIMING(w, INTERVAL_SCHED);
     //__sync_bool_compare_and_swap(&(w->l->is_in_runtime), 0, 1);
-    Cilk_fence();
+    //Cilk_fence();
+    CILK_MB();
     __builtin_longjmp(w->l->rts_ctx, 1);
 }
 
