@@ -1147,6 +1147,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                         //printf("TEST[%d]: goto SLEEPING_ADAPTING_DEQUE state (deque is empty), E:%p, current_stack_frame:%p, state:%d\n", w->self, w->exc, w->current_stack_frame, w->l->elastic_s);
                         if (w->head <= w->tail) { //the worker is set to sleep and its deque is not empty;   
                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), TO_SLEEP, SLEEPING_ADAPTING_DEQUE)) {
+                                deque_lock_self(w);
                                 elastic_core_lock(w);
                                 w->g->elastic_core->ptr_sleeping_active_deque++;
                                 //printf("(B: p %d)(ptr_sleeping_active_deque %d)\n", w->g->program->control_uid, w->g->elastic_core->ptr_sleeping_active_deque);
@@ -1154,6 +1155,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                 elastic_core_unlock(w);
                                 if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
                                     //printf("TEST[%d]: goto SLEEPING_ACTIVE_DEQUE state (deque is not empty), E:%p, current_stack_frame:%p, state:%d\n", w->self, w->exc, w->current_stack_frame, w->l->elastic_s);
+                                    deque_unlock_self(w);
                                     elastic_do_cond_sleep(w);
 
                                     //activated
@@ -1231,6 +1233,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                     }
                                 } else {
                                     printf("ERROR: SLEEPING_ADAPTING_DEQUE is changed by others\n");
+                                    deque_lock_self(w);
                                     abort();
                                 }
                             }
@@ -1532,7 +1535,9 @@ normal_point: //normal part, can not be preempted
             int victim_worker_id = w->g->elastic_core->cpu_state_group[victim];
             if(victim_worker_id != w->self && 
                 (w->g->workers[victim_worker_id]->l->elastic_s==ACTIVE || 
-                w->g->workers[victim_worker_id]->l->elastic_s==SLEEPING_ACTIVE_DEQUE)) {
+                w->g->workers[victim_worker_id]->l->elastic_s==SLEEPING_ACTIVE_DEQUE || 
+                w->g->workers[victim_worker_id]->l->elastic_s==SLEEP_REQUESTED ||
+                w->g->workers[victim_worker_id]->l->elastic_s==TO_SLEEP)) {
                 t = Closure_steal(w, victim_worker_id);
             } else {
                 //pass
