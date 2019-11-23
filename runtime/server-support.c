@@ -311,6 +311,13 @@ void container_plugin_enable_run_cycle(__cilkrts_worker * w) {
     //printf("[PLATFORM]: p:%d, w->g->program->last_do_exit_worker_id: %d\n", w->g->program->control_uid, w->g->program->last_do_exit_worker_id);
     w->g->program->flag_enter_exit_routine = 0;
     //printf("[G LOCK]: %d TO GET the G_lock\n", w->g->program->control_uid);
+    w->g->program->hint_stop_container = 1;
+    int i = 2;
+    for (i=2; i<w->g->options.nproc; i++) {
+        if (i!=w->self) {
+            platform_guarantee_sleep_inactive_deque_worker(w->g->program, i);
+        }
+    }
     pthread_mutex_lock(&(w->g->program->G->lock));
     //pthread_spin_lock(&(w->g->program->G->lock));
     //printf("[G LOCK]: %d GET the G_lock\n", w->g->program->control_uid);

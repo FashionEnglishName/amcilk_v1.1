@@ -120,16 +120,16 @@ void print_all_last_exit_cpu_id(platform_global_state * G) {
 }
 
 void container_block(__cilkrts_worker * w) {
-    w->g->program->hint_stop_container = 1;
+    //w->g->program->hint_stop_container = 1;
     Cilk_fence();
     //wait until all other workers are sleeping
     program_set_begin_exit_time_ns(w->g->program);
-    int i = 2;
+    /*int i = 2;
     for (i=2; i<w->g->options.nproc; i++) {
         if (i!=w->self) {
             platform_guarantee_sleep_inactive_deque_worker(w->g->program, i);
         }
-    }
+    }*/
     program_set_sleeped_all_other_workers_time_ns(w->g->program);
 
     if (w->g->program->control_uid==0) { //???
