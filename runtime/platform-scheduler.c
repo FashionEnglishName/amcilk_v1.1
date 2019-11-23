@@ -93,11 +93,11 @@ void platform_determine_scheduling(platform_global_state * G, enum PLATFORM_SCHE
     //cpu_contain_map is done, then finish allocation by setting cpu_mask
 
     //see container map
-    /*printf("\tcontainer map: ");
+    printf("\tcontainer map: ");
     for(i=0; i<G->nproc; i++) {
         printf("%d ", G->cpu_container_map[i]);
     }
-    printf("\n");*/
+    printf("\n");
 
     //set cpu_mask according to cpu_container_map
     //printf("\tset cpu_mask according to cpu_container_map\n");
