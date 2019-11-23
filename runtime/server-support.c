@@ -307,6 +307,7 @@ int get_count_program_request_buffer(struct platform_global_state * G, int contr
 
 void container_plugin_enable_run_cycle(__cilkrts_worker * w) {
     //printf("[G LOCK]: %d TO GET the G_lock\n", w->g->program->control_uid);
+    usleep(10000);
     pthread_mutex_lock(&(w->g->program->G->lock));
     //pthread_spin_lock(&(w->g->program->G->lock));
     //printf("[G LOCK]: %d GET the G_lock\n", w->g->program->control_uid);
