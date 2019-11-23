@@ -47,8 +47,6 @@ void * main_thread_new_program_receiver(void * arg) {
 //plaform trigger idle container if necessary
 void * main_thread_thread_container_trigger(void * arg) {
     platform_global_state * G = (platform_global_state *)arg;
-
-    //server start
     platform_program_request * old_pr = NULL;
     platform_program_request * pr = NULL;
     int i = 0;
