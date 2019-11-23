@@ -130,6 +130,7 @@ run_point:
         w = __cilkrts_get_tls_worker();
         if (w->self==w->g->program->invariant_running_worker_id) {
             //printf("[PLATFORM]: invariant %d enters to the point after spawn_cilk_main\n", w->self);
+            w->g->program->running_job = 0;
         }
     }
 
@@ -163,7 +164,6 @@ run_point:
     //completed a job
     w = __cilkrts_get_tls_worker();
     sf = w->current_stack_frame;
-    w->g->program->running_job = 0;
     if (w->self==w->g->program->invariant_running_worker_id) {
         program_print_result_acc(w->g->program);
         if (w->g->program->mute==0) {
