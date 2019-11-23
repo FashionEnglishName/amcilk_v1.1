@@ -59,7 +59,7 @@ void * main_thread_thread_container_trigger(void * arg) {
             if (pr!=NULL) {
                 platform_program* p = get_container(G, pr->control_uid);
                 if (p!=NULL) {
-                    platform_guarantee_activate_worker(p, p->invariant_running_worker_id);
+                    platform_try_activate_worker(p, p->invariant_running_worker_id);
                 }
                 usleep(TIME_CONTAINER_TRIGGER_INTERVAL);
             }
@@ -70,7 +70,7 @@ void * main_thread_thread_container_trigger(void * arg) {
         if (pr==old_pr && pr!=NULL) {
             platform_program* p = get_container(G, pr->control_uid);
             if (p!=NULL) {
-                platform_guarantee_activate_worker(p, p->invariant_running_worker_id);
+                platform_try_activate_worker(p, p->invariant_running_worker_id);
             }
             usleep(TIME_CONTAINER_TRIGGER_INTERVAL);
         }
