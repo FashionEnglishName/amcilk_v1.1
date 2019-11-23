@@ -176,7 +176,7 @@ void container_block(__cilkrts_worker * w) {
             w->g->elastic_core->ptr_sleeping_inactive_deque++;
             elastic_core_unlock(w);
             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
-                w->g->program->hint_stop_container = 0;
+                //w->g->program->hint_stop_container = 0;
                 //printf("Activated!\n");
             }
         } else {
