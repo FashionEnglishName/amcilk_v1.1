@@ -146,10 +146,10 @@ run_point:
             } else {
                 // ANGE: Important to reset using sf->worker; 
                 // otherwise w gets cached in a register
-                w = sf->worker;
+                //w = sf->worker;
                 //__cilkrts_alert(ALERT_BOOT, "[%d]: (invoke_main) corrected worker after sync.\n", w->self);
-                w->g->program->running_job = 0;
                 w = __cilkrts_get_tls_worker();
+                w->g->program->running_job = 0;
                 if (w->self==w->g->program->invariant_running_worker_id) {
                     //printf("[PLATFORM]: invariant %d enters to the point after sync\n", w->self);
                 }
