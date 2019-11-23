@@ -959,7 +959,7 @@ __attribute__((noreturn)) void longjmp_to_runtime(__cilkrts_worker * w) {
     CILK_STOP_TIMING(w, INTERVAL_WORK);
     CILK_START_TIMING(w, INTERVAL_SCHED);
     //__sync_bool_compare_and_swap(&(w->l->is_in_runtime), 0, 1);
-    Cilk_fence();
+    //Cilk_fence();
     //CILK_MB();
     __builtin_longjmp(w->l->rts_ctx, 1);
 }
@@ -1519,17 +1519,6 @@ normal_point: //normal part, can not be preempted
             CILK_START_TIMING(w, INTERVAL_SCHED);
             CILK_START_TIMING(w, INTERVAL_IDLE);
 
-            //choice 1
-            /*elastic_core_lock(w);
-            int victim = rts_rand(w) % (w->g->elastic_core->ptr_sleeping_inactive_deque - (w->g->elastic_core->ptr_sleeping_active_deque+1)); // w->g->options.nproc;
-            int victim_worker_id = w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque+1 + victim];
-            if(victim_worker_id != w->self && w->l->elastic_s==ACTIVE) {
-                t = Closure_steal(w, victim_worker_id);
-            }
-            elastic_core_unlock(w);*/
-
-            //choice 2
-            //Best choice among the three
             w = __cilkrts_get_tls_worker();
             int victim = rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque;
             int victim_worker_id = w->g->elastic_core->cpu_state_group[victim];
@@ -1541,16 +1530,6 @@ normal_point: //normal part, can not be preempted
             } else {
                 //pass
             }
-
-            //choice 3
-            /*
-            w = __cilkrts_get_tls_worker();
-            if (w->l->elastic_s==ACTIVE) {
-                int victim = rts_rand(w) % w->g->options.nproc;
-                if(victim != w->self) {
-                    t = Closure_steal(w, victim);
-                }
-            }*/
 
 #if SCHED_STATS
             if(t) { // steal successful
