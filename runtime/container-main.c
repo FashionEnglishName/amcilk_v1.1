@@ -163,6 +163,7 @@ run_point:
     //completed a job
     w = __cilkrts_get_tls_worker();
     sf = w->current_stack_frame;
+    w->g->program->running_job = 0;
     if (w->self==w->g->program->invariant_running_worker_id) {
         program_print_result_acc(w->g->program);
         if (w->g->program->mute==0) {
@@ -172,7 +173,6 @@ run_point:
     }
     w = __cilkrts_get_tls_worker();
     if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), 0, -1)) {
-        w->g->program->running_job = 0;
         CILK_ASSERT_G(w == __cilkrts_get_tls_worker());
         w->g->cilk_main_return = _tmp;
         // WHEN_CILK_DEBUG(sf->magic = ~CILK_STACKFRAME_MAGIC);
