@@ -131,7 +131,7 @@ void container_block(__cilkrts_worker * w) {
         }
     }
     program_set_sleeped_all_other_workers_time_ns(w->g->program);
-
+    w->g->program->G->macro_test_num_stop_container++;
     if (w->g->program->control_uid==0) { //???
         w->g->done = 1;
     }

@@ -330,6 +330,7 @@ struct platform_global_state {
     unsigned long long macro_test_scheduling_begin_2;
     unsigned long long macro_test_scheduling_finish_2;
     unsigned long long macro_test_num_scheduling_revision;
+    unsigned long long macro_test_num_stop_container;
 };
 
 struct platform_program_request {
