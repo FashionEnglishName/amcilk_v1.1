@@ -1378,7 +1378,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                 printf("[ERROR]: last w %d enter runtime failed! (state %d is not ACTIVE or SLEEP_REQUESTED)\n", w->self, w->l->elastic_s);
                 abort();
             }
-            printf("[PLATFORM]: p %d worker %d enters to runtime loop! elastic_s: %d\n", w->g->program->control_uid, w->self, w->l->elastic_s);
+            //printf("[PLATFORM]: p %d worker %d enters to runtime loop! elastic_s: %d\n", w->g->program->control_uid, w->self, w->l->elastic_s);
         }
     }
 }

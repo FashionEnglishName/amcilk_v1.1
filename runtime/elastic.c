@@ -381,7 +381,7 @@ void platform_guarantee_activate_worker(platform_program * p, int cpu_id) {
         Cilk_fence();
         while(p->g->workers[cpu_id]->l->elastic_s!=ACTIVE) {
             if (__sync_bool_compare_and_swap(&(p->g->workers[cpu_id]->l->elastic_s), SLEEPING_INACTIVE_DEQUE, ACTIVATE_REQUESTED)) {
-                usleep(TIME_MAKE_SURE_TO_ACTIVATE);
+                usleep(TIME_MAKE_SURE_TO_ACTIVATE); //must before the activate for the efficiency of activation signal delivery
                 elastic_do_cond_activate(p->g->workers[cpu_id]);
             } else if (p->g->workers[cpu_id]->l->elastic_s!=EXIT_SWITCHING0 && 
                 p->g->workers[cpu_id]->l->elastic_s!=EXIT_SWITCHING1 && 
@@ -434,7 +434,7 @@ void platform_guarantee_cancel_worker_sleep(platform_program * p, int cpu_id) {
         Cilk_fence();
         while(p->g->workers[cpu_id]->l->elastic_s!=ACTIVE) {
             if (__sync_bool_compare_and_swap(&(p->g->workers[cpu_id]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, ACTIVATE_REQUESTED)) {
-                usleep(TIME_MAKE_SURE_TO_ACTIVATE);
+                usleep(TIME_MAKE_SURE_TO_ACTIVATE); //must before the activate for the efficiency of activation signal delivery
                 elastic_do_cond_activate(p->g->workers[cpu_id]);
             } else if (p->g->workers[cpu_id]->l->elastic_s!=EXIT_SWITCHING0 && 
                 p->g->workers[cpu_id]->l->elastic_s!=EXIT_SWITCHING1 && 

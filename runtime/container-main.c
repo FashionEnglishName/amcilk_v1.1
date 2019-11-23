@@ -128,7 +128,7 @@ run_point:
 
         w = __cilkrts_get_tls_worker();
         if (w->self==w->g->program->invariant_running_worker_id) {
-            printf("[PLATFORM]: invariant %d enters to the point after spawn_cilk_main\n", w->self);
+            //printf("[PLATFORM]: invariant %d enters to the point after spawn_cilk_main\n", w->self);
         }
     }
 
@@ -183,11 +183,11 @@ run_point:
     w = __cilkrts_get_tls_worker();
     if (w->self!=w->g->program->invariant_running_worker_id) {
         w->g->program->is_switching = 1;
-        printf("[PLATFORM]: worker %d jumps to runtime for switching invariant %d\n", w->self, w->g->program->invariant_running_worker_id);
+        //printf("[PLATFORM]: worker %d jumps to runtime for switching invariant %d\n", w->self, w->g->program->invariant_running_worker_id);
         //invariant should handle the last closure in its deque
         longjmp_to_runtime(w);
     } else {
-        printf("[PLATFORM]: invariant %d executes container_plugin_enable_run_cycle\n", w->self);
+        //printf("[PLATFORM]: invariant %d executes container_plugin_enable_run_cycle\n", w->self);
         w->g->program->is_switching = 0;
         //CILK_WMB();
         container_plugin_enable_run_cycle(w);
