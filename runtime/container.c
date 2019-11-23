@@ -175,6 +175,14 @@ void container_block(__cilkrts_worker * w) {
         elastic_core_unlock(w);
         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
             usleep(10000);
+            for (i=2; i<w->g->options.nproc; i++) {
+                if (i!=w->self) {
+                    platform_guarantee_sleep_inactive_deque_worker(w->g->program, i);
+                } else {
+                    printf("ERROR: someone activate a worker of a blocking container\n");
+                    abort();
+                }
+            }
             w->g->program->hint_stop_container = 0;
             //printf("Activated!\n");
         }
