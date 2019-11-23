@@ -1532,7 +1532,7 @@ normal_point: //normal part, can not be preempted
             int victim_worker_id = w->g->elastic_core->cpu_state_group[victim];
             if(victim_worker_id != w->self && 
                 (w->g->workers[victim_worker_id]->l->elastic_s==ACTIVE || 
-                //w->g->workers[victim_worker_id]->l->elastic_s==SLEEPING_ACTIVE_DEQUE || 
+                w->g->workers[victim_worker_id]->l->elastic_s==SLEEPING_ACTIVE_DEQUE || 
                 w->g->workers[victim_worker_id]->l->elastic_s==SLEEP_REQUESTED || 
                 w->g->workers[victim_worker_id]->l->elastic_s==TO_SLEEP)) {
                 t = Closure_steal(w, victim_worker_id);
