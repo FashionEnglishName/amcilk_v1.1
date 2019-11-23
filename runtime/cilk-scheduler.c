@@ -966,7 +966,7 @@ __attribute__((noreturn)) void longjmp_to_runtime(__cilkrts_worker * w) {
 
     CILK_STOP_TIMING(w, INTERVAL_WORK);
     CILK_START_TIMING(w, INTERVAL_SCHED);
-    __sync_bool_compare_and_swap(&(w->l->is_in_runtime), 0, 1);
+    //__sync_bool_compare_and_swap(&(w->l->is_in_runtime), 0, 1);
     //Cilk_fence();
     __builtin_longjmp(w->l->rts_ctx, 1);
 }
@@ -1468,14 +1468,12 @@ job_finish_point:
         if (w->g->program->job_finish==1) { //job_finish must compare with 1 since it may set as -1
             do_exit_switching_for_invariant_handling(w);
             reset_exception_pointer(w, t);
-            //t = NULL;
         }
 stop_container_point:
         w = __cilkrts_get_tls_worker();
         if (w->g->program->hint_stop_container==1) {
             do_exit_blocking_container_handling(w);
             reset_exception_pointer(w, t);
-            //t = NULL;
         }
 worker_sleep_point:
         w = __cilkrts_get_tls_worker();
