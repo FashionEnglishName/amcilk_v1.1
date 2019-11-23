@@ -82,6 +82,7 @@ void spawn_cilk_main(platform_program *p, int *res) {
     __cilkrts_stack_frame *sf = alloca(sizeof(__cilkrts_stack_frame));
     __cilkrts_enter_frame_fast(sf);
     __cilkrts_detach(sf);
+    p->running_job = 1;
     *res = cilk_main(p->self, p->input);
     __cilkrts_pop_frame(sf);
     __cilkrts_leave_frame(sf);
@@ -171,6 +172,7 @@ run_point:
     }
     w = __cilkrts_get_tls_worker();
     if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), 0, -1)) {
+        w->g->program->running_job = 0;
         CILK_ASSERT_G(w == __cilkrts_get_tls_worker());
         w->g->cilk_main_return = _tmp;
         // WHEN_CILK_DEBUG(sf->magic = ~CILK_STACKFRAME_MAGIC);

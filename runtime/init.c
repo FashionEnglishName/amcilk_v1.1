@@ -180,6 +180,7 @@ platform_program *container_init(platform_global_state *G, int control_uid, int 
     p->prev = NULL;
     p->control_uid = control_uid;
     p->is_switching = 0;
+    p->running_job = 1;
     p->invariant_running_worker_id = p->control_uid + 1; //workers: 2~N, containers: 1~N
     p->second_level_uid = second_level_uid;
     p->run_times = 0;
