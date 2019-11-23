@@ -1519,7 +1519,7 @@ normal_point: //normal part, can not be preempted
             CILK_START_TIMING(w, INTERVAL_IDLE);
 
             w = __cilkrts_get_tls_worker();
-            if (w->g->program->running_job==0) {
+            if (w->g->program->running_job==1) {
                 int victim = rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque;
                 int victim_worker_id = w->g->elastic_core->cpu_state_group[victim];
                 if(victim_worker_id != w->self && 
