@@ -156,13 +156,13 @@ void container_block(__cilkrts_worker * w) {
             if (__sync_bool_compare_and_swap(&(w->g->program->pickable), 0, 1)) {
                 printf("[STOP CONTAINER %d] (pickable: %d): invariant %d sleep! estate is %d\n", w->g->program->control_uid, w->g->program->pickable, w->self, w->l->elastic_s);
                 pthread_mutex_unlock(&(w->g->program->G->lock));
-                printf("[G LOCK]: %d RELEASE the G_lock\n", w->g->program->control_uid);
+                //printf("[G LOCK]: %d RELEASE the G_lock\n", w->g->program->control_uid);
                 elastic_do_cond_sleep(w);
 
                 //activated
                 w = __cilkrts_get_tls_worker();
                 pthread_mutex_lock(&(w->g->program->G->lock));
-                printf("[G LOCK]: %d GET the G_lock\n", w->g->program->control_uid);
+                //printf("[G LOCK]: %d GET the G_lock\n", w->g->program->control_uid);
             } else {
                 printf("[BUG %d] when stop, pickable state is error!\n", w->g->program->control_uid);
                 abort();

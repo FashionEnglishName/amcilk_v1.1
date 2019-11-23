@@ -313,10 +313,10 @@ void container_plugin_enable_run_cycle(__cilkrts_worker * w) {
     //Boundary: do not enter exit routine and create routine at the same time
     //printf("[PLATFORM]: p:%d, w->g->program->last_do_exit_worker_id: %d\n", w->g->program->control_uid, w->g->program->last_do_exit_worker_id);
     w->g->program->flag_enter_exit_routine = 0;
-    printf("[G LOCK]: %d TO GET the G_lock\n", w->g->program->control_uid);
+    //printf("[G LOCK]: %d TO GET the G_lock\n", w->g->program->control_uid);
     pthread_mutex_lock(&(w->g->program->G->lock));
     //pthread_spin_lock(&(w->g->program->G->lock));
-    printf("[G LOCK]: %d GET the G_lock\n", w->g->program->control_uid);
+    //printf("[G LOCK]: %d GET the G_lock\n", w->g->program->control_uid);
     w->g->program->flag_enter_exit_routine = 1;
     w->g->program->done_one = 1;
     w->g->program->G->most_recent_stop_program_cpumask = w->g->program->cpu_mask;
@@ -375,5 +375,5 @@ new_point:
     }
     //pthread_spin_unlock(&(w->g->program->G->lock));
     pthread_mutex_unlock(&(w->g->program->G->lock));
-    printf("[G LOCK]: %d RELEASE the G_lock\n", w->g->program->control_uid);
+    //printf("[G LOCK]: %d RELEASE the G_lock\n", w->g->program->control_uid);
 }
