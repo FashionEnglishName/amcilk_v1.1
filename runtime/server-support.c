@@ -307,10 +307,7 @@ int get_count_program_request_buffer(struct platform_global_state * G, int contr
     }
 }
 
-//enable container for run cycle
 void container_plugin_enable_run_cycle(__cilkrts_worker * w) {
-    //program complete
-    //Boundary: do not enter exit routine and create routine at the same time
     //printf("[PLATFORM]: p:%d, w->g->program->last_do_exit_worker_id: %d\n", w->g->program->control_uid, w->g->program->last_do_exit_worker_id);
     w->g->program->flag_enter_exit_routine = 0;
     //printf("[G LOCK]: %d TO GET the G_lock\n", w->g->program->control_uid);
@@ -322,10 +319,6 @@ void container_plugin_enable_run_cycle(__cilkrts_worker * w) {
     w->g->program->G->most_recent_stop_program_cpumask = w->g->program->cpu_mask;
     w->g->program->G->stop_program = w->g->program;
     //print_elastic_safe(w->g->program);
-
-    //deregister from the global list if non periodic program
-    //platform_deactivate_container(w->g->program); //1122
-    //printf("\t%d deregister program\n", w->g->program->control_uid);
 
     if (w->g->program->mute==0) {
         platform_response_to_client(w->g->program);
@@ -343,9 +336,6 @@ void container_plugin_enable_run_cycle(__cilkrts_worker * w) {
 
     platform_program_request * first_request;
 new_point:
-    //usleep(TIME_RESPONSE_NEW);
-    //printf("[RUN CONTAINER %d]: ***new a program***\n", w->g->program->control_uid);
-    //printf("\t%d platform_pop_first_request todo\n", w->g->program->control_uid);
     first_request = platform_pop_first_request(w->g->program->G, w->g->program->control_uid);
     //printf("%p\n", first_request);
     if (first_request==NULL) {
@@ -356,7 +346,6 @@ new_point:
             platform_activate_container(w->g->program);//1122
             container_setup_to_run(w->g->program, first_request);
             program_set_activate_container_time_ns(w->g->program);
-            //printf("\t%d do scheduling when new %d, elastic safe: %d, hint_stop: %d\n", w->g->program->control_uid, w->g->program->self, elastic_safe(w), w->g->program->hint_stop_container);
             platform_scheduling(w->g->program->G, w->g->program, NEW_PROGRAM);
             program_set_core_assignment_time_when_run_ns(w->g->program);
             platform_preemption(w->g->program->G, w->g->program, NEW_PROGRAM);

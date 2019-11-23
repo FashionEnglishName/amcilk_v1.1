@@ -102,15 +102,12 @@ void container_set_init_run(platform_program * p) {
 }
 
 void container_setup_to_run(platform_program * p, platform_program_request* pr) {
-    //printf("[RUN CONTAINER %d] (pickable: %d)\n", p->control_uid, p->pickable);              
     //set container
     container_set_by_request(p, pr);
     platform_deinit_program_request(pr);
     p->G->new_program = p;
     p->run_times++; //must before platform_activate_container
-    //platform_activate_container(p); //becomes an instance//1122
     p->done_one = 0;
-    //printf("!!!!!p e is %f", p->elastic_coefficient);
 }
 
 void print_all_last_exit_cpu_id(platform_global_state * G) {
@@ -123,7 +120,6 @@ void print_all_last_exit_cpu_id(platform_global_state * G) {
 }
 
 void container_block(__cilkrts_worker * w) {
-    //printf("\t%d enter exit\n", w->g->program->control_uid);
     w->g->program->hint_stop_container = 1;
     Cilk_fence();
     //wait until all other workers are sleeping
@@ -146,22 +142,21 @@ void container_block(__cilkrts_worker * w) {
             w->g->elastic_core->ptr_sleeping_inactive_deque--;
             elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
             elastic_core_unlock(w); //Zhe: Change
-            //printf("\t%d adapt elastic state and global array, last_do_exit_worker_id is %d\n", w->g->program->control_uid, w->g->program->last_do_exit_worker_id);
-            //pthread_spin_unlock(&(w->g->program->G->lock));
             //exit scheduling
             if (w->g->program->G->nprogram_running!=0) {
-                //printf("\tdo scheduling when exit %d\n", w->g->program->control_uid);
                 platform_preemption(w->g->program->G, w->g->program, EXIT_PROGRAM);
             }
             if (__sync_bool_compare_and_swap(&(w->g->program->pickable), 0, 1)) {
                 printf("[STOP CONTAINER %d] (pickable: %d): invariant %d sleep! estate is %d\n", w->g->program->control_uid, w->g->program->pickable, w->self, w->l->elastic_s);
                 pthread_mutex_unlock(&(w->g->program->G->lock));
+                //pthread_spin_unlock(&(w->g->program->G->lock));
                 //printf("[G LOCK]: %d RELEASE the G_lock\n", w->g->program->control_uid);
                 elastic_do_cond_sleep(w);
 
                 //activated
                 w = __cilkrts_get_tls_worker();
                 pthread_mutex_lock(&(w->g->program->G->lock));
+                //pthread_spin_lock(&(w->g->program->G->lock));
                 //printf("[G LOCK]: %d GET the G_lock\n", w->g->program->control_uid);
             } else {
                 printf("[BUG %d] when stop, pickable state is error!\n", w->g->program->control_uid);
@@ -175,10 +170,6 @@ void container_block(__cilkrts_worker * w) {
 
         //new run preparation
         w = __cilkrts_get_tls_worker();
-        //printf("\t%d prepare new cycle\n", w->g->program->control_uid);
-        //pthread_spin_lock(&(w->g->program->G->lock));
-        //printf("\t%d grab the big lock when new\n", w->g->program->control_uid);
-        //printf("[RUNNING %d]: worker %d activated! estate is %d\n", w->g->program->control_uid, w->self, w->l->elastic_s);
         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
             elastic_core_lock(w);
             elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
