@@ -206,10 +206,11 @@ void program_print_result_acc(platform_program * p) {
     p->G->macro_test_acc_run_time = p->G->macro_test_acc_run_time + program_get_run_time_ns(p)/1000/1000/1000.0;
     p->G->macro_test_acc_latency = p->G->macro_test_acc_latency + program_get_response_latency_ns(p)/1000/1000/1000.0;
     p->G->macro_test_acc_flow_time = p->G->macro_test_acc_flow_time + program_get_flow_time_ns(p)/1000/1000/1000.0;
-    printf("[FINISH CONTAINER %d]: (input: %d)num: %llu, buff: %d, run: %f, latency: %f, flow: %f\n", 
+    printf("[FINISH CONTAINER %d]: (input: %d)num: %llu, buff: %d, run: %f, latency: %f, flow: %f, aver flow: %f\n", 
             p->control_uid, p->input, p->G->macro_test_num_programs_executed,
             get_count_program_request_buffer(p->G, 0), 
             p->G->macro_test_acc_run_time,
             p->G->macro_test_acc_latency,
-            p->G->macro_test_acc_flow_time);
+            p->G->macro_test_acc_flow_time,
+            p->G->macro_test_acc_flow_time/p->G->macro_test_num_programs_executed);
 }
