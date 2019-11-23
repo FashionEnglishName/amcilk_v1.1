@@ -324,8 +324,8 @@ void platform_guarantee_sleep_worker(platform_program * p, int cpu_id) {
             p->g->workers[cpu_id]->l->elastic_s!=SLEEPING_ADAPTING_DEQUE && 
             p->g->workers[cpu_id]->l->elastic_s!=SLEEPING_MUGGING_DEQUE)) {
             if (__sync_bool_compare_and_swap(&(p->g->workers[cpu_id]->l->elastic_s), ACTIVE, SLEEP_REQUESTED)) {
-                printf("\t (p:%d w:%d) guarantee %d worker %d is in ACTIVE state, set as SLEEP_REQUESTED\n", 
-                    w->g->program->control_uid, w->self, p->control_uid, cpu_id);
+                //printf("\t (p:%d w:%d) guarantee %d worker %d is in ACTIVE state, set as SLEEP_REQUESTED\n", 
+                //    w->g->program->control_uid, w->self, p->control_uid, cpu_id);
             }
             //usleep(TIME_MAKE_SURE_TO_SLEEP);
             p->g->workers[cpu_id]->exc = p->g->workers[cpu_id]->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
