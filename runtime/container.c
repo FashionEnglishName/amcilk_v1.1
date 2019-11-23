@@ -124,7 +124,6 @@ void container_block(__cilkrts_worker * w) {
     Cilk_fence();
     //wait until all other workers are sleeping
     program_set_begin_exit_time_ns(w->g->program);
-    platform_program_request * first_request;
     int i = 2;
     for (i=2; i<w->g->options.nproc; i++) {
         if (i!=w->self) {
