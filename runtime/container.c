@@ -1,7 +1,7 @@
 #include "container.h"
 #include "membar.h"
 
-void platform_register_program(platform_program * new_p) {
+void platform_activate_container(platform_program * new_p) {
     if (new_p->periodic!=1 || new_p->run_times==1) {
         platform_program * p = new_p->G->program_head;
         while (p->next!=NULL) {
@@ -13,7 +13,7 @@ void platform_register_program(platform_program * new_p) {
     }
 }
 
-void platform_deregister_program(platform_program * p) {
+void platform_deactivate_container(platform_program * p) {
     //for non periodic scheduling, remove p from program_list
     if (p->periodic==0) {
         p->prev->next = p->next;
@@ -107,8 +107,8 @@ void container_setup_to_run(platform_program * p, platform_program_request* pr) 
     container_set_by_request(p, pr);
     platform_deinit_program_request(pr);
     p->G->new_program = p;
-    p->run_times++; //must before platform_register_program
-    //platform_register_program(p); //becomes an instance//1122
+    p->run_times++; //must before platform_activate_container
+    //platform_activate_container(p); //becomes an instance//1122
     p->done_one = 0;
     //printf("!!!!!p e is %f", p->elastic_coefficient);
 }
@@ -156,8 +156,10 @@ void container_block(__cilkrts_worker * w) {
                 printf("[STOP CONTAINER %d] (pickable: %d): invariant %d sleep! estate is %d\n", w->g->program->control_uid, w->g->program->pickable, w->self, w->l->elastic_s);
                 pthread_mutex_unlock(&(w->g->program->G->lock));
                 printf("[G LOCK]: %d RELEASE the G_lock\n", w->g->program->control_uid);
+                platform_deactivate_container(w->g->program);//1122
                 elastic_do_cond_sleep(w);
-
+                platform_activate_container(w->g->program);//1122
+                //should wait until others do scheduling
                 w = __cilkrts_get_tls_worker();
                 w->g->program->hint_stop_container = 0;
                 pthread_mutex_lock(&(w->g->program->G->lock));

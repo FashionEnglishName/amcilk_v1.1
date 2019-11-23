@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
         }
         p->num_cpu = p->G->nproc-2;
         p->try_num_cpu = p->G->nproc-2;
-        platform_register_program(p);
+        platform_activate_container(p);
         run_program(G, p);
         usleep(1000*500); //to guarantee the correctness of the jump buffer: should be non-null
     }

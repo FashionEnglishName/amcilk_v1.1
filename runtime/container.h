@@ -16,8 +16,8 @@
 #include "micro-bench-support.h"
 extern void container_set_by_request(platform_program * p, platform_program_request * pr);
 
-void platform_register_program(platform_program * new_p);
-void platform_deregister_program(platform_program * p);
+void platform_activate_container(platform_program * new_p);
+void platform_deactivate_container(platform_program * p);
 
 void container_do_elastic_adaption(platform_program * p);
 void container_set_init_run(platform_program * p);

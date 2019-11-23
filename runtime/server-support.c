@@ -324,7 +324,7 @@ void container_plugin_enable_run_cycle(__cilkrts_worker * w) {
     //print_elastic_safe(w->g->program);
 
     //deregister from the global list if non periodic program
-    //platform_deregister_program(w->g->program); //1122
+    //platform_deactivate_container(w->g->program); //1122
     //printf("\t%d deregister program\n", w->g->program->control_uid);
 
     if (w->g->program->mute==0) {
@@ -360,9 +360,9 @@ new_point:
             platform_preemption(w->g->program->G, w->g->program, NEW_PROGRAM);
         } else {
             //printf("[BLOCK CONTAINER %d] no request, enter block\n", w->g->program->control_uid);
-            platform_deregister_program(w->g->program);//1122
+            //platform_deactivate_container(w->g->program);//1122
             container_block(w);
-            platform_register_program(w->g->program);//1122
+            //platform_activate_container(w->g->program);//1122
             goto new_point;
         }
     } else {
