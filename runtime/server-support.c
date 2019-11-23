@@ -311,13 +311,6 @@ void container_plugin_enable_run_cycle(__cilkrts_worker * w) {
     //printf("[PLATFORM]: p:%d, w->g->program->last_do_exit_worker_id: %d\n", w->g->program->control_uid, w->g->program->last_do_exit_worker_id);
     w->g->program->flag_enter_exit_routine = 0;
     //printf("[G LOCK]: %d TO GET the G_lock\n", w->g->program->control_uid);
-    w->g->program->hint_stop_container = 1;
-    int i = 2;
-    for (i=2; i<w->g->options.nproc; i++) {
-        if (i!=w->self) {
-            platform_guarantee_sleep_inactive_deque_worker(w->g->program, i);
-        }
-    }
     pthread_mutex_lock(&(w->g->program->G->lock));
     //pthread_spin_lock(&(w->g->program->G->lock));
     //printf("[G LOCK]: %d GET the G_lock\n", w->g->program->control_uid);
@@ -355,7 +348,6 @@ new_point:
             program_set_activate_container_time_ns(w->g->program);
             platform_scheduling(w->g->program->G, w->g->program, NEW_PROGRAM);
             program_set_core_assignment_time_when_run_ns(w->g->program);
-            w->g->program->hint_stop_container = 0;
             platform_preemption(w->g->program->G, w->g->program, NEW_PROGRAM);
         } else {
             //printf("[BLOCK CONTAINER %d] no request, enter block\n", w->g->program->control_uid);
@@ -368,7 +360,6 @@ new_point:
         //printf("\t%d do scheduling when new %d, elastic safe: %d, hint_stop: %d\n", w->g->program->control_uid, w->g->program->self, elastic_safe(w), w->g->program->hint_stop_container);
         platform_scheduling(w->g->program->G, w->g->program, NEW_PROGRAM);
         program_set_core_assignment_time_when_run_ns(w->g->program);
-        w->g->program->hint_stop_container = 0;
         platform_preemption(w->g->program->G, w->g->program, NEW_PROGRAM);
     }
     //pthread_spin_unlock(&(w->g->program->G->lock));
