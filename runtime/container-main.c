@@ -164,6 +164,10 @@ run_point:
     sf = w->current_stack_frame;
     if (w->self==w->g->program->invariant_running_worker_id) {
         program_print_result_acc(w->g->program);
+        if (w->g->program->mute==0) {
+            platform_response_to_client(w->g->program);
+            //printf("\t%d response to client done!\n", w->g->program->control_uid);
+        }
     }
     w = __cilkrts_get_tls_worker();
     if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), 0, -1)) {

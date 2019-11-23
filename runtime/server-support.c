@@ -316,11 +316,6 @@ void container_plugin_enable_run_cycle(__cilkrts_worker * w) {
     w->g->program->G->most_recent_stop_program_cpumask = w->g->program->cpu_mask;
     w->g->program->G->stop_program = w->g->program;
 
-    if (w->g->program->mute==0) {
-        platform_response_to_client(w->g->program);
-        //printf("\t%d response to client done!\n", w->g->program->control_uid);
-    }
-
     //print_num_ancestor();
 
     //exit scheduling
