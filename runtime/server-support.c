@@ -308,25 +308,20 @@ int get_count_program_request_buffer(struct platform_global_state * G, int contr
 }
 
 void container_plugin_enable_run_cycle(__cilkrts_worker * w) {
-    //printf("[PLATFORM]: p:%d, w->g->program->last_do_exit_worker_id: %d\n", w->g->program->control_uid, w->g->program->last_do_exit_worker_id);
-    w->g->program->flag_enter_exit_routine = 0;
     //printf("[G LOCK]: %d TO GET the G_lock\n", w->g->program->control_uid);
     pthread_mutex_lock(&(w->g->program->G->lock));
     //pthread_spin_lock(&(w->g->program->G->lock));
     //printf("[G LOCK]: %d GET the G_lock\n", w->g->program->control_uid);
-    w->g->program->flag_enter_exit_routine = 1;
     w->g->program->done_one = 1;
     w->g->program->G->most_recent_stop_program_cpumask = w->g->program->cpu_mask;
     w->g->program->G->stop_program = w->g->program;
-    //print_elastic_safe(w->g->program);
 
     if (w->g->program->mute==0) {
         platform_response_to_client(w->g->program);
         //printf("\t%d response to client done!\n", w->g->program->control_uid);
     }
 
-    //program_print_result_acc(w->g->program);
-    print_num_ancestor();
+    //print_num_ancestor();
 
     //exit scheduling
     platform_deactivate_container(w->g->program);//1122
@@ -337,10 +332,8 @@ void container_plugin_enable_run_cycle(__cilkrts_worker * w) {
     platform_program_request * first_request;
 new_point:
     first_request = platform_pop_first_request(w->g->program->G, w->g->program->control_uid);
-    //printf("%p\n", first_request);
     if (first_request==NULL) {
         first_request = platform_pop_first_request(w->g->program->G, 0);
-        //printf("%p\n", first_request);
         if (first_request!=NULL) {
             printf("[NEW CONTAINER %d] input: %d\n", w->g->program->control_uid, w->g->program->input);
             platform_activate_container(w->g->program);//1122
@@ -357,7 +350,6 @@ new_point:
     } else {
         container_setup_to_run(w->g->program, first_request);
         program_set_activate_container_time_ns(w->g->program);
-        //printf("\t%d do scheduling when new %d, elastic safe: %d, hint_stop: %d\n", w->g->program->control_uid, w->g->program->self, elastic_safe(w), w->g->program->hint_stop_container);
         platform_scheduling(w->g->program->G, w->g->program, NEW_PROGRAM);
         program_set_core_assignment_time_when_run_ns(w->g->program);
         platform_preemption(w->g->program->G, w->g->program, NEW_PROGRAM);

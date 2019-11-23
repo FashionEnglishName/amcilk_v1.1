@@ -210,14 +210,12 @@ struct platform_program {
     struct platform_program_request * request_buffer_head;
     pthread_spinlock_t request_buffer_lock;
 
-    pthread_spinlock_t stop_lock;
-    pthread_spinlock_t run_lock;
-    pthread_spinlock_t exit_lock;
-    pthread_spinlock_t trigger_lock;
-    pthread_spinlock_t scheduling_lock;
+    int invariant_running_worker_id;
     volatile int pickable;
     volatile int hint_stop_container;
-    volatile int flag_enter_exit_routine;
+    volatile int job_finish;
+    volatile int last_do_exit_worker_id;
+    volatile int is_switching;
 
     struct platform_program * next;
     struct platform_program * prev;
@@ -227,15 +225,7 @@ struct platform_program {
     int input;
     int control_uid;
     int second_level_uid;
-    volatile int last_do_exit_worker_id;
-    volatile int last_exit_worker_entered_runtime;
-    volatile int is_switching;
     int mute;
-
-    jmpbuf container_exit_handling_ctx;
-    int invariant_running_worker_id;
-    volatile int job_finish;
-    volatile int jump_to_exit_handler;
 
     int periodic;
     unsigned long long next_period_feedback_s;

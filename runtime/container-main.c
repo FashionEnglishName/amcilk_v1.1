@@ -174,7 +174,7 @@ run_point:
         w->g->program->last_do_exit_worker_id = w->self; //must update before set job_finish.
         CILK_WMB();
         if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), -1, 1)) {
-            //CILK_WMB();
+            //pass
         } else {
             printf("???1\n");
             abort();
@@ -189,7 +189,6 @@ run_point:
     } else {
         //printf("[PLATFORM]: invariant %d executes container_plugin_enable_run_cycle\n", w->self);
         w->g->program->is_switching = 0;
-        //CILK_WMB();
         container_plugin_enable_run_cycle(w);
         Cilk_fence();
         goto run_point; //new cycle  
@@ -208,7 +207,6 @@ static void program_main_thread_init(platform_program * p) {
 
 static void threads_join(platform_program * p) {
     for (int i = 0; i < p->g->options.nproc; i++) {
-        //printf("threads_join, program/thread: %d/%d\n", p->self, i);
         int status = pthread_join(p->g->threads[i], NULL);
         if(status != 0)
             printf("Cilk runtime error: thread join (%d) failed: %d\n", i, status);
@@ -225,7 +223,6 @@ void run_program(platform_global_state * G, platform_program * p) {
     //fprintf(stderr, "Cheetah: invoking user main with %d workers.\n", p->g->options.nproc);
     program_main_thread_init(p);
     p->g->start = 1;
-    //printf("TEST: Start!\n");
 }
 
 void join_programs(platform_global_state * G) {

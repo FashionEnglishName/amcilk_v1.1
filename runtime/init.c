@@ -178,9 +178,7 @@ platform_program *container_init(platform_global_state *G, int control_uid, int 
     p->prev = NULL;
     p->control_uid = control_uid;
     p->is_switching = 0;
-    for(int i=0; i < JMPBUF_SIZE; i++) { p->container_exit_handling_ctx[i] = NULL; };
     p->invariant_running_worker_id = p->control_uid + 1; //workers: 2~N, containers: 1~N
-    p->jump_to_exit_handler = 0;
     p->second_level_uid = second_level_uid;
     p->run_times = 0;
     p->requested_time = 0;
@@ -190,11 +188,6 @@ platform_program *container_init(platform_global_state *G, int control_uid, int 
     p->resume_time = 0;
     p->next_period_feedback_s = 1;
     p->next_period_feedback_us = 1;
-    pthread_spin_init(&(p->stop_lock), PTHREAD_PROCESS_PRIVATE);
-    pthread_spin_init(&(p->run_lock), PTHREAD_PROCESS_PRIVATE);
-    pthread_spin_init(&(p->exit_lock), PTHREAD_PROCESS_PRIVATE);
-    pthread_spin_init(&(p->trigger_lock), PTHREAD_PROCESS_PRIVATE);
-    pthread_spin_init(&(p->scheduling_lock), PTHREAD_PROCESS_PRIVATE);
     p->cpu_mask = (int*) malloc(sizeof(int)*G->nproc);
     for (i=0; i<G->nproc; i++) {
         p->cpu_mask[i] = 0;
@@ -222,9 +215,7 @@ void container_set_by_init(platform_program * p, int program_id, int input, int 
     p->done_one = 0;
     p->pickable = 0;
     p->hint_stop_container = 0;
-    p->flag_enter_exit_routine = 0;
     p->job_finish = 0;
-    p->last_exit_worker_entered_runtime = 0;
     p->last_do_exit_worker_id = -1;
     p->is_switching = 0;
 
@@ -289,7 +280,6 @@ void container_set_by_request(platform_program * p, platform_program_request * p
     p->pickable = 0;
     p->hint_stop_container = 0;
     p->job_finish = 0;
-    p->last_exit_worker_entered_runtime = 0;
     p->last_do_exit_worker_id = -1;
     
     //periodic
