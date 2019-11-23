@@ -125,6 +125,7 @@ void print_all_last_exit_cpu_id(platform_global_state * G) {
 void container_block(__cilkrts_worker * w) {
     //printf("\t%d enter exit\n", w->g->program->control_uid);
     w->g->program->hint_stop_container = 1;
+    Cilk_fence();
     //wait until all other workers are sleeping
     program_set_begin_exit_time_ns(w->g->program);
     int i = 2;
@@ -134,13 +135,8 @@ void container_block(__cilkrts_worker * w) {
         }
     }
     program_set_sleeped_all_other_workers_time_ns(w->g->program);
-    //exit scheduling
-    if (w->g->program->G->nprogram_running!=0) {
-        //printf("\tdo scheduling when exit %d\n", w->g->program->control_uid);
-        platform_preemption(w->g->program->G, w->g->program, EXIT_PROGRAM);
-    }
 
-    if (w->g->program->control_uid==0) {
+    if (w->g->program->control_uid==0) { //???
         w->g->done = 1;
     }
     if (w->g->done!=1) {
@@ -152,16 +148,19 @@ void container_block(__cilkrts_worker * w) {
             elastic_core_unlock(w); //Zhe: Change
             //printf("\t%d adapt elastic state and global array, last_do_exit_worker_id is %d\n", w->g->program->control_uid, w->g->program->last_do_exit_worker_id);
             //pthread_spin_unlock(&(w->g->program->G->lock));
+            //exit scheduling
+            if (w->g->program->G->nprogram_running!=0) {
+                //printf("\tdo scheduling when exit %d\n", w->g->program->control_uid);
+                platform_preemption(w->g->program->G, w->g->program, EXIT_PROGRAM);
+            }
             if (__sync_bool_compare_and_swap(&(w->g->program->pickable), 0, 1)) {
                 printf("[STOP CONTAINER %d] (pickable: %d): invariant %d sleep! estate is %d\n", w->g->program->control_uid, w->g->program->pickable, w->self, w->l->elastic_s);
                 pthread_mutex_unlock(&(w->g->program->G->lock));
                 printf("[G LOCK]: %d RELEASE the G_lock\n", w->g->program->control_uid);
-                platform_deactivate_container(w->g->program);//1122
                 elastic_do_cond_sleep(w);
-                platform_activate_container(w->g->program);//1122
-                //should wait until others do scheduling
+
+                //activated
                 w = __cilkrts_get_tls_worker();
-                w->g->program->hint_stop_container = 0;
                 pthread_mutex_lock(&(w->g->program->G->lock));
                 printf("[G LOCK]: %d GET the G_lock\n", w->g->program->control_uid);
             } else {
@@ -186,6 +185,7 @@ void container_block(__cilkrts_worker * w) {
             w->g->elastic_core->ptr_sleeping_inactive_deque++;
             elastic_core_unlock(w);
             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
+                w->g->program->hint_stop_container = 0;
                 //printf("Activated!\n");
             }
         } else {

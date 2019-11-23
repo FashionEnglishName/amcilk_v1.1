@@ -300,6 +300,7 @@ struct platform_global_state {
     struct itimerval timed_scheduling_itv;
     struct itimerval timed_scheduling_oldtv;
 
+    int a_container_activated_no_preemption;
     int nproc;
     int* cpu_container_map;
     volatile int nprogram_running;

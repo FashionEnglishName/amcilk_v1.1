@@ -336,6 +336,7 @@ void container_plugin_enable_run_cycle(__cilkrts_worker * w) {
     print_num_ancestor();
 
     //exit scheduling
+    platform_deactivate_container(w->g->program);//1122
     if (w->g->program->G->nprogram_running!=0) {
         platform_scheduling(w->g->program->G, w->g->program, EXIT_PROGRAM);
     }
@@ -352,6 +353,7 @@ new_point:
         //printf("%p\n", first_request);
         if (first_request!=NULL) {
             printf("[NEW CONTAINER %d] input: %d\n", w->g->program->control_uid, w->g->program->input);
+            platform_activate_container(w->g->program);//1122
             container_setup_to_run(w->g->program, first_request);
             program_set_activate_container_time_ns(w->g->program);
             //printf("\t%d do scheduling when new %d, elastic safe: %d, hint_stop: %d\n", w->g->program->control_uid, w->g->program->self, elastic_safe(w), w->g->program->hint_stop_container);
@@ -360,9 +362,7 @@ new_point:
             platform_preemption(w->g->program->G, w->g->program, NEW_PROGRAM);
         } else {
             //printf("[BLOCK CONTAINER %d] no request, enter block\n", w->g->program->control_uid);
-            //platform_deactivate_container(w->g->program);//1122
             container_block(w);
-            //platform_activate_container(w->g->program);//1122
             goto new_point;
         }
     } else {

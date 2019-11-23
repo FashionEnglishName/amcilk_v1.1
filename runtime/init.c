@@ -43,6 +43,7 @@ platform_global_state * platform_global_state_init(int argc, char* argv[]) {
     G->new_input = 0;
     G->deprecated_program_head = container_init_head(G);
     G->deprecated_program_tail = G->deprecated_program_head;
+    G->a_container_activated_no_preemption = 0;
     pthread_spin_init(&(G->request_buffer_lock), PTHREAD_PROCESS_PRIVATE);
     pthread_mutex_init(&(G->lock), NULL);
     //pthread_spin_init(&(G->lock), PTHREAD_PROCESS_PRIVATE);
