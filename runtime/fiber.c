@@ -127,8 +127,8 @@ void sysdep_longjmp_to_sf(__cilkrts_stack_frame *sf) {
     // last spawn.
     // This feature is only available in ABI 1 or later frames, and only
     // needed on IA64 or Intel64 processors.
-    __sync_bool_compare_and_swap(&(sf->worker->l->is_in_runtime), 1, 0);
-    //Cilk_fence();
+    //__sync_bool_compare_and_swap(&(sf->worker->l->is_in_runtime), 1, 0);
+    Cilk_fence();
     //CILK_MB();
     restore_x86_fp_state(sf);
     __builtin_longjmp(sf->ctx, 1);
