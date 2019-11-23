@@ -131,7 +131,6 @@ void container_block(__cilkrts_worker * w) {
         }
     }
     program_set_sleeped_all_other_workers_time_ns(w->g->program);
-    w->g->program->G->macro_test_num_stop_container++;
     if (w->g->program->control_uid==0) { //???
         w->g->done = 1;
     }
@@ -148,6 +147,7 @@ void container_block(__cilkrts_worker * w) {
             }
             if (__sync_bool_compare_and_swap(&(w->g->program->pickable), 0, 1)) {
                 printf("[STOP CONTAINER %d] (pickable: %d): invariant %d sleep! estate is %d\n", w->g->program->control_uid, w->g->program->pickable, w->self, w->l->elastic_s);
+                w->g->program->G->macro_test_num_stop_container++;
                 pthread_mutex_unlock(&(w->g->program->G->lock));
                 //pthread_spin_unlock(&(w->g->program->G->lock));
                 //printf("[G LOCK]: %d RELEASE the G_lock\n", w->g->program->control_uid);
