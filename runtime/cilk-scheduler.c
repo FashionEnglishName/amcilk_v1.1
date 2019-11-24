@@ -1144,6 +1144,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                 elastic_core_unlock(w);
                                 if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
                                     deque_unlock_self(w);
+                                    
                                     elastic_do_cond_sleep(w);
 
                                     //activated
@@ -1306,8 +1307,6 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                     }
                     //printf("[PLATFORM]: invariant %d jumps to exit handling\n", w->self);
                     __builtin_longjmp(w->current_stack_frame->ctx, 1);
-                    //sysdep_longjmp_to_sf(w->current_stack_frame);
-
                 } else {
                     if (w->g->program->last_do_exit_worker_id!=-1) {
                         printf("%d %d last %d\n", w->g->program->control_uid, w->self, w->g->program->last_do_exit_worker_id);

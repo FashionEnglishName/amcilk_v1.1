@@ -171,22 +171,11 @@ run_point:
                 if(__builtin_setjmp(w->current_stack_frame->ctx) == 0) {
                     w->g->program->is_switching = 1;
                     longjmp_to_runtime(w);
-                } else {
-                    w = __cilkrts_get_tls_worker();
-                    if (w->self==w->g->program->invariant_running_worker_id) {
-                        w->g->program->is_switching = 0;
-                        program_print_result_acc(w->g->program);
-                        if (w->g->program->mute==0) {
-                            platform_response_to_client(w->g->program);
-                        }
-                        container_plugin_enable_run_cycle(w);
-                        goto run_point; //new cycle  
-                    } else {
-                        printf("ERROR: a non-inv worker jumps to exiting handling\n");
-                        abort();
-                    }
                 }
-            } else {
+            }
+            //only inv can reach here
+            w = __cilkrts_get_tls_worker();
+            if (w->self==w->g->program->invariant_running_worker_id) {
                 w->g->program->is_switching = 0;
                 program_print_result_acc(w->g->program);
                 if (w->g->program->mute==0) {
@@ -194,6 +183,9 @@ run_point:
                 }
                 container_plugin_enable_run_cycle(w);
                 goto run_point; //new cycle  
+            } else {
+                printf("ERROR: a non-inv worker jumps to exiting handling\n");
+                abort();
             }
         } else {
             printf("ERROR: job_finish state is changed by others\n");
@@ -201,7 +193,7 @@ run_point:
         }
     }
 
-
+    //meaningless, this line can not be reached
     longjmp_to_runtime(w);//just for correctness
 }
 
