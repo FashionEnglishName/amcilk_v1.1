@@ -1184,7 +1184,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             w->g->elastic_core->ptr_sleeping_inactive_deque++;
                                             elastic_core_unlock(w);
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
-                                                //res = NULL;
+                                                res = NULL;
                                             } else {
                                                 printf("ERROR: ACTIVATING3 is changed by others\n");
                                                 abort();
@@ -1243,7 +1243,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         w->g->elastic_core->ptr_sleeping_inactive_deque++;
                                         elastic_core_unlock(w);
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
-                                            //res = NULL;
+                                            res = NULL;
                                         } else {
                                             printf("ERROR: ACTIVATING4 is changed by others\n");
                                             abort();
