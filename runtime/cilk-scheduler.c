@@ -1188,7 +1188,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 elastic_core_lock(w);
                                                 elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque]]);
                                                 w->g->elastic_core->ptr_sleeping_active_deque--;
-                                                print_cpu_state_group(w->g->program);
                                                 elastic_core_unlock(w);
                                                 //printf("\t(D: p %d)(ptr_sleeping_active_deque %d)\n", w->g->program->control_uid, w->g->elastic_core->ptr_sleeping_active_deque);
                                                 if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
@@ -1278,7 +1277,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         elastic_core_unlock(w);
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
                                             //printf("Activated!\n");
-                                            res = NULL;
+                                            //res = NULL;
                                         } else {
                                             printf("ERROR: ACTIVATING4 is changed by others\n");
                                             abort();
