@@ -160,7 +160,7 @@ run_point:
         abort();
     }
 
-    //completed a job
+    /*//completed a job
     w = __cilkrts_get_tls_worker();
     sf = w->current_stack_frame;
     if (w->self==w->g->program->invariant_running_worker_id) {
@@ -197,7 +197,41 @@ run_point:
         container_plugin_enable_run_cycle(w);
         Cilk_fence();
         goto run_point; //new cycle  
+    }*/
+    w = __cilkrts_get_tls_worker();
+    sf = w->current_stack_frame;
+    if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), 0, -1)) {
+        CILK_ASSERT_G(w == __cilkrts_get_tls_worker());
+        w->g->cilk_main_return = _tmp;
+        // WHEN_CILK_DEBUG(sf->magic = ~CILK_STACKFRAME_MAGIC);
+        //printf("[PLATFORM]: worker %d set cilk_main_return\n", w->self);
+        w->g->program->last_do_exit_worker_id = w->self; //must update before set job_finish.
+        CILK_WMB();
+        if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), -1, 1)) {
+            //pass
+        } else {
+            printf("???1\n");
+            abort();
+        }
     }
+    if(__builtin_setjmp(sf->ctx) == 0) {
+        longjmp_to_runtime(w);
+    } else {
+        if (w->self==w->g->program->invariant_running_worker_id) {
+            program_print_result_acc(w->g->program);
+            if (w->g->program->mute==0) {
+                platform_response_to_client(w->g->program);
+                //printf("\t%d response to client done!\n", w->g->program->control_uid);
+            }
+            w->g->program->is_switching = 0;
+            container_plugin_enable_run_cycle(w);
+            goto run_point; //new cycle  
+        } else {
+            printf("???2\n");
+            abort();
+        }
+    }
+
 
     longjmp_to_runtime(w);//just for correctness
 }

@@ -865,7 +865,7 @@ Closure *Closure_steal(__cilkrts_worker *const w, int victim) {
                     if (w->g->elastic_core->test_thief==victim) {
                         w->g->elastic_core->test_num_give_up_steal_running++;
                     }
-                    goto give_up_single_steal;
+                    goto give_up;
                 }
                 break;
 
@@ -886,7 +886,7 @@ Closure *Closure_steal(__cilkrts_worker *const w, int victim) {
                     }
                 }
 
-give_up_single_steal:
+give_up:
                 // MUST unlock the closure before the queue;
                 // see rule D in the file PROTOCOLS
                 Closure_unlock(w, cl);
