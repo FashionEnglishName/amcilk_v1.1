@@ -1305,7 +1305,9 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                         usleep(TIME_EXIT_CTX_SWITCH); //important for delay avoid unknown sigfault due to inconsistent var
                     }
                     //printf("[PLATFORM]: invariant %d jumps to exit handling\n", w->self);
-                    __builtin_longjmp(w->current_stack_frame->ctx, 1);
+                    //__builtin_longjmp(w->current_stack_frame->ctx, 1);
+                    sysdep_longjmp_to_sf(w->current_stack_frame);
+
                 } else {
                     if (w->g->program->last_do_exit_worker_id!=-1) {
                         printf("%d %d last %d\n", w->g->program->control_uid, w->self, w->g->program->last_do_exit_worker_id);
