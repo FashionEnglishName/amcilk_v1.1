@@ -1077,16 +1077,21 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             if (cl->status==CLOSURE_RETURNING) { //give up mugging
                                                 cl = return_value(w, cl);
                                                 if (cl!=NULL) {
-                                                    deque_add_bottom(w, cl, w->self);
-                                                    setup_for_execution(w, cl);
-                                                    if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
-                                                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
-                                                            printf("GIVE UP MUGGING\n");
-                                                            deque_unlock_self(w);
-                                                            longjmp_to_user_code(w, cl);
+                                                    if (cl->status==CLOSURE_READY) {
+                                                        deque_add_bottom(w, cl, w->self);
+                                                        setup_for_execution(w, cl);
+                                                        if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
+                                                            if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
+                                                                printf("GIVE UP MUGGING\n");
+                                                                deque_unlock_self(w);
+                                                                longjmp_to_user_code(w, cl);
+                                                            }
+                                                        } else {
+                                                            printf("ERROR: SLEEPING_MUGGING_DEQUE1 is changed by others\n");
+                                                            abort();
                                                         }
                                                     } else {
-                                                        printf("ERROR: SLEEPING_MUGGING_DEQUE1 is changed by others\n");
+                                                        printf("ERROR: cl state error (should be CLOSURE_READY)\n");
                                                         abort();
                                                     }
                                                 }
@@ -1161,7 +1166,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                         abort();
                                                     }
                                                 } else {
-                                                    printf("ERROR: error cl status %d\n", cl->status);
+                                                    printf("ERROR: error1 cl status %d\n", cl->status);
                                                     abort();
                                                 }
                                             } else {
@@ -1204,12 +1209,17 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                     if (cl->status==CLOSURE_RETURNING) { //give up
                                         cl = return_value(w, cl);
                                         if (cl!=NULL) {
-                                            deque_add_bottom(w, cl, w->self);
-                                            setup_for_execution(w, cl);
-                                            __sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED);
-                                            w->exc = w->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
-                                            deque_unlock_self(w);
-                                            longjmp_to_user_code(w, cl);
+                                            if (cl->status==CLOSURE_READY) {
+                                                deque_add_bottom(w, cl, w->self);
+                                                setup_for_execution(w, cl);
+                                                __sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED);
+                                                w->exc = w->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
+                                                deque_unlock_self(w);
+                                                longjmp_to_user_code(w, cl);
+                                            } else {
+                                                printf("ERROR: error2 cl status %d\n", cl->status);
+                                                abort();
+                                            }
                                         }
                                     } else {
                                         printf("ERROR: wrong cl status at bottom [%d] when deque is empty and go to sleep\n", cl->status);
@@ -1233,7 +1243,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         w->g->elastic_core->ptr_sleeping_inactive_deque++;
                                         elastic_core_unlock(w);
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
-                                            res = NULL;
+                                            //res = NULL;
                                         } else {
                                             printf("ERROR: ACTIVATING4 is changed by others\n");
                                             abort();
