@@ -198,7 +198,6 @@ run_point:
         Cilk_fence();
         goto run_point; //new cycle  
     }*/
-printf("!!!!!!!!!??????\n");
     if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), 0, -1)) {
         printf("??????\n");
         w = __cilkrts_get_tls_worker();
@@ -209,6 +208,7 @@ printf("!!!!!!!!!??????\n");
         CILK_WMB();
         if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), -1, 1)) {
             if(__builtin_setjmp(w->current_stack_frame->ctx) == 0) {
+                w->g->program->is_switching = 1;
                 longjmp_to_runtime(w);
             } else {
                 if (w->self==w->g->program->invariant_running_worker_id) {
