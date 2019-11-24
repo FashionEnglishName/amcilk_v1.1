@@ -1292,7 +1292,6 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                 elastic_mugging(w, w->g->program->last_do_exit_worker_id);
                 if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING1, EXIT_SWITCHING2)) {
                     while(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s != ACTIVE) {
-                        //printf("\tinvar w wait, %d %d %d\n", w->g->program->control_uid, w->self, w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s);
                         usleep(TIME_EXIT_CTX_SWITCH); //important for delay avoid unknown sigfault due to inconsistent var
                     }
                     //printf("[PLATFORM]: invariant %d jumps to exit handling\n", w->self);
@@ -1333,18 +1332,15 @@ void do_exit_blocking_container_handling(__cilkrts_worker *w) {
     w = __cilkrts_get_tls_worker();
     //invariant worker goes back to exit handling
     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVE, SLEEPING_INACTIVE_DEQUE)) {
-        elastic_core_lock(w); //Zhe: Change
+        elastic_core_lock(w);
         w->g->elastic_core->ptr_sleeping_inactive_deque--;
         elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
-        elastic_core_unlock(w); //Zhe: Change
-        //printf("\t%d 1worker_scheduler, w %d done, state %d\n", w->g->program->control_uid, w->self, w->l->elastic_s);
+        elastic_core_unlock(w);
         elastic_do_cond_sleep(w);
-        //printf("\t%d 1worker_scheduler, w %d wake up\n", w->g->program->control_uid, w->self);
 
         //activated
         w = __cilkrts_get_tls_worker();
         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
-            //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
             elastic_core_lock(w);
             elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
             w->g->elastic_core->ptr_sleeping_inactive_deque++;
@@ -1354,18 +1350,15 @@ void do_exit_blocking_container_handling(__cilkrts_worker *w) {
             }
         }
     } else if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, SLEEPING_INACTIVE_DEQUE)) {
-        elastic_core_lock(w); //Zhe: Change
+        elastic_core_lock(w);
         w->g->elastic_core->ptr_sleeping_inactive_deque--;
         elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
-        elastic_core_unlock(w); //Zhe: Change
-        //printf("\t%d 1worker_scheduler, w %d done, state %d\n", w->g->program->control_uid, w->self, w->l->elastic_s);
+        elastic_core_unlock(w);
         elastic_do_cond_sleep(w);
-        //printf("\t%d 1worker_scheduler, w %d wake up\n", w->g->program->control_uid, w->self);
 
         //activated
         w = __cilkrts_get_tls_worker();
         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
-            //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
             elastic_core_lock(w);
             elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
             w->g->elastic_core->ptr_sleeping_inactive_deque++;
@@ -1389,7 +1382,6 @@ void worker_sleep_handling(__cilkrts_worker *w) {
         //activated
         w = __cilkrts_get_tls_worker();
         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
-            //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
             elastic_core_lock(w);
             elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
             w->g->elastic_core->ptr_sleeping_inactive_deque++;
