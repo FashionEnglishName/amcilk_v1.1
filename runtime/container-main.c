@@ -175,8 +175,8 @@ run_point:
                 }
             }
             //only inv can reach here
-            printf("[PLATFORM]: invariant %d enters to exit handling\n", w->self);
             w = __cilkrts_get_tls_worker();
+            printf("[PLATFORM]: invariant %d enters to exit handling\n", w->self);
             if (w->self==w->g->program->invariant_running_worker_id) {
                 w->g->program->is_switching = 0;
                 program_print_result_acc(w->g->program);
