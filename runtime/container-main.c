@@ -160,7 +160,9 @@ run_point:
         abort();
     }
 
-    /*//completed a job
+    printf("??????\n");
+
+    //completed a job
     w = __cilkrts_get_tls_worker();
     sf = w->current_stack_frame;
     if (w->self==w->g->program->invariant_running_worker_id) {
@@ -197,11 +199,11 @@ run_point:
         container_plugin_enable_run_cycle(w);
         Cilk_fence();
         goto run_point; //new cycle  
-    }*/
+    }*
 
-    w = __cilkrts_get_tls_worker();
-    sf = w->current_stack_frame;
-    if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), 0, -1)) {
+    /*if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), 0, -1)) {
+        w = __cilkrts_get_tls_worker();
+        sf = w->current_stack_frame;
         CILK_ASSERT_G(w == __cilkrts_get_tls_worker());
         w->g->cilk_main_return = _tmp;
         // WHEN_CILK_DEBUG(sf->magic = ~CILK_STACKFRAME_MAGIC);
@@ -231,7 +233,7 @@ run_point:
                 abort();
             }
         }
-    }
+    }*/
 
 
     longjmp_to_runtime(w);//just for correctness
