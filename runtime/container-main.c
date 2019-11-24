@@ -161,47 +161,8 @@ run_point:
     }
 
     //completed a job
-    /*w = __cilkrts_get_tls_worker();
-    sf = w->current_stack_frame;
-    if (w->self==w->g->program->invariant_running_worker_id) {
-        program_print_result_acc(w->g->program);
-        if (w->g->program->mute==0) {
-            platform_response_to_client(w->g->program);
-            //printf("\t%d response to client done!\n", w->g->program->control_uid);
-        }
-    }
     w = __cilkrts_get_tls_worker();
     if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), 0, -1)) {
-        CILK_ASSERT_G(w == __cilkrts_get_tls_worker());
-        w->g->cilk_main_return = _tmp;
-        // WHEN_CILK_DEBUG(sf->magic = ~CILK_STACKFRAME_MAGIC);
-        //printf("[PLATFORM]: worker %d set cilk_main_return\n", w->self);
-        w->g->program->last_do_exit_worker_id = w->self; //must update before set job_finish.
-        CILK_WMB();
-        if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), -1, 1)) {
-            //pass
-        } else {
-            printf("???1\n");
-            abort();
-        }
-    }
-    w = __cilkrts_get_tls_worker();
-    if (w->self!=w->g->program->invariant_running_worker_id) {
-        w->g->program->is_switching = 1;
-        //printf("[PLATFORM]: worker %d jumps to runtime for switching invariant %d\n", w->self, w->g->program->invariant_running_worker_id);
-        //invariant should handle the last closure in its deque
-        longjmp_to_runtime(w);
-    } else {
-        //printf("[PLATFORM]: invariant %d executes container_plugin_enable_run_cycle\n", w->self);
-        w->g->program->is_switching = 0;
-        container_plugin_enable_run_cycle(w);
-        Cilk_fence();
-        goto run_point; //new cycle  
-    }*/
-
-
-    if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), 0, -1)) {
-        w = __cilkrts_get_tls_worker();
         w->g->cilk_main_return = _tmp;
         w->g->program->last_do_exit_worker_id = w->self; //must update before set job_finish.
         CILK_WMB();
@@ -221,7 +182,7 @@ run_point:
                         container_plugin_enable_run_cycle(w);
                         goto run_point; //new cycle  
                     } else {
-                        printf("???2\n");
+                        printf("ERROR: a non-inv worker jumps to exiting handling\n");
                         abort();
                     }
                 }
@@ -235,7 +196,7 @@ run_point:
                 goto run_point; //new cycle  
             }
         } else {
-            printf("???1\n");
+            printf("ERROR: job_finish state is changed by others\n");
             abort();
         }
     }
