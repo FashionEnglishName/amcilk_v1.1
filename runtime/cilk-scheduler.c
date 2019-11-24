@@ -1109,7 +1109,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
 
                                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {    
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
-                                                //sysdep_longjmp_to_sf(w->current_stack_frame);
                                                 __builtin_longjmp(w->current_stack_frame->ctx, 1);
                                             } else {
                                                 printf("ERROR: DO_MUGGING1 is changed by others, recover failed\n");
@@ -1156,7 +1155,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
                                                 if (cl->status==CLOSURE_RUNNING) {
                                                     if (w->current_stack_frame!=NULL) {
-                                                        //sysdep_longjmp_to_sf(w->current_stack_frame);
                                                         __builtin_longjmp(w->current_stack_frame->ctx, 1);
                                                     } else {
                                                         printf("ERROR: w->current_stack_frame==NULL when being activated (be not mugged case)\n");
@@ -1280,7 +1278,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
 void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
     w = __cilkrts_get_tls_worker();
     if (w->g->program->is_switching==1) {
-        //printf("%d %d: w->g->program->done_one = %d\n", w->g->program->done_one, w->g->program->control_uid, w->self);
         //for switching: inv enter exit rountine
         if (w->self==w->g->program->invariant_running_worker_id) {
             Closure *tmp_cl;
@@ -1301,7 +1298,8 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                         usleep(TIME_EXIT_CTX_SWITCH); //important for delay avoid unknown sigfault due to inconsistent var
                     }
                     //printf("[PLATFORM]: invariant %d jumps to exit handling\n", w->self);
-                    sysdep_longjmp_to_sf(w->current_stack_frame);
+                    //sysdep_longjmp_to_sf(w->current_stack_frame);
+                    __builtin_longjmp(w->current_stack_frame->ctx, 1);
                 } else {
                     if (w->g->program->last_do_exit_worker_id!=-1) {
                         printf("%d %d last %d\n", w->g->program->control_uid, w->self, w->g->program->last_do_exit_worker_id);
