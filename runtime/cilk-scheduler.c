@@ -1147,7 +1147,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                     Closure *cl = deque_peek_bottom(w, w->self);
                                     deque_unlock_self(w);
                                     if (cl!=NULL) {
-                                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) { //Zhe: update
+                                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
                                             elastic_core_lock(w);
                                             elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque]]);
                                             w->g->elastic_core->ptr_sleeping_active_deque--;
@@ -1173,7 +1173,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             abort();
                                         }
                                     } else { //be mugged
-                                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) { //Zhe: update
+                                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
                                             elastic_core_lock(w);
                                             elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
                                             w->g->elastic_core->ptr_sleeping_inactive_deque++;
@@ -1289,16 +1289,13 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
             }
             deque_unlock_self(w);
             if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING0, EXIT_SWITCHING1)) {
-                //printf("\tinv %d mugging %d begin\n", w->self, w->g->program->last_do_exit_worker_id);
                 elastic_mugging(w, w->g->program->last_do_exit_worker_id);
-                //printf("\tinv %d mugging %d done!\n", w->self, w->g->program->last_do_exit_worker_id);
                 if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING1, EXIT_SWITCHING2)) {
                     while(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s != ACTIVE) {
                         //printf("\tinvar w wait, %d %d %d\n", w->g->program->control_uid, w->self, w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s);
                         usleep(TIME_EXIT_CTX_SWITCH); //important for delay avoid unknown sigfault due to inconsistent var
                     }
                     //printf("[PLATFORM]: invariant %d jumps to exit handling\n", w->self);
-                    //sysdep_longjmp_to_sf(w->current_stack_frame);
                     __builtin_longjmp(w->current_stack_frame->ctx, 1);
                 } else {
                     if (w->g->program->last_do_exit_worker_id!=-1) {
