@@ -1084,8 +1084,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                                                 printf("GIVE UP MUGGING\n");
                                                                 deque_unlock_self(w);
-                                                                //longjmp_to_user_code(w, cl);
-                                                                __builtin_longjmp(w->current_stack_frame->ctx, 1);
+                                                                longjmp_to_user_code(w, cl);
                                                             }
                                                         } else {
                                                             printf("ERROR: SLEEPING_MUGGING_DEQUE1 is changed by others\n");
