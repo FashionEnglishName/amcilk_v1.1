@@ -208,6 +208,7 @@ run_point:
         w->g->program->last_do_exit_worker_id = w->self; //must update before set job_finish.
         CILK_WMB();
         if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), -1, 1)) {
+            __cilkrts_save_fp_ctrl_state(w->current_stack_frame);
             if(__builtin_setjmp(w->current_stack_frame->ctx) == 0) {
                 longjmp_to_runtime(w);
             } else {
