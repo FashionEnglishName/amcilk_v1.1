@@ -1143,16 +1143,14 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
 
                                     //activated
                                     w = __cilkrts_get_tls_worker();
-                                    Cilk_fence();
-                                    if (w->head > w->tail) { //must be mugged
+                                    if (false) { //must be mugged
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) { //Zhe: update
-                                            //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
                                             elastic_core_lock(w);
                                             elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
                                             w->g->elastic_core->ptr_sleeping_inactive_deque++;
                                             elastic_core_unlock(w);
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
-                                                //res = NULL;
+                                                res = NULL;
                                             } else {
                                                 printf("ERROR: ACTIVATING1 is changed by others\n");
                                                 abort();
@@ -1163,7 +1161,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         }
 
                                     } else { //h<=t
-                                        //printf("TEST[%d]: goto ACTIVATING state, current_stack_frame:%p\n", w->self, w->current_stack_frame);
                                         deque_lock_self(w);
                                         Closure *cl = deque_peek_bottom(w, w->self);
                                         deque_unlock_self(w);
