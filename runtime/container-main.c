@@ -211,6 +211,7 @@ run_point:
                 w->g->program->is_switching = 1;
                 longjmp_to_runtime(w);
             } else {
+                w = __cilkrts_get_tls_worker();
                 if (w->self==w->g->program->invariant_running_worker_id) {
                     program_print_result_acc(w->g->program);
                     if (w->g->program->mute==0) {
