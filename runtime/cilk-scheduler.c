@@ -1155,7 +1155,8 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
                                                 if (cl->status==CLOSURE_RUNNING) {
                                                     if (w->current_stack_frame!=NULL) {
-                                                        sysdep_longjmp_to_sf(w->current_stack_frame);
+                                                        //sysdep_longjmp_to_sf(w->current_stack_frame);
+                                                        __builtin_longjmp(w->current_stack_frame->ctx, 1);
                                                     } else {
                                                         printf("ERROR: w->current_stack_frame==NULL when being activated (be not mugged case)\n");
                                                         abort();
