@@ -199,7 +199,7 @@ run_point:
         container_plugin_enable_run_cycle(w);
         Cilk_fence();
         goto run_point; //new cycle  
-    }*
+    }
 
     /*if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), 0, -1)) {
         w = __cilkrts_get_tls_worker();
