@@ -23,7 +23,7 @@
 #define BUF_SIZE 10240
 
 //#define NumRequests 1000000
-#define NumRequests 2000
+#define NumRequests 500
 //#define NumRequests 500
 //#define NumRequests 200
 //#define NumRequests 100
