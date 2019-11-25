@@ -1499,13 +1499,12 @@ normal_point: //normal part, can not be preempted
                                     printf("victim %d(%d) is mugged2 by %d(%d)\n", victim, w->g->workers[victim]->l->elastic_s, w->self, w->l->elastic_s);
                                     if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {  
                                         printf("victim %d(%d) is mugged completely by %d(%d)\n", victim, w->g->workers[victim]->l->elastic_s, w->self, w->l->elastic_s);  
-                                        CILK_WMB();
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                             __builtin_longjmp(w->current_stack_frame->ctx, 1);
-                                        } else {
+                                        }/* else {
                                             printf("ERROR: DO_MUGGING3 is changed by others, %d recover failed (%d)\n", w->self, w->l->elastic_s);
                                             abort();
-                                        }
+                                        }*/
                                     } else {
                                         printf("ERROR: SLEEPING_MUGGING_DEQUE3 is changed by others, %d\n", w->g->workers[victim]->l->elastic_s);
                                         abort();
