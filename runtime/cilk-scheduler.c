@@ -1500,7 +1500,7 @@ normal_point: //normal part, can not be preempted
                                     if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {  
                                         printf("victim %d(%d) is mugged completely by %d(%d)\n", victim, w->g->workers[victim]->l->elastic_s, w->self, w->l->elastic_s);  
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
-                                            printf("%d(%d) jumps to user code\n", w->self, w->l->elastic_s);
+                                            //printf("%d(%d) jumps to user code\n", w->self, w->l->elastic_s);
                                             __builtin_longjmp(w->current_stack_frame->ctx, 1);
                                         } else {
                                             printf("ERROR: DO_MUGGING3 is changed by others, %d recover failed (%d)\n", w->self, w->l->elastic_s);
