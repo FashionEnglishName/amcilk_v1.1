@@ -26,7 +26,7 @@
 #define BUF_SIZE 10240
 
 //server end spec
-#define CONTAINER_COUNT 30
+#define CONTAINER_COUNT 1
 #define TIME_MAKE_SURE_TO_SLEEP 100//100 //important! depends of the size of a single frame
 #define TIME_MAKE_SURE_TO_ACTIVATE 10//100 //important! depends of implementation of block/activate mechanism
 #define TIME_EXIT_CTX_SWITCH 100 //important! can not be too small for the efficiency
