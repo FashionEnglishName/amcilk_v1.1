@@ -1151,7 +1151,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                     w = __cilkrts_get_tls_worker();
                                     deque_lock_self(w);
                                     Closure *cl = deque_peek_bottom(w, w->self);
-                                    deque_unlock_self(w);
                                     if (cl!=NULL) {
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
                                             elastic_core_lock(w);
@@ -1161,6 +1160,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
                                                 if (cl->status==CLOSURE_RUNNING) {
                                                     if (w->current_stack_frame!=NULL) {
+                                                        deque_unlock_self(w);
                                                         __builtin_longjmp(w->current_stack_frame->ctx, 1);
                                                     } else {
                                                         printf("ERROR: w->current_stack_frame==NULL when being activated (be not mugged case)\n");
@@ -1178,6 +1178,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             printf("ERROR: activated without requested2\n");
                                             abort();
                                         }
+                                        deque_unlock_self(w);
                                     } else { //be mugged
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
                                             elastic_core_lock(w);
@@ -1194,6 +1195,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             printf("ERROR: activated without requested3\n");
                                             abort();
                                         }
+                                        deque_unlock_self(w);
                                     }
                                 } else {
                                     printf("ERROR: SLEEPING_ADAPTING_DEQUE is changed by others\n");

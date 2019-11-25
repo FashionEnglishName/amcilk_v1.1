@@ -175,7 +175,8 @@ run_point:
                     longjmp_to_runtime(w);
                 }
             }
-            //only inv can reach here
+
+            //only inv worker can reach here
             w = __cilkrts_get_tls_worker();
             printf("[PLATFORM]: invariant %d enters to exit handling\n", w->self);
             if (w->self==w->g->program->invariant_running_worker_id) {
@@ -186,6 +187,7 @@ run_point:
                 }
                 container_plugin_enable_run_cycle(w);
                 goto run_point; //new cycle  
+
             } else {
                 printf("ERROR: a non-inv worker jumps to exiting handling\n");
                 abort();
