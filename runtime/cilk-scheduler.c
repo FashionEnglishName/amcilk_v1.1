@@ -1498,18 +1498,18 @@ normal_point: //normal part, can not be preempted
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                             __builtin_longjmp(w->current_stack_frame->ctx, 1);
                                         } else {
-                                            printf("ERROR: DO_MUGGING1 is changed by others, recover failed\n");
+                                            printf("ERROR: DO_MUGGING3 is changed by others, recover failed\n");
                                             abort();
                                         }
                                     } else {
-                                        printf("ERROR: SLEEPING_MUGGING_DEQUE2 is changed by others\n");
+                                        printf("ERROR: SLEEPING_MUGGING_DEQUE3 is changed by others, %d\n", w->g->workers[victim]->l->elastic_s);
                                         abort();
                                     }
                                 } else {
                                     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                         //pass
                                     } else {
-                                        printf("ERROR: DO_MUGGING2 is changed by others, recover failed\n");
+                                        printf("ERROR: DO_MUGGING4 is changed by others, recover failed\n");
                                         abort();
                                     }
                                 }
