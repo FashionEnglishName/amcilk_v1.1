@@ -1500,7 +1500,6 @@ normal_point: //normal part, can not be preempted
                                     if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {  
                                         printf("victim %d(%d) is mugged completely by %d(%d)\n", victim, w->g->workers[victim]->l->elastic_s, w->self, w->l->elastic_s);  
                                         CILK_WMB();
-                                        w = __cilkrts_get_tls_worker();
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                             __builtin_longjmp(w->current_stack_frame->ctx, 1);
                                         } else {
