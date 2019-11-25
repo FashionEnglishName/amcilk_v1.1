@@ -440,6 +440,7 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
 
     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, TO_SLEEP)) {
         if (w->head <= w->tail) {//zhe del =
+            sysdep_save_fp_ctrl_state(w->current_stack_frame);
             if (!__builtin_setjmp(w->current_stack_frame->ctx)) {
                 //printf("TEST[%d]: goto TO_SLEEP state (to_sleep), current_stack_frame:%p, closure status:%d, E:%p\n", w->self, w->current_stack_frame, t->status, w->exc);
                 Closure_unlock(w, t);
@@ -1116,8 +1117,8 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
 
                                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {    
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
-                                                __builtin_longjmp(w->current_stack_frame->ctx, 1);
-                                                //sysdep_longjmp_to_sf(w->current_stack_frame);
+                                                //__builtin_longjmp(w->current_stack_frame->ctx, 1);
+                                                sysdep_longjmp_to_sf(w->current_stack_frame);
                                             } else {
                                                 printf("ERROR: DO_MUGGING1 is changed by others, recover failed\n");
                                                 abort();
@@ -1501,8 +1502,8 @@ normal_point: //normal part, can not be preempted
                                 printf("victim %d(%d) is mugged2 by %d(%d)\n", victim, w->g->workers[victim]->l->elastic_s, w->self, w->l->elastic_s);
                                 if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {  
                                     printf("%d(%d) jumps to user code\n", w->self, w->l->elastic_s);
-                                    __builtin_longjmp(w->current_stack_frame->ctx, 1);
-                                    //sysdep_longjmp_to_sf(w->current_stack_frame);
+                                    //__builtin_longjmp(w->current_stack_frame->ctx, 1);
+                                    sysdep_longjmp_to_sf(w->current_stack_frame);
                                 } else {
                                     printf("ERROR: SLEEPING_MUGGING_DEQUE3 is changed by others, %d\n", w->g->workers[victim]->l->elastic_s);
                                     abort();
