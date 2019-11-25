@@ -445,11 +445,12 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
                 //printf("TEST[%d]: goto TO_SLEEP state (to_sleep), current_stack_frame:%p, closure status:%d, E:%p\n", w->self, w->current_stack_frame, t->status, w->exc);
                 Closure_unlock(w, t);
                 deque_unlock_self(w);
+                printf("%d enter Cilk_exception_handler for stealing\n", w->self);
                 longjmp_to_runtime(w);
             } else { //when whole deque thief jumps here, do normal routine as if nothing happens
                 w = __cilkrts_get_tls_worker();
                 printf("%d jumps at Cilk_exception_handler\n", w->self);
-                //return;
+                return;
             }
         } else {// w->head>w->tail
             __cilkrts_alert(ALERT_EXCEPT, "[%d]: (Cilk_exception_handler) this is a steal!\n", w->self);
