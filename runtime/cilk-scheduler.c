@@ -448,7 +448,7 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
                 longjmp_to_runtime(w);
             } else { //when whole deque thief jumps here, do normal routine as if nothing happens
                 w = __cilkrts_get_tls_worker();
-                printf("%d jumps here\n", w->self);
+                printf("%d jumps at Cilk_exception_handler\n", w->self);
                 return;
             }
         } else {// w->head>w->tail
@@ -1165,7 +1165,8 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 if (cl->status==CLOSURE_RUNNING) {
                                                     if (w->current_stack_frame!=NULL) {
                                                         deque_unlock_self(w);
-                                                        __builtin_longjmp(w->current_stack_frame->ctx, 1);
+                                                        //__builtin_longjmp(w->current_stack_frame->ctx, 1);
+                                                        sysdep_longjmp_to_sf(w->current_stack_frame);
                                                     } else {
                                                         printf("ERROR: w->current_stack_frame==NULL when being activated (be not mugged case)\n");
                                                         abort();
@@ -1503,7 +1504,12 @@ normal_point: //normal part, can not be preempted
                                 if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {  
                                     printf("%d(%d) jumps to user code\n", w->self, w->l->elastic_s);
                                     //__builtin_longjmp(w->current_stack_frame->ctx, 1);
-                                    sysdep_longjmp_to_sf(w->current_stack_frame);
+                                    if (w->current_stack_frame!=NULL) {
+                                        sysdep_longjmp_to_sf(w->current_stack_frame);
+                                    } else {
+                                        printf("ERROR: w->current_stack_frame==NULL2 when being activated (be not mugged case)\n");
+                                        abort();
+                                    }
                                 } else {
                                     printf("ERROR: SLEEPING_MUGGING_DEQUE3 is changed by others, %d\n", w->g->workers[victim]->l->elastic_s);
                                     abort();
