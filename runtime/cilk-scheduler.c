@@ -1508,7 +1508,7 @@ normal_point: //normal part, can not be preempted
                                     if (w->current_stack_frame!=NULL) {
                                         sysdep_longjmp_to_sf(w->current_stack_frame);
                                     } else {
-                                        printf("p:%d, ERROR: w->current_stack_frame==NULL2 when being activated (be not mugged case)\n", w->g->program->control_uid);
+                                        printf("p:%d, ERROR: (w:%d) w->current_stack_frame==NULL2 after mugging\n", w->self, w->g->program->control_uid);
                                         abort();
                                     }
                                 } else {
