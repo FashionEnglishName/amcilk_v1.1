@@ -53,7 +53,7 @@ void * main_thread_thread_container_trigger(void * arg) {
     int control_uid = 0;
     while(1) {
         if (G->nprogram_running>=CONTAINER_COUNT_THRESHOLD) {
-            usleep(TIME_CONTAINER_TRIGGER_INTERVAL);
+            usleep(10*TIME_CONTAINER_TRIGGER_INTERVAL);
             continue;
         }
         
