@@ -1,4 +1,5 @@
 #include "macro-bench-support.h"
+#include "rts-config.h"
 
 void program_set_requested_time_ns(platform_program_request * pr) {
     struct timespec temp;
@@ -206,11 +207,16 @@ void program_print_result_acc(platform_program * p) {
     p->G->macro_test_acc_run_time = p->G->macro_test_acc_run_time + program_get_run_time_ns(p)/1000/1000/1000.0;
     p->G->macro_test_acc_latency = p->G->macro_test_acc_latency + program_get_response_latency_ns(p)/1000/1000/1000.0;
     p->G->macro_test_acc_flow_time = p->G->macro_test_acc_flow_time + program_get_flow_time_ns(p)/1000/1000/1000.0;
+    int buff_count = get_count_program_request_buffer(p->G, 0);
     printf("[FINISH CONTAINER %d]: (input: %d)num: %llu, sched revision: %llu, stop container: %llu, buff: %d, run: %f, latency: %f, flow: %f, aver flow: %f\n", 
             p->control_uid, p->input, p->G->macro_test_num_programs_executed, p->G->macro_test_num_scheduling_revision, p->G->macro_test_num_stop_container,
-            get_count_program_request_buffer(p->G, 0), 
+            buff_count, 
             p->G->macro_test_acc_run_time,
             p->G->macro_test_acc_latency,
             p->G->macro_test_acc_flow_time,
             p->G->macro_test_acc_flow_time/p->G->macro_test_num_programs_executed);
+    if (buff_count>OVERLOADED_THRESHOLD) {
+        printf("ERROR: system overheaded\n");
+        abort();
+    }
 }
