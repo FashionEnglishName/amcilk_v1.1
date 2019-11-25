@@ -1518,7 +1518,7 @@ normal_point: //normal part, can not be preempted
                     }
                 }
 
-                victim = rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque;
+                int victim = rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque;
                 int victim_worker_id = w->g->elastic_core->cpu_state_group[victim];
                 if(victim_worker_id != w->self && 
                     (w->g->workers[victim_worker_id]->l->elastic_s==ACTIVE || 
