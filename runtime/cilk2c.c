@@ -90,7 +90,7 @@ void __cilkrts_sync(__cilkrts_stack_frame *sf) {
 
 // inlined by the compiler; this implementation is only used in container-main.c
 void __cilkrts_pop_frame(__cilkrts_stack_frame * sf) {
-    __cilkrts_worker *w = __cilkrts_get_tls_worker(); //Chen
+    __cilkrts_worker *w = __cilkrts_get_tls_worker();
     __cilkrts_alert(ALERT_CFRAME, "[%d]: (__cilkrts_pop_frame) frame %p\n", w->self, sf);
 
     CILK_ASSERT(w, sf->flags & CILK_FRAME_VERSION);
@@ -100,7 +100,7 @@ void __cilkrts_pop_frame(__cilkrts_stack_frame * sf) {
 }
 
 void __cilkrts_leave_frame(__cilkrts_stack_frame * sf) {
-    __cilkrts_worker *w = __cilkrts_get_tls_worker(); //Chen
+    __cilkrts_worker *w = __cilkrts_get_tls_worker();
     __cilkrts_alert(ALERT_CFRAME, 
         "[%d]: (__cilkrts_leave_frame) leaving frame %p\n", w->self, sf);
 
@@ -134,6 +134,8 @@ void __cilkrts_leave_frame(__cilkrts_stack_frame * sf) {
                 //printf("enter __cilkrts_leave_frame3 before Cilk_exception_handler %d\n", w->self);
             }
             Cilk_exception_handler(); 
+            w = __cilkrts_get_tls_worker();
+            printf("p:%d, w:%d returns __cilkrts_leave_frame\n", w->g->program->control_uid, w->self);
         }
         // CILK_ASSERT(w, *(w->tail) == w->current_stack_frame);
     } else {
