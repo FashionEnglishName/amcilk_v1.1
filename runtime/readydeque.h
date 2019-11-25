@@ -9,6 +9,7 @@ typedef struct ReadyDeque ReadyDeque;
 #include "debug.h"
 #include "closure.h"
 #include "mutex.h"
+#include "membar.h"
 
 // Actual declaration
 struct ReadyDeque {
@@ -24,6 +25,7 @@ static inline void deque_assert_ownership(__cilkrts_worker *const w, int pn) {
 }
 
 static inline void deque_lock_self(__cilkrts_worker *const w) {
+  Cilk_fence();
   int pn = w->self;
   cilk_mutex_lock(&w->g->deques[pn]->mutex);
   WHEN_CILK_DEBUG(w->g->deques[pn]->mutex_owner = w->self);
@@ -36,6 +38,7 @@ static inline void deque_unlock_self(__cilkrts_worker *const w) {
 }
 
 static inline int deque_trylock(__cilkrts_worker *const w, int pn) {
+  Cilk_fence();
   int ret = cilk_mutex_try(&w->g->deques[pn]->mutex);
   if(ret) {
     WHEN_CILK_DEBUG(w->g->deques[pn]->mutex_owner = w->self);
@@ -44,6 +47,7 @@ static inline int deque_trylock(__cilkrts_worker *const w, int pn) {
 }
 
 static inline void deque_lock(__cilkrts_worker *const w, int pn) {
+  Cilk_fence();
   cilk_mutex_lock(&w->g->deques[pn]->mutex);
   WHEN_CILK_DEBUG(w->g->deques[pn]->mutex_owner = w->self);
 }
