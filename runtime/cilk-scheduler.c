@@ -1481,7 +1481,7 @@ normal_point: //normal part, can not be preempted
 
             w = __cilkrts_get_tls_worker();
             if (w->g->program->running_job==1) {
-                /*if (elastic_safe(w)) {
+                if (elastic_safe(w)) {
                     if (w->l->elastic_s==ACTIVE) { //steal whole deque if has any, DO_MUGGING
                         elastic_core_lock(w);
                         int victim = elastic_get_worker_id_sleeping_active_deque(w);
@@ -1511,15 +1511,14 @@ normal_point: //normal part, can not be preempted
                             }
                         }
                     }
-                }*/
+                }
 
                 int victim = rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque;
                 int victim_worker_id = w->g->elastic_core->cpu_state_group[victim];
                 if(victim_worker_id != w->self && 
                     (w->g->workers[victim_worker_id]->l->elastic_s==ACTIVE || 
                     w->g->workers[victim_worker_id]->l->elastic_s==SLEEP_REQUESTED ||
-                    w->g->workers[victim_worker_id]->l->elastic_s==TO_SLEEP ||
-                    w->g->workers[victim_worker_id]->l->elastic_s==SLEEPING_ACTIVE_DEQUE)) {
+                    w->g->workers[victim_worker_id]->l->elastic_s==TO_SLEEP)) {
                     t = Closure_steal(w, victim_worker_id);
                 } else {
                     //pass
