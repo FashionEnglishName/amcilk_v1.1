@@ -1508,7 +1508,8 @@ normal_point: //normal part, can not be preempted
                                     if (w->current_stack_frame!=NULL) {
                                         sysdep_longjmp_to_sf(w->current_stack_frame);
                                     } else {
-                                        printf("p:%d, ERROR: (w:%d) w->current_stack_frame==NULL2 after mugging\n", w->self, w->g->program->control_uid);
+                                        w = __cilkrts_get_tls_worker();
+                                        printf("p:%d, ERROR: (w:%d) w->current_stack_frame==NULL2 after mugging\n", w->g->program->control_uid, w->self);
                                         abort();
                                     }
                                 } else {
