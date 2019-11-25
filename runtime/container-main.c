@@ -181,10 +181,12 @@ run_point:
             printf("[PLATFORM]: invariant %d enters to exit handling\n", w->self);
             if (w->self==w->g->program->invariant_running_worker_id) {
                 w->g->program->is_switching = 0;
+                pthread_mutex_lock(&(w->g->program->G->lock));
                 program_print_result_acc(w->g->program);
                 if (w->g->program->mute==0) {
                     platform_response_to_client(w->g->program);
                 }
+                pthread_mutex_unlock(&(w->g->program->G->lock));
                 container_plugin_enable_run_cycle(w);
                 goto run_point; //new cycle  
 
