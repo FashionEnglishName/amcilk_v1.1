@@ -101,6 +101,10 @@ void platform_determine_scheduling(platform_global_state * G, enum PLATFORM_SCHE
     }
     printf("\n");
 
+    if (count_running_container!=G->nprogram_running) {
+        printf("ERROR: inconsistency between scheduler and nprogram_running.\n");
+    }
+
     //set cpu_mask according to cpu_container_map
     //printf("\tset cpu_mask according to cpu_container_map\n");
     tmp_p = G->program_head->next;
