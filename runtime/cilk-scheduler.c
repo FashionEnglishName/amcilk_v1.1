@@ -1101,7 +1101,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             }
                                         }
                                         deque_unlock_self(w);
-
+                                        w = __cilkrts_get_tls_worker();
                                         elastic_mugging(w, victim);
 
                                         elastic_core_lock(w);
@@ -1486,7 +1486,7 @@ normal_point: //normal part, can not be preempted
                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVE, DO_MUGGING)) {
                                 if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
                                     elastic_mugging(w, victim);
-
+                                    w = __cilkrts_get_tls_worker();
                                     elastic_core_lock(w);
                                     w->g->elastic_core->ptr_sleeping_inactive_deque--;
                                     int tmp_victim_cpu_state_group_pos = w->g->workers[victim]->l->elastic_pos_in_cpu_state_group;
@@ -1494,6 +1494,7 @@ normal_point: //normal part, can not be preempted
                                     elastic_do_exchange_state_group(w->g->workers[w->g->elastic_core->cpu_state_group[tmp_victim_cpu_state_group_pos]], w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque]]);
                                     w->g->elastic_core->ptr_sleeping_active_deque--;
                                     elastic_core_unlock(w);
+
                                     if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {    
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                             __builtin_longjmp(w->current_stack_frame->ctx, 1);
