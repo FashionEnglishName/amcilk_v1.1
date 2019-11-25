@@ -1485,9 +1485,9 @@ normal_point: //normal part, can not be preempted
                         if (w->self!=victim && victim!=-1) {
                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVE, DO_MUGGING)) {
                                 if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
-                                    printf("victim %d is going to be mugged (%d)\n", victim, w->g->workers[victim]->l->elastic_s);
+                                    printf("victim %d(%d) is going to be mugged by %d(%d)\n", victim, w->g->workers[victim]->l->elastic_s, w->self, w->l->elastic_s);
                                     elastic_mugging(w, victim);
-                                    printf("victim %d is mugged (%d)\n", victim, w->g->workers[victim]->l->elastic_s);
+                                    printf("victim %d(%d) is mugged by %d(%d)\n", victim, w->g->workers[victim]->l->elastic_s, w->self, w->l->elastic_s);
                                     w = __cilkrts_get_tls_worker();
                                     elastic_core_lock(w);
                                     w->g->elastic_core->ptr_sleeping_inactive_deque--;
@@ -1496,13 +1496,13 @@ normal_point: //normal part, can not be preempted
                                     elastic_do_exchange_state_group(w->g->workers[w->g->elastic_core->cpu_state_group[tmp_victim_cpu_state_group_pos]], w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque]]);
                                     w->g->elastic_core->ptr_sleeping_active_deque--;
                                     elastic_core_unlock(w);
-                                    printf("victim %d is mugged2 (%d)\n", victim, w->g->workers[victim]->l->elastic_s);
+                                    printf("victim %d(%d) is mugged2 by %d(%d)\n", victim, w->g->workers[victim]->l->elastic_s, w->self, w->l->elastic_s);
                                     if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {  
-                                        printf("victim %d is mugged complete!(%d)\n", victim, w->g->workers[victim]->l->elastic_s);  
+                                        printf("victim %d(%d) is mugged completely by %d(%d)\n", victim, w->g->workers[victim]->l->elastic_s, w->self, w->l->elastic_s);  
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                             __builtin_longjmp(w->current_stack_frame->ctx, 1);
                                         } else {
-                                            printf("ERROR: DO_MUGGING3 is changed by others, recover failed\n");
+                                            printf("ERROR: DO_MUGGING3 is changed by others, recover failed (%d)\n", w->l->elastic_s);
                                             abort();
                                         }
                                     } else {
