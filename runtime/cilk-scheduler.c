@@ -1480,6 +1480,37 @@ normal_point: //normal part, can not be preempted
             if (w->g->program->running_job==1) {
                 if (elastic_safe(w)) {
                     if (w->l->elastic_s==ACTIVE) { //steal whole deque if has any, DO_MUGGING
+                        deque_lock_self(w);
+                                        Closure *cl;
+                                        cl = deque_xtract_bottom(w, w->self);
+                                        if (cl!=NULL) {
+                                            if (cl->status==CLOSURE_RETURNING) { //give up mugging
+                                                cl = return_value(w, cl);
+                                                if (cl!=NULL) {
+                                                    if (cl->status==CLOSURE_READY) {
+                                                        deque_add_bottom(w, cl, w->self);
+                                                        setup_for_execution(w, cl);
+                                                        if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
+                                                            if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
+                                                                printf("GIVE UP MUGGING\n");
+                                                                deque_unlock_self(w);
+                                                                longjmp_to_user_code(w, cl);
+                                                            }
+                                                        } else {
+                                                            printf("ERROR: SLEEPING_MUGGING_DEQUE1 is changed by others\n");
+                                                            abort();
+                                                        }
+                                                    } else {
+                                                        printf("ERROR: cl state error (should be CLOSURE_READY)\n");
+                                                        abort();
+                                                    }
+                                                }
+                                            } else {
+                                                printf("ERROR: wrong cl status at bottom [%d] when mugging\n", cl->status);
+                                                abort();
+                                            }
+                                        }
+                                        deque_unlock_self(w);
                         elastic_core_lock(w);
                         int victim = elastic_get_worker_id_sleeping_active_deque(w);
                         elastic_core_unlock(w);
