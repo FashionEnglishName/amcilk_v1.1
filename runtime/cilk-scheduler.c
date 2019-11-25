@@ -1508,11 +1508,11 @@ normal_point: //normal part, can not be preempted
                                     //__builtin_longjmp(w->current_stack_frame->ctx, 1);
                                     if (w->current_stack_frame!=NULL) {
                                         sysdep_longjmp_to_sf(w->current_stack_frame);
-                                    } else {
+                                    }/* else {
                                         w = __cilkrts_get_tls_worker();
                                         printf("p:%d, ERROR: (w:%d) w->current_stack_frame==NULL2 after mugging\n", w->g->program->control_uid, w->self);
                                         abort();
-                                    }
+                                    }*/
                                 } else {
                                     printf("p:%d, ERROR: SLEEPING_MUGGING_DEQUE3 is changed by others, %d\n", w->g->program->control_uid, w->g->workers[victim]->l->elastic_s);
                                     abort();
