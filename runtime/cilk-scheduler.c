@@ -477,7 +477,7 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
                 }
                 Closure_unlock(w, t);
                 deque_unlock_self(w);
-                printf("%d enter Cilk_exception_handler for stealing\n", w->self);
+                //printf("%d enter Cilk_exception_handler for stealing\n", w->self);
                 longjmp_to_runtime(w); // NOT returning back to user code
             } else {
                 Closure_unlock(w, t);
