@@ -1502,7 +1502,7 @@ normal_point: //normal part, can not be preempted
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                             __builtin_longjmp(w->current_stack_frame->ctx, 1);
                                         } else {
-                                            printf("ERROR: DO_MUGGING3 is changed by others, recover failed (%d)\n", w->l->elastic_s);
+                                            printf("ERROR: DO_MUGGING3 is changed by others, %d recover failed (%d)\n", w->self, w->l->elastic_s);
                                             abort();
                                         }
                                     } else {
