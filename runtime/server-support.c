@@ -334,6 +334,12 @@ new_point:
         first_request = platform_pop_first_request(w->g->program->G, 0);
         if (first_request!=NULL) {
             printf("[NEW CONTAINER %d] input: %d\n", w->g->program->control_uid, w->g->program->input);
+            for (int i=2; i<w->g->program->nproc; i++) {
+                if (w->g->workers[i]->l->elastic_s==SLEEPING_ACTIVE_DEQUE) {
+                    printf("!!!SLEEPING_ACTIVE_DEQUE before beginning\n");
+                    abort();
+                }
+            }
             platform_activate_container(w->g->program);//1122
             container_setup_to_run(w->g->program, first_request);
             program_set_activate_container_time_ns(w->g->program);

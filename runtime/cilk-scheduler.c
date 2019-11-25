@@ -1504,7 +1504,6 @@ normal_point: //normal part, can not be preempted
                                 if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {  
                                     printf("%d(%d) jumps to user code\n", w->self, w->l->elastic_s);
                                     //__builtin_longjmp(w->current_stack_frame->ctx, 1);
-                                    w = __cilkrts_get_tls_worker();
                                     if (w->current_stack_frame!=NULL) {
                                         sysdep_longjmp_to_sf(w->current_stack_frame);
                                     } else {
