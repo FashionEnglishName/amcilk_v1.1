@@ -445,7 +445,6 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
                 //printf("TEST[%d]: goto TO_SLEEP state (to_sleep), current_stack_frame:%p, closure status:%d, E:%p\n", w->self, w->current_stack_frame, t->status, w->exc);
                 Closure_unlock(w, t);
                 deque_unlock_self(w);
-                printf("%d enter Cilk_exception_handler for stealing\n", w->self);
                 longjmp_to_runtime(w);
             } else { //when whole deque thief jumps here, do normal routine as if nothing happens
                 w = __cilkrts_get_tls_worker();
@@ -478,6 +477,7 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
                 }
                 Closure_unlock(w, t);
                 deque_unlock_self(w);
+                printf("%d enter Cilk_exception_handler for stealing\n", w->self);
                 longjmp_to_runtime(w); // NOT returning back to user code
             } else {
                 Closure_unlock(w, t);
