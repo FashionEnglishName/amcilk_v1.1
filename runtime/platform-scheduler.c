@@ -64,6 +64,7 @@ void platform_determine_scheduling(platform_global_state * G, enum PLATFORM_SCHE
 
     //set running container in cpu_container_map
     tmp_p = G->program_head->next;
+    int count_running_container = 0;
     while(tmp_p!=NULL) {
         //printf("\tcurrent running p%d, new%d, old%d\n", tmp_p->control_uid, tmp_p->try_num_cpu, tmp_p->num_cpu);
         tmp_p->num_cpu = tmp_p->try_num_cpu;
@@ -87,13 +88,14 @@ void platform_determine_scheduling(platform_global_state * G, enum PLATFORM_SCHE
                 tmp_p->tmp_num_cpu++;
             }
         }
+        count_running_container++;
 
         tmp_p = tmp_p->next;
     }
     //cpu_contain_map is done, then finish allocation by setting cpu_mask
 
     //see container map
-    printf("\tcontainer map: ");
+    printf("\t[%d], container map: ", count_running_container);
     for(i=0; i<G->nproc; i++) {
         printf("%d ", G->cpu_container_map[i]);
     }
