@@ -95,7 +95,7 @@ void platform_determine_scheduling(platform_global_state * G, enum PLATFORM_SCHE
     //cpu_contain_map is done, then finish allocation by setting cpu_mask
 
     //see container map
-    printf("\t[%d], container map: ", count_running_container);
+    printf("\t[%d, %d], container map: ", count_running_container, G->nprogram_running);
     for(i=0; i<G->nproc; i++) {
         printf("%d ", G->cpu_container_map[i]);
     }
