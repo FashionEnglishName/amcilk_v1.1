@@ -1484,7 +1484,7 @@ normal_point: //normal part, can not be preempted
                         elastic_core_unlock(w);
                         if (w->self!=victim && victim!=-1) {
                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVE, DO_MUGGING)) {
-                                if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
+                                if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE3)) {
                                     elastic_mugging(w, victim);
                                     w = __cilkrts_get_tls_worker();
                                     elastic_core_lock(w);
@@ -1495,7 +1495,7 @@ normal_point: //normal part, can not be preempted
                                     w->g->elastic_core->ptr_sleeping_active_deque--;
                                     elastic_core_unlock(w);
 
-                                    if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {    
+                                    if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE3, SLEEPING_INACTIVE_DEQUE)) {    
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                             __builtin_longjmp(w->current_stack_frame->ctx, 1);
                                         } else {
