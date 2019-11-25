@@ -1480,6 +1480,9 @@ normal_point: //normal part, can not be preempted
             if (w->g->program->running_job==1) {
                 if (elastic_safe(w)) {
                     if (w->l->elastic_s==ACTIVE) { //steal whole deque if has any, DO_MUGGING
+                        elastic_core_lock(w);
+                        int victim = elastic_get_worker_id_sleeping_active_deque(w);
+                        elastic_core_unlock(w);
                         deque_lock_self(w);
                                         Closure *cl;
                                         cl = deque_xtract_bottom(w, w->self);
@@ -1511,9 +1514,7 @@ normal_point: //normal part, can not be preempted
                                             }
                                         }
                                         deque_unlock_self(w);
-                        elastic_core_lock(w);
-                        int victim = elastic_get_worker_id_sleeping_active_deque(w);
-                        elastic_core_unlock(w);
+                        
                         if (w->self!=victim && victim!=-1) {
                             if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
                                 printf("victim %d(%d) is going to be mugged by %d(%d)\n", victim, w->g->workers[victim]->l->elastic_s, w->self, w->l->elastic_s);
