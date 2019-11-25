@@ -21,8 +21,8 @@
 #define DEFAULT_FIBER_POOL_CAP  128 // initial per-worker fiber pool capacity 
 
 //C/S arch
-#define SERVER_FIFO_NAME "/home/zhe.wang/cilk_fifo" //"/project/adams/home/zhe.wang/cilk_fifo"
-#define PROGRAM_FIFO_NAME_BASE "/home/zhe.wang/cilk_fifo_p" //"/project/adams/home/zhe.wang/cilk_fifo_p"
+#define SERVER_FIFO_NAME "/project/adams/home/zhe.wang/cilk_fifo" //"/home/zhe.wang/cilk_fifo" //"/project/adams/home/zhe.wang/cilk_fifo"
+#define PROGRAM_FIFO_NAME_BASE "/project/adams/home/zhe.wang/cilk_fifo_p" //"/home/zhe.wang/cilk_fifo_p" //"/project/adams/home/zhe.wang/cilk_fifo_p"
 #define BUF_SIZE 10240
 
 //server end spec
