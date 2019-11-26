@@ -1339,31 +1339,39 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
             if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING0, EXIT_SWITCHING1)) {
                 deque_lock(w, w->g->program->last_do_exit_worker_id);
                 deque_lock_self(w);
-                Closure * cl = deque_peek_top(w, w->self);
-                Closure_lock(w, cl);
-                elastic_mugging(w, w->g->program->last_do_exit_worker_id);
-                if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING1, EXIT_SWITCHING2)) {
-                    while(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s != ACTIVE) {
-                        usleep(TIME_EXIT_CTX_SWITCH); //important for delay avoid unknown sigfault due to inconsistent var
+                Closure * cl_w = deque_peek_top(w, w->self);
+                if (cl_w!=NULL) {
+                    Closure_lock(w, cl_w);
+                    Closure * cl_l = deque_peek_top(w, w->g->program->last_do_exit_worker_id);
+                    if (cl_l!=NULL) {
+                        Closure_lock(w, cl_l);
+                        elastic_mugging(w, w->g->program->last_do_exit_worker_id);
+                        if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING1, EXIT_SWITCHING2)) {
+                            while(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s != ACTIVE) {
+                                usleep(TIME_EXIT_CTX_SWITCH); //important for delay avoid unknown sigfault due to inconsistent var
+                            }
+                            printf("[PLATFORM %d]: invariant %d jumps to exit handling\n", w->g->program->control_uid, w->self);
+                            if (w->current_stack_frame!=NULL) {
+                                Closure_unlock(w, cl_l);
+                                Closure_unlock(w, cl_w);
+                                deque_unlock_self(w);
+                                deque_unlock(w, w->g->program->last_do_exit_worker_id);
+                                sysdep_longjmp_to_sf(w->current_stack_frame);
+                            } else {
+                                printf("[ERROR]: current_stack_frame=NULL in do_exit_switching_for_invariant_handling\n");
+                                abort();
+                            }
+                        } else {
+                            if (w->g->program->last_do_exit_worker_id!=-1) {
+                                printf("%d %d last %d\n", w->g->program->control_uid, w->self, w->g->program->last_do_exit_worker_id);
+                                printf("[ERROR]: set last w %d elastic_s failed! elastic_s %d\n", w->g->program->last_do_exit_worker_id, w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s);
+                                abort();
+                            }
+                        }
+                        Closure_unlock(w, cl_l);
                     }
-                    printf("[PLATFORM %d]: invariant %d jumps to exit handling\n", w->g->program->control_uid, w->self);
-                    if (w->current_stack_frame!=NULL) {
-                        Closure_unlock(w, cl);
-                        deque_unlock_self(w);
-                        deque_unlock(w, w->g->program->last_do_exit_worker_id);
-                        sysdep_longjmp_to_sf(w->current_stack_frame);
-                    } else {
-                        printf("[ERROR]: current_stack_frame=NULL in do_exit_switching_for_invariant_handling\n");
-                        abort();
-                    }
-                } else {
-                    if (w->g->program->last_do_exit_worker_id!=-1) {
-                        printf("%d %d last %d\n", w->g->program->control_uid, w->self, w->g->program->last_do_exit_worker_id);
-                        printf("[ERROR]: set last w %d elastic_s failed! elastic_s %d\n", w->g->program->last_do_exit_worker_id, w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s);
-                        abort();
-                    }
+                    Closure_unlock(w, cl_w);
                 }
-                Closure_unlock(w, cl);
                 deque_unlock_self(w);
                 deque_unlock(w, w->g->program->last_do_exit_worker_id);
             }
