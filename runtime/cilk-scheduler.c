@@ -440,14 +440,14 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
 
     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, TO_SLEEP)) {
         if (w->head <= w->tail) {//zhe del =
-            //sysdep_save_fp_ctrl_state(w->current_stack_frame);
+            sysdep_save_fp_ctrl_state(w->current_stack_frame);
             if (!__builtin_setjmp(w->current_stack_frame->ctx)) {
                 //printf("TEST[%d]: goto TO_SLEEP state (to_sleep), current_stack_frame:%p, closure status:%d, E:%p\n", w->self, w->current_stack_frame, t->status, w->exc);
                 Closure_unlock(w, t);
                 deque_unlock_self(w);
                 longjmp_to_runtime(w);
             } else { //when whole deque thief jumps here, do normal routine as if nothing happens
-                w = __cilkrts_get_tls_worker();
+                //w = __cilkrts_get_tls_worker();
                 //printf("%d jumps at Cilk_exception_handler\n", w->self);
                 return;
             }
@@ -1080,6 +1080,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         Closure *cl;
                                         cl = deque_xtract_bottom(w, w->self);
                                         if (cl!=NULL) {
+                                            Closure_lock(w, cl);
                                             if (cl->status==CLOSURE_RETURNING) { //give up mugging
                                                 w = __cilkrts_get_tls_worker();
                                                 cl = return_value(w, cl);
@@ -1090,6 +1091,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
                                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                                                 printf("p%d, w%d: GIVE UP MUGGING\n", w->g->program->control_uid, w->self);
+                                                                Closure_unlock(w, cl);
                                                                 deque_unlock_self(w);
                                                                 elastic_core_unlock(w);
                                                                 longjmp_to_user_code(w, cl);
@@ -1107,6 +1109,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 printf("ERROR: wrong cl status at bottom [%d] when mugging\n", cl->status);
                                                 abort();
                                             }
+                                            Closure_unlock(w, cl);
                                         }
                                         deque_unlock_self(w);
                                         
@@ -1175,6 +1178,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                     deque_lock_self(w);
                                     Closure *cl = deque_peek_bottom(w, w->self);
                                     if (cl!=NULL) {
+                                        Closure_lock(w, cl);
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
                                             elastic_core_lock(w);
                                             elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque]]);
@@ -1183,6 +1187,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
                                                 if (cl->status==CLOSURE_RUNNING) {
                                                     if (w->current_stack_frame!=NULL) {
+                                                        Closure_unlock(w, cl);
                                                         deque_unlock_self(w);
                                                         sysdep_longjmp_to_sf(w->current_stack_frame);
                                                     } else {
@@ -1201,6 +1206,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             printf("ERROR: activated without requested2\n");
                                             abort();
                                         }
+                                        Closure_unlock(w, cl);
                                         deque_unlock_self(w);
                                     } else { //be mugged
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
@@ -1232,6 +1238,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                 Closure *cl;
                                 cl = deque_xtract_bottom(w, w->self);
                                 if (cl!=NULL) {
+                                    Closure_lock(w, cl);
                                     if (cl->status==CLOSURE_RETURNING) { //give up
                                         w = __cilkrts_get_tls_worker();
                                         cl = return_value(w, cl);
@@ -1241,6 +1248,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 setup_for_execution(w, cl);
                                                 __sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED);
                                                 w->exc = w->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
+                                                Closure_unlock(w, cl);
                                                 deque_unlock_self(w);
                                                 longjmp_to_user_code(w, cl);
                                             } else {
@@ -1252,6 +1260,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         printf("ERROR: wrong cl status at bottom [%d] when deque is empty and go to sleep\n", cl->status);
                                         abort();
                                     }
+                                    Closure_unlock(w, cl);
                                 }
                                 deque_unlock_self(w);
 
