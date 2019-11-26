@@ -1545,10 +1545,10 @@ normal_point: //normal part, can not be preempted
                 }*/
 
                 int victim_worker_id = w->g->elastic_core->cpu_state_group[rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque];
-                if(victim_worker_id != w->self && 
+                if(victim_worker_id != w->self/* && 
                     (w->g->workers[victim_worker_id]->l->elastic_s==ACTIVE || 
                     w->g->workers[victim_worker_id]->l->elastic_s==SLEEP_REQUESTED ||
-                    w->g->workers[victim_worker_id]->l->elastic_s==TO_SLEEP)) {
+                    w->g->workers[victim_worker_id]->l->elastic_s==TO_SLEEP)*/) {
                     w = __cilkrts_get_tls_worker();
                     t = Closure_steal(w, victim_worker_id);
                 } else {
