@@ -1238,7 +1238,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                 Closure *cl;
                                 cl = deque_xtract_bottom(w, w->self);
                                 if (cl!=NULL) {
-                                    Closure_lock(w, cl);
+                                    //Closure_lock(w, cl);
                                     if (cl->status==CLOSURE_RETURNING) { //give up
                                         w = __cilkrts_get_tls_worker();
                                         cl = return_value(w, cl);
@@ -1248,7 +1248,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 setup_for_execution(w, cl);
                                                 __sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED);
                                                 w->exc = w->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
-                                                Closure_unlock(w, cl);
+                                                //Closure_unlock(w, cl);
                                                 deque_unlock_self(w);
                                                 longjmp_to_user_code(w, cl);
                                             } else {
@@ -1260,7 +1260,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         printf("ERROR: wrong cl status at bottom [%d] when deque is empty and go to sleep\n", cl->status);
                                         abort();
                                     }
-                                    Closure_unlock(w, cl);
+                                    //Closure_unlock(w, cl);
                                 }
                                 deque_unlock_self(w);
 
