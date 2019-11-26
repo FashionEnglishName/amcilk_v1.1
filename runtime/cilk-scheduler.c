@@ -1114,7 +1114,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 abort();
                                             }
                                         }*/
-                                        cl = deque_peek_bottom(w, w->self);
+                                        //cl = deque_peek_bottom(w, w->self);
                                         if (cl!=NULL) {
                                             if (cl->status==CLOSURE_RETURNING) { //give up mugging
                                                 if(w->l->fiber_to_free) { 
@@ -1123,14 +1123,14 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 w->l->fiber_to_free = NULL;
                                                 if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
                                                     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
-                                                        deque_unlock_self(w);
+                                                        //deque_unlock_self(w);
                                                         elastic_core_unlock(w);
                                                         return res;
                                                     }
                                                 }
                                             }
                                         }
-                                        deque_unlock_self(w);
+                                        //deque_unlock_self(w);
                                         
 
                                         w = __cilkrts_get_tls_worker();
@@ -1253,7 +1253,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                             }
                         } else { //deque is empty
                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), TO_SLEEP, SLEEPING_ADAPTING_DEQUE)) {
-                                deque_lock_self(w);
+                                //deque_lock_self(w);
                                 Closure *cl;
                                 /*cl = deque_xtract_bottom(w, w->self);
                                 if (cl!=NULL) {
@@ -1295,7 +1295,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         }
                                     }
                                 }
-                                deque_unlock_self(w);
+                                //deque_unlock_self(w);
 
                                 if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_INACTIVE_DEQUE)) { 
                                     elastic_core_lock(w);
