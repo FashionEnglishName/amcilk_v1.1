@@ -92,8 +92,31 @@ static void signal_immediate_exception_to_all(__cilkrts_worker *const w) {
 }
 */
 
-static void setup_for_execution(__cilkrts_worker * w, Closure *t) {
+// ==============================================
+// TLS related functions 
+// ==============================================
+static pthread_key_t worker_key;
 
+void __cilkrts_init_tls_variables() {
+    int status = pthread_key_create(&worker_key, NULL);
+    USE_UNUSED(status);
+    CILK_ASSERT_G(status == 0);   
+}
+
+void * __cilkrts_get_current_thread_id() {
+    return (void *)pthread_self();
+}
+
+__cilkrts_worker * __cilkrts_get_tls_worker() {
+    return tls_worker;
+}
+
+void __cilkrts_set_tls_worker(__cilkrts_worker *w) {
+    tls_worker = w;
+}
+
+static void setup_for_execution(__cilkrts_worker * w, Closure *t) {
+    w = __cilkrts_get_tls_worker();
     __cilkrts_alert(ALERT_SCHED, 
         "[%d]: (setup_for_execution) closure %p\n", w->self, t);
     t->frame->worker = w;
@@ -112,7 +135,7 @@ static void setup_for_execution(__cilkrts_worker * w, Closure *t) {
 // the right fiber), or b) a worker just performed a provably good steal
 // successfully
 static void setup_for_sync(__cilkrts_worker *w, Closure *t) {
-
+    w = __cilkrts_get_tls_worker();
     Closure_assert_ownership(w, t);
     // ANGE: this must be true since in case a) we would have freed it in
     // Cilk_sync, or in case b) we would have freed it when we first returned to
@@ -139,29 +162,6 @@ static void setup_for_sync(__cilkrts_worker *w, Closure *t) {
     t->frame->worker = w;
 }
 
-
-// ==============================================
-// TLS related functions 
-// ==============================================
-static pthread_key_t worker_key;
-
-void __cilkrts_init_tls_variables() {
-    int status = pthread_key_create(&worker_key, NULL);
-    USE_UNUSED(status);
-    CILK_ASSERT_G(status == 0);   
-}
-
-void * __cilkrts_get_current_thread_id() {
-    return (void *)pthread_self();
-}
-
-__cilkrts_worker * __cilkrts_get_tls_worker() {
-    return tls_worker;
-}
-
-void __cilkrts_set_tls_worker(__cilkrts_worker *w) {
-    tls_worker = w;
-}
 
 
 // ==============================================
@@ -922,6 +922,7 @@ give_up:
 
 __attribute__((noreturn)) void 
 longjmp_to_user_code(__cilkrts_worker * w, Closure *t) {
+    w = __cilkrts_get_tls_worker();
     __cilkrts_stack_frame *sf = t->frame;
     struct cilk_fiber *fiber = t->fiber;
 
@@ -956,6 +957,7 @@ longjmp_to_user_code(__cilkrts_worker * w, Closure *t) {
 }
 
 __attribute__((noreturn)) void longjmp_to_runtime(__cilkrts_worker * w) {
+    w = __cilkrts_get_tls_worker();
     __cilkrts_alert(ALERT_SCHED | ALERT_FIBER, 
             "[%d]: (longjmp_to_runtime)\n", w->self);
 
@@ -1029,7 +1031,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
 
     Closure *res = NULL;
     __cilkrts_stack_frame *f;
-
+    w = __cilkrts_get_tls_worker();
     if (t!=NULL) { //worker TO_SLEEP deque is empty
         __cilkrts_alert(ALERT_SCHED, "[%d]: (do_what_it_says) closure %p\n", w->self, t);
         Closure_lock(w, t);
@@ -1079,6 +1081,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         cl = deque_xtract_bottom(w, w->self);
                                         if (cl!=NULL) {
                                             if (cl->status==CLOSURE_RETURNING) { //give up mugging
+                                                w = __cilkrts_get_tls_worker();
                                                 cl = return_value(w, cl);
                                                 if (cl!=NULL) {
                                                     if (cl->status==CLOSURE_READY) {
@@ -1216,6 +1219,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                 cl = deque_xtract_bottom(w, w->self);
                                 if (cl!=NULL) {
                                     if (cl->status==CLOSURE_RETURNING) { //give up
+                                        w = __cilkrts_get_tls_worker();
                                         cl = return_value(w, cl);
                                         if (cl!=NULL) {
                                             if (cl->status==CLOSURE_READY) {
@@ -1279,6 +1283,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                 // the return protocol assumes t is not locked, and everybody 
                 // will respect the fact that t is returning
                 Closure_unlock(w, t);
+                w = __cilkrts_get_tls_worker();
                 res = return_value(w, t);
                 break; // ?
 
@@ -1422,6 +1427,7 @@ void worker_scheduler(__cilkrts_worker *w, Closure *t) {
     CILK_ASSERT(w, w == __cilkrts_get_tls_worker());
     rts_srand(w, w->self * 162347);  
     CILK_START_TIMING(w, INTERVAL_SCHED);
+    w = __cilkrts_get_tls_worker();
     while(!w->g->done) {//!w->g->done, meaningless, just kept for original structure
         //printf("%d %d: w->g->program->done_one = %d\n", w->g->program->done_one, w->g->program->control_uid, w->self);
 job_finish_point:
@@ -1532,6 +1538,7 @@ normal_point: //normal part, can not be preempted
                     (w->g->workers[victim_worker_id]->l->elastic_s==ACTIVE || 
                     w->g->workers[victim_worker_id]->l->elastic_s==SLEEP_REQUESTED ||
                     w->g->workers[victim_worker_id]->l->elastic_s==TO_SLEEP)) {
+                    w = __cilkrts_get_tls_worker();
                     t = Closure_steal(w, victim_worker_id);
                 } else {
                     //pass

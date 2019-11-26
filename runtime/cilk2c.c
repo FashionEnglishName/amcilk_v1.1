@@ -74,7 +74,7 @@ void __cilkrts_sync(__cilkrts_stack_frame *sf) {
     //CILK_ASSERT(w, sf->worker == __cilkrts_get_tls_worker());
     CILK_ASSERT(w, sf->flags & CILK_FRAME_VERSION);
     CILK_ASSERT(w, sf == w->current_stack_frame);
-
+    w = __cilkrts_get_tls_worker();
     if( Cilk_sync(w, sf) == SYNC_READY ) {
         __cilkrts_alert(ALERT_SYNC, 
             "[%d]: (__cilkrts_sync) synced frame %p!\n", w->self, sf);
@@ -149,6 +149,7 @@ void __cilkrts_leave_frame(__cilkrts_stack_frame * sf) {
                 "[%d]: (__cilkrts_leave_frame) parent is call_parent!\n", w->self);
             // leaving a full frame; need to get the full frame of its call
             // parent back onto the deque
+            w = __cilkrts_get_tls_worker();
             Cilk_set_return(w);
             CILK_ASSERT(w, w->current_stack_frame->flags & CILK_FRAME_VERSION);
         }
