@@ -440,17 +440,17 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
 
     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, TO_SLEEP)) {
         if (w->head <= w->tail) {//zhe del =
-            //sysdep_save_fp_ctrl_state(w->current_stack_frame);
-            if (!__builtin_setjmp(w->current_stack_frame->ctx)) {
+            sysdep_save_fp_ctrl_state(w->current_stack_frame);
+            //if (!__builtin_setjmp(w->current_stack_frame->ctx)) {
                 //printf("TEST[%d]: goto TO_SLEEP state (to_sleep), current_stack_frame:%p, closure status:%d, E:%p\n", w->self, w->current_stack_frame, t->status, w->exc);
                 Closure_unlock(w, t);
                 deque_unlock_self(w);
                 longjmp_to_runtime(w);
-            } else { //when whole deque thief jumps here, do normal routine as if nothing happens
-                w = __cilkrts_get_tls_worker();
-                printf("%d jumps at Cilk_exception_handler\n", w->self);
-                return;
-            }
+            //} else { //when whole deque thief jumps here, do normal routine as if nothing happens
+                //w = __cilkrts_get_tls_worker();
+                //printf("%d jumps at Cilk_exception_handler\n", w->self);
+               // return;
+            //}
         } else {// w->head>w->tail
             __cilkrts_alert(ALERT_EXCEPT, "[%d]: (Cilk_exception_handler) this is a steal!\n", w->self);
             //printf("TEST[%d]: goto TO_SLEEP state (steal&to_sleep), current_stack_frame:%p, closure status:%d, E:%p\n", w->self, w->current_stack_frame, t->status, w->exc);
@@ -1130,8 +1130,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                     deque_unlock_self(w);
                                                     deque_unlock(w, victim);
                                                     elastic_core_unlock(w);
-                                                    //sysdep_longjmp_to_sf(w->current_stack_frame);
-                                                    __builtin_longjmp(w->current_stack_frame->ctx, 1);
+                                                    sysdep_longjmp_to_sf(w->current_stack_frame);
                                                 } else {
                                                     printf("ERROR: current_stack_frame==NULL in MUGGING after entering runtime\n");
                                                     abort();
@@ -1185,8 +1184,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 if (cl->status==CLOSURE_RUNNING) {
                                                     if (w->current_stack_frame!=NULL) {
                                                         deque_unlock_self(w);
-                                                        //sysdep_longjmp_to_sf(w->current_stack_frame);
-                                                        __builtin_longjmp(w->current_stack_frame->ctx, 1);
+                                                        sysdep_longjmp_to_sf(w->current_stack_frame);
                                                     } else {
                                                         printf("ERROR: w->current_stack_frame==NULL when being activated (be not mugged case)\n");
                                                         abort();
@@ -1582,8 +1580,7 @@ normal_point: //normal part, can not be preempted
                                 deque_unlock_self(w);
                                 deque_unlock(w, victim_worker_id);
                                 elastic_core_unlock(w);
-                                //sysdep_longjmp_to_sf(w->current_stack_frame);
-                                __builtin_longjmp(w->current_stack_frame->ctx, 1);
+                                sysdep_longjmp_to_sf(w->current_stack_frame);
                             } else {
                                 printf("ERROR: !!current_stack_frame==NULL, %p, %p\n", w->current_stack_frame, w->g->workers[victim_worker_id]->current_stack_frame);
                                 abort();
