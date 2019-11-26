@@ -1,4 +1,5 @@
 #include "internal.h"
+#include "stdio.h"
 
 void micro_test_get_clock(platform_global_state * G, int idx);
 unsigned long long micro_get_diff_a_b(platform_global_state * G, int idx_a, int idx_b);
