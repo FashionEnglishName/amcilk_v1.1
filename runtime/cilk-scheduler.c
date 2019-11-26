@@ -1555,10 +1555,11 @@ normal_point: //normal part, can not be preempted
                 }*/
 
                 int victim_worker_id = w->g->elastic_core->cpu_state_group[rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque];
-                if(victim_worker_id != w->self/* && 
+                if(victim_worker_id != w->self && 
                     (w->g->workers[victim_worker_id]->l->elastic_s==ACTIVE || 
                     w->g->workers[victim_worker_id]->l->elastic_s==SLEEP_REQUESTED ||
-                    w->g->workers[victim_worker_id]->l->elastic_s==TO_SLEEP)*/) {
+                    w->g->workers[victim_worker_id]->l->elastic_s==TO_SLEEP ||
+                    w->g->workers[victim_worker_id]->l->elastic_s==SLEEPING_ACTIVE_DEQUE)) {
                     if (__sync_bool_compare_and_swap(&(w->g->workers[victim_worker_id]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
                         elastic_core_lock(w);
                         deque_lock(w, victim_worker_id);
@@ -1581,7 +1582,7 @@ normal_point: //normal part, can not be preempted
                                 elastic_core_unlock(w);
                                 sysdep_longjmp_to_sf(w->current_stack_frame);
                             } else {
-                                printf("!!current_stack_frame==NULL, %p, %p\n", w->current_stack_frame, w->g->workers[victim_worker_id]->current_stack_frame);
+                                printf("ERROR: !!current_stack_frame==NULL, %p, %p\n", w->current_stack_frame, w->g->workers[victim_worker_id]->current_stack_frame);
                                 abort();
                             }
                         } else {
