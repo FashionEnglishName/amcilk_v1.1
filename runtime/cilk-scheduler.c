@@ -1126,10 +1126,15 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
 
                                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {    
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
-                                                deque_unlock_self(w);
-                                                deque_unlock(w, victim);
-                                                elastic_core_unlock(w);
-                                                sysdep_longjmp_to_sf(w->current_stack_frame);
+                                                if (w->current_stack_frame!=NULL) {
+                                                    deque_unlock_self(w);
+                                                    deque_unlock(w, victim);
+                                                    elastic_core_unlock(w);
+                                                    sysdep_longjmp_to_sf(w->current_stack_frame);
+                                                } else {
+                                                    printf("ERROR: current_stack_frame==NULL in MUGGING after entering runtime\n");
+                                                    abort();
+                                                }
                                             } else {
                                                 printf("ERROR: DO_MUGGING1 is changed by others, recover failed\n");
                                                 abort();
@@ -1330,9 +1335,14 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                         usleep(TIME_EXIT_CTX_SWITCH); //important for delay avoid unknown sigfault due to inconsistent var
                     }
                     printf("[PLATFORM]: invariant %d jumps to exit handling\n", w->self);
-                    deque_unlock_self(w);
-                    deque_unlock(w, w->g->program->last_do_exit_worker_id);
-                    sysdep_longjmp_to_sf(w->current_stack_frame);
+                    if (w->current_stack_frame!=NULL) {
+                        deque_unlock_self(w);
+                        deque_unlock(w, w->g->program->last_do_exit_worker_id);
+                        sysdep_longjmp_to_sf(w->current_stack_frame);
+                    } else {
+                        printf("[ERROR]: current_stack_frame=NULL in do_exit_switching_for_invariant_handling\n");
+                        abort();
+                    }
                 } else {
                     if (w->g->program->last_do_exit_worker_id!=-1) {
                         printf("%d %d last %d\n", w->g->program->control_uid, w->self, w->g->program->last_do_exit_worker_id);
