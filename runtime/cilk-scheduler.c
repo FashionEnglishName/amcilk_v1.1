@@ -1281,6 +1281,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                     }
                                     //Closure_unlock(w, cl);
                                 }*/
+                                cl = deque_peek_bottom(w, w->self);
                                 if (cl!=NULL) {
                                     if (cl->status==CLOSURE_RETURNING) { //give up mugging
                                         if(w->l->fiber_to_free) { 
