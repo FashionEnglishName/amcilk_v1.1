@@ -1064,8 +1064,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                     "[%d]: (do_what_it_says) Jump into user code.\n", w->self);
 
                 if( __builtin_setjmp(w->l->rts_ctx) == 0 ) {
-                    w->l->give_up_mugging = 0;
-                    w->l->give_up_sleeping = 0;
                     longjmp_to_user_code(w, t);
                 } else {
                     //Zhe: the hook for longjmp_to_runtime
