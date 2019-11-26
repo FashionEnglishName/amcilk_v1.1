@@ -1546,6 +1546,7 @@ normal_point: //normal part, can not be preempted
                                 deque_unlock(w, victim);
                             }
                         }
+                        elastic_core_unlock(w);
                     }
                 }
 
