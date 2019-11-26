@@ -1571,7 +1571,7 @@ normal_point: //normal part, can not be preempted
                     (w->g->workers[victim_worker_id]->l->elastic_s==ACTIVE || 
                     w->g->workers[victim_worker_id]->l->elastic_s==SLEEP_REQUESTED ||
                     w->g->workers[victim_worker_id]->l->elastic_s==TO_SLEEP/* ||
-                    w->g->workers[victim_worker_id]->l->elastic_s==SLEEPING_ACTIVE_DEQUE)*/) {
+                    w->g->workers[victim_worker_id]->l->elastic_s==SLEEPING_ACTIVE_DEQUE*/)) {
                     /*if (__sync_bool_compare_and_swap(&(w->g->workers[victim_worker_id]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
                         elastic_core_lock(w);
                         deque_lock(w, victim_worker_id);
