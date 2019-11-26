@@ -20,7 +20,7 @@
 #define DEFAULT_STACK_SIZE 0x100000 // 1 MBytes
 #define DEFAULT_FIBER_POOL_CAP  128 // initial per-worker fiber pool capacity 
 
-/*
+
 //C/S arch
 #define SERVER_FIFO_NAME "/home/zhe.wang/cilk_fifo" //"/home/zhe.wang/cilk_fifo" //"/project/adams/home/zhe.wang/cilk_fifo"
 #define PROGRAM_FIFO_NAME_BASE "/home/zhe.wang/cilk_fifo_p" //"/home/zhe.wang/cilk_fifo_p" //"/project/adams/home/zhe.wang/cilk_fifo_p"
@@ -35,8 +35,9 @@
 #define GUARANTEE_PREMPT_WAITING_TIME 10000
 #define CONTAINER_COUNT_THRESHOLD CONTAINER_COUNT
 #define OVERLOADED_THRESHOLD 2*CONTAINER_COUNT
-*/
 
+
+/*
 //C/S arch
 #define SERVER_FIFO_NAME "/project/adams/home/zhe.wang/cilk_fifo" //"/home/zhe.wang/cilk_fifo" //"/project/adams/home/zhe.wang/cilk_fifo"
 #define PROGRAM_FIFO_NAME_BASE "/project/adams/home/zhe.wang/cilk_fifo_p" //"/home/zhe.wang/cilk_fifo_p" //"/project/adams/home/zhe.wang/cilk_fifo_p"
@@ -51,5 +52,5 @@
 #define GUARANTEE_PREMPT_WAITING_TIME 10000
 #define CONTAINER_COUNT_THRESHOLD CONTAINER_COUNT
 #define OVERLOADED_THRESHOLD 2*CONTAINER_COUNT
-
+*/
 #endif // _CONFIG_H 
