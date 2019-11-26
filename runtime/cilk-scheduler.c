@@ -1319,7 +1319,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
             }
             deque_unlock_self(w);
             if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING0, EXIT_SWITCHING1)) {
-                deque_lock(w, victim);
+                deque_lock(w, w->g->program->last_do_exit_worker_id);
                 deque_lock_self(w);
                 elastic_mugging(w, w->g->program->last_do_exit_worker_id);
                 if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING1, EXIT_SWITCHING2)) {
@@ -1328,7 +1328,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                     }
                     printf("[PLATFORM]: invariant %d jumps to exit handling\n", w->self);
                     deque_unlock_self(w);
-                    deque_unlock(w, victim);
+                    deque_unlock(w, w->g->program->last_do_exit_worker_id);
                     sysdep_longjmp_to_sf(w->current_stack_frame);
                 } else {
                     if (w->g->program->last_do_exit_worker_id!=-1) {
@@ -1338,7 +1338,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                     }
                 }
                 deque_unlock_self(w);
-                deque_unlock(w, victim);
+                deque_unlock(w, w->g->program->last_do_exit_worker_id);
             }
         } else if (w->self==w->g->program->last_do_exit_worker_id) {
             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVE, EXIT_SWITCHING0)) {
