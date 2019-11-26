@@ -1507,29 +1507,24 @@ normal_point: //normal part, can not be preempted
 
             w = __cilkrts_get_tls_worker();
             if (w->g->program->running_job==1) {
-                if (elastic_safe(w)) {
-                    if (w->l->elastic_s==ACTIVE) { //steal whole deque if has any, DO_MUGGING
-                        //elastic_core_lock(w);
-                        int victim = elastic_get_worker_id_sleeping_active_deque(w);
-                        //elastic_core_unlock(w);
-                        
-                        if (w->self!=victim && victim!=-1) {
-                            if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
+                        int victim_worker_id = elastic_get_worker_id_sleeping_active_deque(w);                        
+                        if (w->self!=victim_worker_id && victim_worker_id!=-1) {
+                            if (__sync_bool_compare_and_swap(&(w->g->workers[victim_worker_id]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
                                 elastic_core_lock(w);
-                                deque_lock(w, victim);
+                                deque_lock(w, victim_worker_id);
                                 deque_lock_self(w);
-                                elastic_mugging(w, victim);
+                                elastic_mugging(w, victim_worker_id);
                                 //elastic_core_lock(w);
                                 w->g->elastic_core->ptr_sleeping_inactive_deque--;
-                                int tmp_victim_cpu_state_group_pos = w->g->workers[victim]->l->elastic_pos_in_cpu_state_group;
-                                elastic_do_exchange_state_group(w->g->workers[victim], w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
+                                int tmp_victim_cpu_state_group_pos = w->g->workers[victim_worker_id]->l->elastic_pos_in_cpu_state_group;
+                                elastic_do_exchange_state_group(w->g->workers[victim_worker_id], w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
                                 elastic_do_exchange_state_group(w->g->workers[w->g->elastic_core->cpu_state_group[tmp_victim_cpu_state_group_pos]], w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque]]);
                                 w->g->elastic_core->ptr_sleeping_active_deque--;
                                 //elastic_core_unlock(w);
-                                if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {  
+                                if (__sync_bool_compare_and_swap(&(w->g->workers[victim_worker_id]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {  
                                     if (w->current_stack_frame!=NULL) {
                                         deque_unlock_self(w);
-                                        deque_unlock(w, victim);
+                                        deque_unlock(w, victim_worker_id);
                                         elastic_core_unlock(w);
                                         sysdep_longjmp_to_sf(w->current_stack_frame);
                                     } else {
@@ -1540,19 +1535,16 @@ normal_point: //normal part, can not be preempted
                                         w->l->fiber_to_free = NULL;
                                     }
                                 } else {
-                                    printf("p:%d, ERROR: SLEEPING_MUGGING_DEQUE3 is changed by others, %d\n", w->g->program->control_uid, w->g->workers[victim]->l->elastic_s);
+                                    printf("p:%d, ERROR: SLEEPING_MUGGING_DEQUE3 is changed by others, %d\n", w->g->program->control_uid, w->g->workers[victim_worker_id]->l->elastic_s);
                                     abort();
                                 }
                                 deque_unlock_self(w);
-                                deque_unlock(w, victim);
+                                deque_unlock(w, victim_worker_id);
                                 elastic_core_unlock(w);
                             }
                         }
-                    }
-                }
 
-                int victim = rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque;
-                int victim_worker_id = w->g->elastic_core->cpu_state_group[victim];
+                victim_worker_id = w->g->elastic_core->cpu_state_group[rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque];
                 if(victim_worker_id != w->self && 
                     (w->g->workers[victim_worker_id]->l->elastic_s==ACTIVE || 
                     w->g->workers[victim_worker_id]->l->elastic_s==SLEEP_REQUESTED ||
