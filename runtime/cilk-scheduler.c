@@ -460,14 +460,7 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
             }
             Closure_unlock(w, t);
             deque_unlock_self(w);
-            sysdep_save_fp_ctrl_state(w->current_stack_frame);
-            if (!__builtin_setjmp(w->current_stack_frame->ctx)) {
-                longjmp_to_runtime(w); // NOT returning back to user code  
-            } else {
-                w = __cilkrts_get_tls_worker();
-                //printf("%d jumps at Cilk_exception_handler\n", w->self);
-                return;
-            }
+            longjmp_to_runtime(w); // NOT returning back to user code  
         }
 
     } else { //normal routine
