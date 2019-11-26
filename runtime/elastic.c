@@ -147,10 +147,10 @@ void elastic_mugging(__cilkrts_worker *w, int victim){
     w->l->shadow_stack = w->g->workers[victim]->l->shadow_stack;
     w->g->workers[victim]->l->shadow_stack = shadow_tmp;
 
-    /*int tmp_provably_good_steal;
+    int tmp_provably_good_steal;
     tmp_provably_good_steal = w->l->provably_good_steal;
     w->l->provably_good_steal = w->g->workers[victim]->l->provably_good_steal;
-    w->g->workers[victim]->l->provably_good_steal = tmp_provably_good_steal;*/
+    w->g->workers[victim]->l->provably_good_steal = tmp_provably_good_steal;
 
     __cilkrts_stack_frame * tmp_current_stack_frame;
     tmp_current_stack_frame = w->g->workers[victim]->current_stack_frame;

@@ -964,7 +964,7 @@ __attribute__((noreturn)) void longjmp_to_runtime(__cilkrts_worker * w) {
     CILK_STOP_TIMING(w, INTERVAL_WORK);
     CILK_START_TIMING(w, INTERVAL_SCHED);
     //__sync_bool_compare_and_swap(&(w->l->is_in_runtime), 0, 1);
-    Cilk_fence();
+    //Cilk_fence();
     //CILK_MB();
     __builtin_longjmp(w->l->rts_ctx, 1);
 }
@@ -1568,11 +1568,8 @@ normal_point: //normal part, can not be preempted
                                 elastic_core_unlock(w);
                                 sysdep_longjmp_to_sf(w->current_stack_frame);
                             } else {
-                                w = __cilkrts_get_tls_worker();
-                                if(w->l->fiber_to_free) { 
-                                    cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
-                                }
-                                w->l->fiber_to_free = NULL;
+                                printf("!!!????>>>>>current_stack_frame==NULL\n");
+                                abort();
                             }
                         } else {
                             printf("p:%d, ERROR: SLEEPING_MUGGING_DEQUE3 is changed by others, %d\n", w->g->program->control_uid, w->g->workers[victim_worker_id]->l->elastic_s);
