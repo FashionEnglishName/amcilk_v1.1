@@ -1123,7 +1123,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 w->l->fiber_to_free = NULL;
                                                 deque_unlock_self(w);
                                                 elastic_core_unlock(w);
-                                                return res;
+                                                return NULL;
                                             }
                                         }
                                         deque_unlock_self(w);
