@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdint.h>
+#include "../runtime/rts-config.h"
 
 int program;
 int input;
