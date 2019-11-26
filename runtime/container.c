@@ -240,6 +240,6 @@ void container_do_elastic_adaption(platform_program * p) {
     }
     t4 = micro_get_clock();
     //printf("\t%d %d scheduling activating cores done\n", p->control_uid, p->input);
-    print_cpu_state_group(p);
+    //print_cpu_state_group(p);
     //printf("%f, %f, %f, %f\n", (t1-t0)/1000/1000/1000.0, (t2-t1)/1000/1000/1000.0, (t3-t2)/1000/1000/1000.0, (t4-t3)/1000/1000/1000.0);
 }

@@ -1392,32 +1392,6 @@ void do_exit_blocking_container_handling(__cilkrts_worker *w) {
 void worker_sleep_handling(__cilkrts_worker *w) {
     w = __cilkrts_get_tls_worker();
     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, SLEEPING_ADAPTING_DEQUE)) {
-        deque_lock_self(w);
-                                Closure *cl;
-                                cl = deque_xtract_bottom(w, w->self);
-                                if (cl!=NULL) {
-                                    if (cl->status==CLOSURE_RETURNING) { //give up
-                                        cl = return_value(w, cl);
-                                        if (cl!=NULL) {
-                                            if (cl->status==CLOSURE_READY) {
-                                                deque_add_bottom(w, cl, w->self);
-                                                setup_for_execution(w, cl);
-                                                __sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED);
-                                                w->exc = w->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
-                                                deque_unlock_self(w);
-                                                longjmp_to_user_code(w, cl);
-                                            } else {
-                                                printf("ERROR: error2 cl status %d\n", cl->status);
-                                                abort();
-                                            }
-                                        }
-                                    } else {
-                                        printf("ERROR: wrong cl status at bottom [%d] when deque is empty and go to sleep\n", cl->status);
-                                        abort();
-                                    }
-                                }
-                                deque_unlock_self(w);
-
         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {
 
             elastic_core_lock(w);
