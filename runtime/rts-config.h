@@ -31,7 +31,7 @@
 #define TIME_MAKE_SURE_TO_ACTIVATE 100//100 //important! depends of implementation of block/activate mechanism
 #define TIME_EXIT_CTX_SWITCH 100 //important! can not be too small for the efficiency
 #define TIME_REQUEST_RECEIVE_INTERVAL 25000//Bing: 50000, 45000, 75301; Finance:
-#define TIME_CONTAINER_TRIGGER_INTERVAL (CONTAINER_COUNT/15)*2*TIME_REQUEST_RECEIVE_INTERVAL //important! when workload is high
+#define TIME_CONTAINER_TRIGGER_INTERVAL 8*TIME_REQUEST_RECEIVE_INTERVAL //important! when workload is high
 #define GUARANTEE_PREMPT_WAITING_TIME 10000
 #define CONTAINER_COUNT_THRESHOLD CONTAINER_COUNT
 #define OVERLOADED_THRESHOLD 2*CONTAINER_COUNT
