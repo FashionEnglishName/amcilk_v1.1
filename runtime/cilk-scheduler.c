@@ -1554,6 +1554,7 @@ normal_point: //normal part, can not be preempted
                         deque_lock(w, victim_worker_id);
                         deque_lock_self(w);
                         elastic_mugging(w, victim_worker_id);
+                        printf("1\n");
                         //elastic_core_lock(w);
                         w->g->elastic_core->ptr_sleeping_inactive_deque--;
                         int tmp_victim_cpu_state_group_pos = w->g->workers[victim_worker_id]->l->elastic_pos_in_cpu_state_group;
@@ -1562,7 +1563,9 @@ normal_point: //normal part, can not be preempted
                         w->g->elastic_core->ptr_sleeping_active_deque--;
                         //elastic_core_unlock(w);
                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim_worker_id]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {  
+                            printf("2\n");
                             if (w->current_stack_frame!=NULL) {
+                                printf("3\n");
                                 deque_unlock_self(w);
                                 deque_unlock(w, victim_worker_id);
                                 elastic_core_unlock(w);
