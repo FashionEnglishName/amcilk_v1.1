@@ -1554,7 +1554,7 @@ normal_point: //normal part, can not be preempted
                         deque_lock(w, victim_worker_id);
                         deque_lock_self(w);
                         elastic_mugging(w, victim_worker_id);
-                        printf("1\n");
+                        printf("1, %p, %p\n", w->current_stack_frame, w->g->workers[victim_worker_id]->current_stack_frame);
                         //elastic_core_lock(w);
                         w->g->elastic_core->ptr_sleeping_inactive_deque--;
                         int tmp_victim_cpu_state_group_pos = w->g->workers[victim_worker_id]->l->elastic_pos_in_cpu_state_group;
@@ -1563,17 +1563,15 @@ normal_point: //normal part, can not be preempted
                         w->g->elastic_core->ptr_sleeping_active_deque--;
                         //elastic_core_unlock(w);
                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim_worker_id]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {  
-                            printf("2\n");
+                            printf("2, %p, %p\n", w->current_stack_frame, w->g->workers[victim_worker_id]->current_stack_frame);
                             if (w->current_stack_frame!=NULL) {
-                                if (1) {
-                                    printf("3\n");
-                                    deque_unlock_self(w);
-                                    deque_unlock(w, victim_worker_id);
-                                    elastic_core_unlock(w);
-                                    sysdep_longjmp_to_sf(w->current_stack_frame);
-                                }
+                                printf("3, %p, %p\n", w->current_stack_frame, w->g->workers[victim_worker_id]->current_stack_frame);
+                                deque_unlock_self(w);
+                                deque_unlock(w, victim_worker_id);
+                                elastic_core_unlock(w);
+                                sysdep_longjmp_to_sf(w->current_stack_frame);
                             } else {
-                                printf("!!current_stack_frame==NULL\n");
+                                printf("!!current_stack_frame==NULL, %p, %p\n", w->current_stack_frame, w->g->workers[victim_worker_id]->current_stack_frame);
                                 abort();
                             }
                         } else {
