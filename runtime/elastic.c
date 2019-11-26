@@ -288,7 +288,9 @@ void print_num_ancestor() {
 }*/
 //correct standard
 int elastic_get_worker_id_sleeping_active_deque(__cilkrts_worker *w) {
-    print_cpu_state_group(w->g->program);
+    if (w->self==w->g->program->invariant_running_worker_id) {
+        print_cpu_state_group(w->g->program);
+    }
     for (int i=0; i<w->g->program->G->nproc; i++) {
         if (w->g->workers[i]->l->elastic_s==SLEEPING_ACTIVE_DEQUE) {
             return i;
@@ -482,7 +484,7 @@ void print_cpu_state_group(platform_program * p) {
     for (i=0; i<p->g->options.nproc; i++) {
         printf("%d ", p->g->workers[p->g->elastic_core->cpu_state_group[i]]->l->elastic_s);
     }
-    //printf("\n");
+    printf("\n");
     //printf("\t(ptr_sleeping_inactive_deque %d)", p->g->elastic_core->ptr_sleeping_inactive_deque);
     //printf("(ptr_sleeping_active_deque %d)\n", p->g->elastic_core->ptr_sleeping_active_deque);
 }
