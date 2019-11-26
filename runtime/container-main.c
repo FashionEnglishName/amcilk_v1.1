@@ -160,7 +160,7 @@ run_point:
         abort();
     }
 
-    sleep(1);
+    usleep(100000);
 
     //a job is completed
     w = __cilkrts_get_tls_worker();
