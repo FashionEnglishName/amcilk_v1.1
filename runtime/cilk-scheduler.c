@@ -1528,8 +1528,11 @@ normal_point: //normal part, can not be preempted
                                 elastic_core_unlock(w);
                                 sysdep_longjmp_to_sf(w->current_stack_frame);
                             } else {
-                                printf("ERROR: DO_MUGGING3 (current_stack_frame==NULL)\n");
-                                abort();
+                                w = __cilkrts_get_tls_worker();
+                                if(w->l->fiber_to_free) { 
+                                    cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
+                                }
+                                w->l->fiber_to_free = NULL;
                             }
                         } else {
                             printf("p:%d, ERROR: SLEEPING_MUGGING_DEQUE3 is changed by others, %d\n", w->g->program->control_uid, w->g->workers[victim_worker_id]->l->elastic_s);
