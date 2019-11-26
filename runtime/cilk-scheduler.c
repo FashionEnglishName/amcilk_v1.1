@@ -1287,7 +1287,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
                                         }
                                         w->l->fiber_to_free = NULL;
-                                        if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED)) {
+                                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED)) {
                                             w->exc = w->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
                                             deque_unlock_self(w);
                                             return NULL;
