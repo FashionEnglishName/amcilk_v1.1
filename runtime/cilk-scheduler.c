@@ -440,7 +440,7 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
 
     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, TO_SLEEP)) {
         if (w->head <= w->tail) {//zhe del =
-            sysdep_save_fp_ctrl_state(w->current_stack_frame);
+            //sysdep_save_fp_ctrl_state(w->current_stack_frame);
             if (!__builtin_setjmp(w->current_stack_frame->ctx)) {
                 //printf("TEST[%d]: goto TO_SLEEP state (to_sleep), current_stack_frame:%p, closure status:%d, E:%p\n", w->self, w->current_stack_frame, t->status, w->exc);
                 Closure_unlock(w, t);
@@ -1130,7 +1130,8 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                     deque_unlock_self(w);
                                                     deque_unlock(w, victim);
                                                     elastic_core_unlock(w);
-                                                    sysdep_longjmp_to_sf(w->current_stack_frame);
+                                                    //sysdep_longjmp_to_sf(w->current_stack_frame);
+                                                    __builtin_longjmp(w->current_stack_frame->ctx, 1);
                                                 } else {
                                                     printf("ERROR: current_stack_frame==NULL in MUGGING after entering runtime\n");
                                                     abort();
@@ -1184,7 +1185,8 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 if (cl->status==CLOSURE_RUNNING) {
                                                     if (w->current_stack_frame!=NULL) {
                                                         deque_unlock_self(w);
-                                                        sysdep_longjmp_to_sf(w->current_stack_frame);
+                                                        //sysdep_longjmp_to_sf(w->current_stack_frame);
+                                                        __builtin_longjmp(w->current_stack_frame->ctx, 1);
                                                     } else {
                                                         printf("ERROR: w->current_stack_frame==NULL when being activated (be not mugged case)\n");
                                                         abort();
