@@ -438,9 +438,6 @@ struct local_state {
     //Zhe: platform
     int run_at_beginning;
     int is_in_runtime;
-    //Zhe
-    int give_up_mugging;
-    int give_up_sleeping;
 };
 
 /**

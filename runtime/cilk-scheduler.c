@@ -1082,24 +1082,20 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         Closure *cl;
                                         cl = deque_xtract_bottom(w, w->self);
                                         if (cl!=NULL) {
-                                            //Closure_lock(w, cl);
                                             if (cl->status==CLOSURE_RETURNING) { //give up mugging
                                                 w = __cilkrts_get_tls_worker();
-                                                        if(w->l->fiber_to_free) { 
+                                                if(w->l->fiber_to_free) { 
                                                     cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
                                                 }
                                                 w->l->fiber_to_free = NULL;
-                                                //Closure_unlock(w, cl);
                                                 cl = return_value(w, cl);
                                                 if (cl!=NULL) {
-                                                    //Closure_lock(w, cl);
                                                     if (cl->status==CLOSURE_READY) {
                                                         deque_add_bottom(w, cl, w->self);
                                                         setup_for_execution(w, cl);
                                                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
                                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                                                 printf("p%d, w%d: GIVE UP MUGGING\n", w->g->program->control_uid, w->self);
-                                                                //Closure_unlock(w, cl);
                                                                 deque_unlock_self(w);
                                                                 elastic_core_unlock(w);
                                                                 longjmp_to_user_code(w, cl);
@@ -1112,31 +1108,12 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                         printf("ERROR: cl state error (should be CLOSURE_READY)\n");
                                                         abort();
                                                     }
-                                                    //Closure_unlock(w, cl);
                                                 }
                                             } else {
-                                                //Closure_unlock(w, cl);
                                                 printf("ERROR: wrong cl status at bottom [%d] when mugging\n", cl->status);
                                                 abort();
                                             }
                                         }
-                                        /*cl = deque_peek_bottom(w, w->self);
-                                        if (cl!=NULL) {
-                                            if (cl->status==CLOSURE_RETURNING) { //give up mugging
-                                                if(w->l->fiber_to_free) { 
-                                                    cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
-                                                }
-                                                w->l->fiber_to_free = NULL;
-                                                if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
-                                                    if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
-                                                        deque_unlock_self(w);
-                                                        w->l->give_up_mugging = 1;
-                                                        elastic_core_unlock(w);
-                                                        return res;
-                                                    }
-                                                }
-                                            }
-                                        }*/
                                         deque_unlock_self(w);
                                         
 
@@ -1204,7 +1181,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                     deque_lock_self(w);
                                     Closure *cl = deque_peek_bottom(w, w->self);
                                     if (cl!=NULL) {
-                                        //Closure_lock(w, cl);
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
                                             elastic_core_lock(w);
                                             elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque]]);
@@ -1213,7 +1189,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
                                                 if (cl->status==CLOSURE_RUNNING) {
                                                     if (w->current_stack_frame!=NULL) {
-                                                        //Closure_unlock(w, cl);
                                                         deque_unlock_self(w);
                                                         sysdep_longjmp_to_sf(w->current_stack_frame);
                                                     } else {
@@ -1232,7 +1207,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             printf("ERROR: activated without requested2\n");
                                             abort();
                                         }
-                                        //Closure_unlock(w, cl);
                                         deque_unlock_self(w);
                                     } else { //be mugged
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
@@ -1264,7 +1238,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                 Closure *cl;
                                 cl = deque_xtract_bottom(w, w->self);
                                 if (cl!=NULL) {
-                                    //Closure_lock(w, cl);
                                     if (cl->status==CLOSURE_RETURNING) { //give up
                                         w = __cilkrts_get_tls_worker();
                                         if(w->l->fiber_to_free) { 
@@ -1279,7 +1252,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 setup_for_execution(w, cl);
                                                 __sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED);
                                                 w->exc = w->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
-                                                //Closure_unlock(w, cl);
                                                 deque_unlock_self(w);
                                                 longjmp_to_user_code(w, cl);
                                             } else {
@@ -1291,23 +1263,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         printf("ERROR: wrong cl status at bottom [%d] when deque is empty and go to sleep\n", cl->status);
                                         abort();
                                     }
-                                    //Closure_unlock(w, cl);
                                 }
-                                /*cl = deque_peek_bottom(w, w->self);
-                                if (cl!=NULL) {
-                                    if (cl->status==CLOSURE_RETURNING) { //give up mugging
-                                        if(w->l->fiber_to_free) { 
-                                            cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
-                                        }
-                                        w->l->fiber_to_free = NULL;
-                                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED)) {
-                                            w->exc = w->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
-                                            w->l->give_up_sleeping = 1;
-                                            deque_unlock_self(w);
-                                            return res;
-                                        }
-                                    }
-                                }*/
                                 deque_unlock_self(w);
 
                                 if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_INACTIVE_DEQUE)) { 
@@ -1524,9 +1480,7 @@ stop_container_point:
         }
 worker_sleep_point:
         w = __cilkrts_get_tls_worker();
-        if (w->l->give_up_sleeping==0 && w->l->give_up_mugging==0) {
-            worker_sleep_handling(w);
-        }
+        worker_sleep_handling(w);
         
         if (w->g->program->job_finish==1) {
             goto job_finish_point;
