@@ -460,7 +460,14 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
             }
             Closure_unlock(w, t);
             deque_unlock_self(w);
-            longjmp_to_runtime(w); // NOT returning back to user code  
+            sysdep_save_fp_ctrl_state(w->current_stack_frame);
+            if (!__builtin_setjmp(w->current_stack_frame->ctx)) {
+                longjmp_to_runtime(w); // NOT returning back to user code  
+            } else {
+                w = __cilkrts_get_tls_worker();
+                //printf("%d jumps at Cilk_exception_handler\n", w->self);
+                return;
+            }
         }
 
     } else { //normal routine
@@ -1108,6 +1115,8 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             }
                                         }
                                         deque_unlock_self(w);
+                                        
+
                                         w = __cilkrts_get_tls_worker();
                                         elastic_mugging(w, victim);
 
@@ -1121,7 +1130,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
 
                                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {    
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
-                                                //__builtin_longjmp(w->current_stack_frame->ctx, 1);
                                                 sysdep_longjmp_to_sf(w->current_stack_frame);
                                             } else {
                                                 printf("ERROR: DO_MUGGING1 is changed by others, recover failed\n");
@@ -1169,7 +1177,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 if (cl->status==CLOSURE_RUNNING) {
                                                     if (w->current_stack_frame!=NULL) {
                                                         deque_unlock_self(w);
-                                                        //__builtin_longjmp(w->current_stack_frame->ctx, 1);
                                                         sysdep_longjmp_to_sf(w->current_stack_frame);
                                                     } else {
                                                         printf("ERROR: w->current_stack_frame==NULL when being activated (be not mugged case)\n");
