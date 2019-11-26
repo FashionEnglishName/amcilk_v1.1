@@ -36,7 +36,6 @@ void elastic_core_lock(__cilkrts_worker *w);
 void elastic_core_unlock(__cilkrts_worker *w);
 void elastic_core_lock_g(global_state *g);
 void elastic_core_unlock_g(global_state *g);
-void elastic_all_worker_frame_num_test(__cilkrts_worker *w);
 int elastic_get_worker_id_sleeping_active_deque(__cilkrts_worker *w);
 
 void platform_rts_srand(platform_global_state * G, unsigned int seed);

@@ -1507,28 +1507,29 @@ normal_point: //normal part, can not be preempted
 
             w = __cilkrts_get_tls_worker();
             if (w->g->program->running_job==1) {
-                /*if (elastic_safe(w)) {
+                if (elastic_safe(w)) {
                     if (w->l->elastic_s==ACTIVE) { //steal whole deque if has any, DO_MUGGING
                         elastic_core_lock(w);
                         int victim = elastic_get_worker_id_sleeping_active_deque(w);
-                        elastic_core_unlock(w);
+                        //elastic_core_unlock(w);
                         
                         if (w->self!=victim && victim!=-1) {
                             if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
                                 deque_lock(w, victim);
                                 deque_lock_self(w);
                                 elastic_mugging(w, victim);
-                                elastic_core_lock(w);
+                                //elastic_core_lock(w);
                                 w->g->elastic_core->ptr_sleeping_inactive_deque--;
                                 int tmp_victim_cpu_state_group_pos = w->g->workers[victim]->l->elastic_pos_in_cpu_state_group;
                                 elastic_do_exchange_state_group(w->g->workers[victim], w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
                                 elastic_do_exchange_state_group(w->g->workers[w->g->elastic_core->cpu_state_group[tmp_victim_cpu_state_group_pos]], w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque]]);
                                 w->g->elastic_core->ptr_sleeping_active_deque--;
-                                elastic_core_unlock(w);
+                                //elastic_core_unlock(w);
                                 if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {  
                                     if (w->current_stack_frame!=NULL) {
                                         deque_unlock_self(w);
                                         deque_unlock(w, victim);
+                                        elastic_core_unlock(w);
                                         sysdep_longjmp_to_sf(w->current_stack_frame);
                                     } else {
                                         w = __cilkrts_get_tls_worker();
@@ -1546,7 +1547,7 @@ normal_point: //normal part, can not be preempted
                             }
                         }
                     }
-                }*/
+                }
 
                 int victim = rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque;
                 int victim_worker_id = w->g->elastic_core->cpu_state_group[victim];
@@ -1584,7 +1585,6 @@ normal_point: //normal part, can not be preempted
         } else if (w->g->program->hint_stop_container==1) {
             goto stop_container_point;
         } else {
-
             goto worker_sleep_point;
         }
     }
