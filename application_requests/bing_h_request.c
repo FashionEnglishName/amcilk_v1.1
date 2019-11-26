@@ -15,11 +15,10 @@
 #include <sched.h>
 
 #include "../runtime/cilk2c.h"
+#include "../runtime/rts-config.h"
 #include "../handcomp_test/ktiming.h"
 #include "../handcomp_test/timespec_functions.h"
 
-#define SERVER_FIFO_NAME "/home/zhe.wang/cilk_fifo" //"/home/zhe.wang/cilk_fifo" //"/project/adams/home/zhe.wang/cilk_fifo"
-#define PROGRAM_FIFO_NAME_BASE "/home/zhe.wang/cilk_fifo_p" //"/home/zhe.wang/cilk_fifo_p" //"/project/adams/home/zhe.wang/cilk_fifo_p"
 #define BUF_SIZE 10240
 
 //#define NumRequests 1000000
