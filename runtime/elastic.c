@@ -178,9 +178,6 @@ void elastic_all_worker_frame_num_test(__cilkrts_worker *w) {
 }
 
 void elastic_mugging(__cilkrts_worker *w, int victim){
-    deque_lock(w, victim);
-    deque_lock_self(w);
-    
     ReadyDeque * tmp = w->g->deques[w->self];
     w->g->deques[w->self] = w->g->deques[victim];
     w->g->deques[victim] = tmp;
@@ -212,11 +209,7 @@ void elastic_mugging(__cilkrts_worker *w, int victim){
     w->g->workers[victim]->current_stack_frame->worker = w->g->workers[victim];//added 1109
     w->current_stack_frame = tmp_current_stack_frame;
     w->current_stack_frame->worker = w;
-
-
     //printf("TEST[%d]: elastic_mugging of worker[%d] finished, %p\n", w->self, victim, w->current_stack_frame);
-    deque_unlock_self(w);
-    deque_unlock(w, victim);
 }
 
 void elastic_worker_request_cpu_to_sleep(__cilkrts_worker *w, int cpu_id) {
