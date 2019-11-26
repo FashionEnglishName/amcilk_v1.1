@@ -1580,7 +1580,8 @@ normal_point: //normal part, can not be preempted
                                 deque_unlock_self(w);
                                 deque_unlock(w, victim_worker_id);
                                 elastic_core_unlock(w);
-                                sysdep_longjmp_to_sf(w->current_stack_frame);
+                                //sysdep_longjmp_to_sf(w->current_stack_frame);
+                                __builtin_longjmp(w->current_stack_frame->ctx, 1);
                             } else {
                                 printf("ERROR: !!current_stack_frame==NULL, %p, %p\n", w->current_stack_frame, w->g->workers[victim_worker_id]->current_stack_frame);
                                 abort();
