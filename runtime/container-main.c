@@ -163,18 +163,18 @@ run_point:
     //a job is completed
     w = __cilkrts_get_tls_worker();
 
-    pthread_mutex_lock(&(w->g->program->G->lock));
-    program_print_result_acc(w->g->program);
-    if (w->g->program->mute==0) {
-        platform_response_to_client(w->g->program);
-    }
-    pthread_mutex_unlock(&(w->g->program->G->lock));
-
     if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), 0, -1)) {
         w->g->cilk_main_return = _tmp;
         w->g->program->last_do_exit_worker_id = w->self; //must update before set job_finish.
         CILK_WMB();
         if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), -1, 1)) {
+            //pthread_mutex_lock(&(w->g->program->G->lock));
+            program_print_result_acc(w->g->program);
+            if (w->g->program->mute==0) {
+                platform_response_to_client(w->g->program);
+            }
+            //pthread_mutex_unlock(&(w->g->program->G->lock));
+    
             if (w->self!=w->g->program->invariant_running_worker_id) {
                 __cilkrts_save_fp_ctrl_state_for_preempt(w->current_stack_frame);
                 if(!__builtin_setjmp(w->current_stack_frame->prempt_ctx)) {
