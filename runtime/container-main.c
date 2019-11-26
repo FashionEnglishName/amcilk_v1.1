@@ -160,6 +160,8 @@ run_point:
         abort();
     }
 
+    sleep(1);
+
     //a job is completed
     w = __cilkrts_get_tls_worker();
 
@@ -174,7 +176,7 @@ run_point:
                 platform_response_to_client(w->g->program);
             }
             //pthread_mutex_unlock(&(w->g->program->G->lock));
-    
+
             if (w->self!=w->g->program->invariant_running_worker_id) {
                 __cilkrts_save_fp_ctrl_state_for_preempt(w->current_stack_frame);
                 if(!__builtin_setjmp(w->current_stack_frame->prempt_ctx)) {
