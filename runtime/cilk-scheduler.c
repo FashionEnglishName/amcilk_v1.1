@@ -1121,10 +1121,10 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                     cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
                                                 }
                                                 w->l->fiber_to_free = NULL;
-                                                deque_unlock_self(w);
-                                                elastic_core_unlock(w);
                                                 if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
                                                     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
+                                                        deque_unlock_self(w);
+                                                        elastic_core_unlock(w);
                                                         return NULL;
                                                     }
                                                 }
@@ -1287,12 +1287,10 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
                                         }
                                         w->l->fiber_to_free = NULL;
-                                        deque_unlock_self(w);
-                                        elastic_core_unlock(w);
-                                        if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
-                                            if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
-                                                return NULL;
-                                            }
+                                        if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED)) {
+                                            w->exc = w->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
+                                            deque_unlock_self(w);
+                                            return NULL;
                                         }
                                     }
                                 }
