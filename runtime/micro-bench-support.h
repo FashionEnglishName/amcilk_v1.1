@@ -1,4 +1,5 @@
 #include "internal.h"
+#include "elastic.h"
 #include "stdio.h"
 
 void micro_test_get_clock(platform_global_state * G, int idx);
