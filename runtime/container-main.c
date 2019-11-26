@@ -171,14 +171,14 @@ run_point:
                 __cilkrts_save_fp_ctrl_state(w->current_stack_frame);
                 if(__builtin_setjmp(w->current_stack_frame->ctx) == 0) {
                     w->g->program->is_switching = 1;
-                    printf("[PLATFORM]: last worker %d jumps to runtime\n", w->self);
+                    printf("[PLATFORM %d]: last worker %d jumps to runtime\n", w->g->program->control_uid, w->self);
                     longjmp_to_runtime(w);
                 }
             }
 
             //only inv worker can reach here
             w = __cilkrts_get_tls_worker();
-            printf("[PLATFORM]: invariant %d enters to exit handling\n", w->self);
+            printf("[PLATFORM %d]: invariant %d enters to exit handling\n", w->g->program->control_uid, w->self);
             if (w->self==w->g->program->invariant_running_worker_id) {
                 w->g->program->is_switching = 0;
                 pthread_mutex_lock(&(w->g->program->G->lock));
