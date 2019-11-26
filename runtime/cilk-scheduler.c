@@ -1514,8 +1514,8 @@ normal_point: //normal part, can not be preempted
                         //elastic_core_unlock(w);
                         
                         if (w->self!=victim && victim!=-1) {
-                            elastic_core_lock(w);
                             if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
+                                elastic_core_lock(w);
                                 deque_lock(w, victim);
                                 deque_lock_self(w);
                                 elastic_mugging(w, victim);
@@ -1545,8 +1545,8 @@ normal_point: //normal part, can not be preempted
                                 }
                                 deque_unlock_self(w);
                                 deque_unlock(w, victim);
+                                elastic_core_unlock(w);
                             }
-                            elastic_core_unlock(w);
                         }
                     }
                 }
