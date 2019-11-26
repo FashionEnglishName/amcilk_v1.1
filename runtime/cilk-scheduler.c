@@ -1118,7 +1118,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         w = __cilkrts_get_tls_worker();
                                         deque_lock(w, victim);
                                         deque_lock_self(w);
-                                        Closure *cl = deque_peek_top(w, victim);
+                                        cl = deque_peek_top(w, victim);
                                         Closure_lock(w, cl);
                                         elastic_mugging(w, victim);
 
@@ -1342,7 +1342,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
             if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING0, EXIT_SWITCHING1)) {
                 deque_lock(w, w->g->program->last_do_exit_worker_id);
                 deque_lock_self(w);
-                Closure *cl = deque_peek_top(w, victim);
+                Closure *cl = deque_peek_top(w, w->g->program->last_do_exit_worker_id);
                 Closure_lock(w, cl);
                 elastic_mugging(w, w->g->program->last_do_exit_worker_id);
                 if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING1, EXIT_SWITCHING2)) {
