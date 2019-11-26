@@ -79,6 +79,12 @@ struct __cilkrts_stack_frame {
     uint32_t mxcsr;
     uint16_t fpcsr;
 
+    //preemption
+    jmpbuf prempt_ctx;
+    uint32_t prempt_mxcsr;
+    uint16_t prempt_fpcsr;
+
+
     /**
      * reserved is not used at this time.  Client code should initialize it
      * to 0 before the first Cilk operation

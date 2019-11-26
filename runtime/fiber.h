@@ -58,6 +58,7 @@ static inline void cilk_fiber_set_owner(struct cilk_fiber * fiber,
     fiber->owner = owner;
 }
 
+void sysdep_save_fp_ctrl_state_for_preempt(__cilkrts_stack_frame *sf);
 void sysdep_save_fp_ctrl_state(__cilkrts_stack_frame *sf);
 char * sysdep_reset_jump_buffers_for_resume(struct cilk_fiber* fiber,
                                             __cilkrts_stack_frame *sf);
@@ -65,6 +66,8 @@ __attribute__((noreturn)) void sysdep_longjmp_to_sf(__cilkrts_stack_frame *sf);
 __attribute__((noreturn)) void init_fiber_run(__cilkrts_worker *w,
                                               struct cilk_fiber * fiber, 
                                               __cilkrts_stack_frame *sf);
+
+__attribute__((noreturn)) void sysdep_longjmp_to_sf_for_preempt(__cilkrts_stack_frame *sf);
 
 void cilk_fiber_pool_global_init(global_state *g); 
 void cilk_fiber_pool_global_terminate(global_state *g); 
