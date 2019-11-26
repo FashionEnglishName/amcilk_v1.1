@@ -1122,7 +1122,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         if (cl_w!=NULL) {
                                             Closure_lock(w, cl_w);
                                         }
-                                        Closure * cl_l = deque_peek_top(w, w->g->program->last_do_exit_worker_id);
+                                        Closure * cl_l = deque_peek_top(w, victim);
                                         if (cl_l!=NULL) {
                                             Closure_lock(w, cl_l);
                                         }
