@@ -1568,7 +1568,7 @@ normal_point: //normal part, can not be preempted
                                 elastic_core_unlock(w);
                                 sysdep_longjmp_to_sf(w->current_stack_frame);
                             } else {
-                                printf("!!!????>>>>>current_stack_frame==NULL\n");
+                                printf("!!current_stack_frame==NULL\n");
                                 abort();
                             }
                         } else {
