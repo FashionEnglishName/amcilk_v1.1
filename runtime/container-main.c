@@ -168,8 +168,10 @@ run_point:
         CILK_WMB();
         if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), -1, 1)) {
             if (w->self!=w->g->program->invariant_running_worker_id) {
-                __cilkrts_save_fp_ctrl_state(w->current_stack_frame);
-                if(__builtin_setjmp(w->current_stack_frame->ctx) == 0) {
+                __cilkrts_save_fp_ctrl_state_for_prempt(w->current_stack_frame);
+                if(!__builtin_setjmp(w->current_stack_frame->prempt_ctx)) {
+                /*__cilkrts_save_fp_ctrl_state(w->current_stack_frame);
+                if(__builtin_setjmp(w->current_stack_frame->ctx) == 0) {*/
                     w->g->program->is_switching = 1;
                     printf("[PLATFORM %d]: last worker %d jumps to runtime\n", w->g->program->control_uid, w->self);
                     longjmp_to_runtime(w);
