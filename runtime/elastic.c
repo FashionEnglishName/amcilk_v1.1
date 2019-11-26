@@ -277,7 +277,7 @@ void print_num_ancestor() {
 }*/
 
 //Choice 2, better
-int elastic_get_worker_id_sleeping_active_deque(__cilkrts_worker *w) {
+/*int elastic_get_worker_id_sleeping_active_deque(__cilkrts_worker *w) {
     if (w->g->elastic_core->ptr_sleeping_active_deque>=0) {
         w->l->rand_next = w->l->rand_next * 1103515245 + 12345;
         int id = w->l->rand_next >> 16;
@@ -285,6 +285,14 @@ int elastic_get_worker_id_sleeping_active_deque(__cilkrts_worker *w) {
     } else {
         return -1;
     }
+}*/
+int elastic_get_worker_id_sleeping_active_deque(__cilkrts_worker *w) {
+    for (int i=0; i<w->g->program->G->nproc; i++) {
+        if (w->g->workers[i]->l->elastic_s==SLEEPING_ACTIVE_DEQUE) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 void print_worker_deque(__cilkrts_worker *w) {
