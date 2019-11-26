@@ -78,7 +78,7 @@ void sleep_for_ts (struct timespec sleep_time){
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //#define NumRequests 1000000
-#define NumRequests 100000
+#define NumRequests 1000
 //#define NumRequests 10
 #define ResultAccuracy 1000000.0
 #define RequestWeightMultiplierFirstGroup 200
