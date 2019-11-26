@@ -1118,6 +1118,8 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         w = __cilkrts_get_tls_worker();
                                         deque_lock(w, victim);
                                         deque_lock_self(w);
+                                        Closure *cl = deque_peek_top(w, victim);
+                                        Closure_lock(w, cl);
                                         elastic_mugging(w, victim);
 
                                         //elastic_core_lock(w);
@@ -1131,6 +1133,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {    
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                                 if (w->current_stack_frame!=NULL) {
+                                                    Closure_unlock(w, cl);
                                                     deque_unlock_self(w);
                                                     deque_unlock(w, victim);
                                                     elastic_core_unlock(w);
@@ -1147,6 +1150,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             printf("ERROR: SLEEPING_MUGGING_DEQUE2 is changed by others\n");
                                             abort();
                                         }
+                                        Closure_unlock(w, cl);
                                         deque_unlock_self(w);
                                         deque_unlock(w, victim);
                                     } else {
@@ -1338,6 +1342,8 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
             if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING0, EXIT_SWITCHING1)) {
                 deque_lock(w, w->g->program->last_do_exit_worker_id);
                 deque_lock_self(w);
+                Closure *cl = deque_peek_top(w, victim);
+                Closure_lock(w, cl);
                 elastic_mugging(w, w->g->program->last_do_exit_worker_id);
                 if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING1, EXIT_SWITCHING2)) {
                     while(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s != ACTIVE) {
@@ -1347,6 +1353,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                     if (w->current_stack_frame!=NULL) {
                         deque_unlock_self(w);
                         deque_unlock(w, w->g->program->last_do_exit_worker_id);
+                        Closure_unlock(w, cl);
                         sysdep_longjmp_to_sf(w->current_stack_frame);
                     } else {
                         printf("[ERROR]: current_stack_frame=NULL in do_exit_switching_for_invariant_handling\n");
@@ -1359,6 +1366,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                         abort();
                     }
                 }
+                Closure_unlock(w, cl);
                 deque_unlock_self(w);
                 deque_unlock(w, w->g->program->last_do_exit_worker_id);
             }
