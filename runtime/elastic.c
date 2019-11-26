@@ -288,9 +288,6 @@ void print_num_ancestor() {
 }*/
 //correct standard
 int elastic_get_worker_id_sleeping_active_deque(__cilkrts_worker *w) {
-    if (w->self==w->g->program->invariant_running_worker_id) {
-        print_cpu_state_group(w->g->program);
-    }
     for (int i=0; i<w->g->program->G->nproc; i++) {
         if (w->g->workers[i]->l->elastic_s==SLEEPING_ACTIVE_DEQUE) {
             return i;
