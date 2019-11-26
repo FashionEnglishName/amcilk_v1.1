@@ -1381,7 +1381,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                         }
                         deque_unlock_self(w);
                         deque_unlock(w, w->g->program->last_do_exit_worker_id);
-                        sysdep_longjmp_to_sf_for_preempt(w->current_stack_frame);
+                        sysdep_longjmp_to_sf_for_switch(w->current_stack_frame);
                     } else {
                         printf("[ERROR]: current_stack_frame=NULL in do_exit_switching_for_invariant_handling\n");
                         abort();

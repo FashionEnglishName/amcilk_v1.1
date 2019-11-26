@@ -174,7 +174,7 @@ run_point:
             }
             //pthread_mutex_unlock(&(w->g->program->G->lock));
             if (w->self!=w->g->program->invariant_running_worker_id) {
-                __cilkrts_save_fp_ctrl_state_for_preempt(w->current_stack_frame);
+                __cilkrts_save_fp_ctrl_state_for_switch(w->current_stack_frame);
                 if(!__builtin_setjmp(w->current_stack_frame->prempt_ctx)) {
                     w->g->program->is_switching = 1;
                     printf("[PLATFORM %d]: last worker %d jumps to runtime\n", w->g->program->control_uid, w->self);

@@ -93,6 +93,13 @@ static void restore_x86_fp_state_for_preempt (__cilkrts_stack_frame *sf) {
     asm volatile ("fnclex\n\t" "fldcw %0" : : "m" (sf->prempt_fpcsr));
 }
 
+static void restore_x86_fp_state_for_switch (__cilkrts_stack_frame *sf) {
+    // Assume cpu supports sse
+    asm volatile ("ldmxcsr %0" : : "m" (sf->switch_mxcsr));
+    asm volatile ("fnclex\n\t" "fldcw %0" : : "m" (sf->switch_fpcsr));
+}
+
+
 
 //===============================================================
 // Supported public functions
@@ -108,6 +115,12 @@ void sysdep_save_fp_ctrl_state_for_preempt(__cilkrts_stack_frame *sf) {
     // Assume cpu supports sse
     asm volatile ("stmxcsr %0" : "=m" (sf->prempt_mxcsr));
     asm volatile ("fnstcw %0" : "=m" (sf->prempt_fpcsr));
+}
+
+void sysdep_save_fp_ctrl_state_for_switch(__cilkrts_stack_frame *sf) {
+    // Assume cpu supports sse
+    asm volatile ("stmxcsr %0" : "=m" (sf->switch_mxcsr));
+    asm volatile ("fnstcw %0" : "=m" (sf->switch_fpcsr));
 }
 
 char* sysdep_reset_jump_buffers_for_resume(struct cilk_fiber* fiber,
@@ -162,6 +175,24 @@ void sysdep_longjmp_to_sf_for_preempt(__cilkrts_stack_frame *sf) {
     restore_x86_fp_state_for_preempt(sf);
     __builtin_longjmp(sf->prempt_ctx, 1);
 }
+
+__attribute__((noreturn))
+void sysdep_longjmp_to_sf_for_switch(__cilkrts_stack_frame *sf) {
+
+   /* __cilkrts_alert(ALERT_FIBER, "[%d]: longjmp to sf, BP/SP/PC: %p/%p/%p\n",
+                    sf->worker->self, FP(sf), SP(sf), PC(sf));*/ //Chen
+
+    // Restore the floating point state that was set in this frame at the
+    // last spawn.
+    // This feature is only available in ABI 1 or later frames, and only
+    // needed on IA64 or Intel64 processors.
+    //__sync_bool_compare_and_swap(&(sf->worker->l->is_in_runtime), 1, 0);
+    //Cilk_fence();
+    //CILK_MB();
+    restore_x86_fp_state_for_switch(sf);
+    __builtin_longjmp(sf->switch_ctx, 1);
+}
+
 __attribute__((noreturn))
 void init_fiber_run(__cilkrts_worker *w, 
                     struct cilk_fiber * fiber,

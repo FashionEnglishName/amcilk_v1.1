@@ -70,6 +70,10 @@ void __cilkrts_save_fp_ctrl_state_for_preempt(__cilkrts_stack_frame *sf) {
     sysdep_save_fp_ctrl_state_for_preempt(sf);
 }
 
+void __cilkrts_save_fp_ctrl_state_for_switch(__cilkrts_stack_frame *sf) {
+    sysdep_save_fp_ctrl_state_for_switch(sf);
+}
+
 void __cilkrts_sync(__cilkrts_stack_frame *sf) {
 
     __cilkrts_worker *w = __cilkrts_get_tls_worker(); //Chen

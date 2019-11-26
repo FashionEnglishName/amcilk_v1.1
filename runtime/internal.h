@@ -84,6 +84,11 @@ struct __cilkrts_stack_frame {
     uint32_t prempt_mxcsr;
     uint16_t prempt_fpcsr;
 
+    //switching
+    jmpbuf switch_ctx;
+    uint32_t switch_mxcsr;
+    uint16_t switch_fpcsr;
+
 
     /**
      * reserved is not used at this time.  Client code should initialize it
