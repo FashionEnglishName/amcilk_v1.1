@@ -1507,7 +1507,7 @@ normal_point: //normal part, can not be preempted
 
             w = __cilkrts_get_tls_worker();
             if (w->g->program->running_job==1) {
-                int victim_worker_id = elastic_get_worker_id_sleeping_active_deque(w);                        
+                /*int victim_worker_id = elastic_get_worker_id_sleeping_active_deque(w);                        
                 if (w->self!=victim_worker_id && victim_worker_id!=-1) {
                     if (__sync_bool_compare_and_swap(&(w->g->workers[victim_worker_id]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
                         elastic_core_lock(w);
@@ -1542,9 +1542,9 @@ normal_point: //normal part, can not be preempted
                         deque_unlock(w, victim_worker_id);
                         elastic_core_unlock(w);
                     }
-                }
+                }*/
 
-                victim_worker_id = w->g->elastic_core->cpu_state_group[rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque];
+                int victim_worker_id = w->g->elastic_core->cpu_state_group[rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque];
                 if(victim_worker_id != w->self && 
                     (w->g->workers[victim_worker_id]->l->elastic_s==ACTIVE || 
                     w->g->workers[victim_worker_id]->l->elastic_s==SLEEP_REQUESTED ||
