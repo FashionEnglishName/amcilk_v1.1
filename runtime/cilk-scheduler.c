@@ -1116,13 +1116,13 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         deque_lock_self(w);
                                         elastic_mugging(w, victim);
 
-                                        elastic_core_lock(w);
+                                        //elastic_core_lock(w);
                                         w->g->elastic_core->ptr_sleeping_inactive_deque--;
                                         int tmp_victim_cpu_state_group_pos = w->g->workers[victim]->l->elastic_pos_in_cpu_state_group;
                                         elastic_do_exchange_state_group(w->g->workers[victim], w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
                                         elastic_do_exchange_state_group(w->g->workers[w->g->elastic_core->cpu_state_group[tmp_victim_cpu_state_group_pos]], w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque]]);
                                         w->g->elastic_core->ptr_sleeping_active_deque--;
-                                        elastic_core_unlock(w);
+                                        //elastic_core_unlock(w);
 
                                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {    
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
