@@ -1078,15 +1078,15 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                     if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
                                         deque_lock_self(w);
                                         Closure *cl;
-                                        cl = deque_xtract_bottom(w, w->self);
+                                        /*cl = deque_xtract_bottom(w, w->self);
                                         if (cl!=NULL) {
-                                            Closure_lock(w, cl);
+                                            //Closure_lock(w, cl);
                                             if (cl->status==CLOSURE_RETURNING) { //give up mugging
                                                 w = __cilkrts_get_tls_worker();
-                                                Closure_unlock(w, cl);
+                                                //Closure_unlock(w, cl);
                                                 cl = return_value(w, cl);
                                                 if (cl!=NULL) {
-                                                    Closure_lock(w, cl);
+                                                    //Closure_lock(w, cl);
                                                     if (cl->status==CLOSURE_READY) {
                                                         deque_add_bottom(w, cl, w->self);
                                                         setup_for_execution(w, cl);
@@ -1106,12 +1106,22 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                         printf("ERROR: cl state error (should be CLOSURE_READY)\n");
                                                         abort();
                                                     }
-                                                    Closure_unlock(w, cl);
+                                                    //Closure_unlock(w, cl);
                                                 }
                                             } else {
-                                                Closure_unlock(w, cl);
+                                                //Closure_unlock(w, cl);
                                                 printf("ERROR: wrong cl status at bottom [%d] when mugging\n", cl->status);
                                                 abort();
+                                            }
+                                        }*/
+                                        cl = deque_peek_bottom(w, w->self);
+                                        if (cl!=NULL) {
+                                            if (cl->status==CLOSURE_RETURNING) { //give up mugging
+                                                if(w->l->fiber_to_free) { 
+                                                    cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
+                                                }
+                                                w->l->fiber_to_free = NULL;
+                                                return res;
                                             }
                                         }
                                         deque_unlock_self(w);
