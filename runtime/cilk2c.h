@@ -14,7 +14,7 @@ extern unsigned long ZERO;
 void __cilkrts_enter_frame(__cilkrts_stack_frame *sf);
 void __cilkrts_enter_frame_fast(__cilkrts_stack_frame * sf);
 void __cilkrts_save_fp_ctrl_state(__cilkrts_stack_frame *sf);
-void __cilkrts_save_fp_ctrl_state_for_prempt(__cilkrts_stack_frame *sf);
+void __cilkrts_save_fp_ctrl_state_for_preempt(__cilkrts_stack_frame *sf);
 void __cilkrts_detach(__cilkrts_stack_frame * self);
 void __cilkrts_sync(__cilkrts_stack_frame *sf);
 void __cilkrts_pop_frame(__cilkrts_stack_frame * sf);

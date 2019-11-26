@@ -66,8 +66,8 @@ void __cilkrts_save_fp_ctrl_state(__cilkrts_stack_frame *sf) {
     sysdep_save_fp_ctrl_state(sf);
 }
 
-void __cilkrts_save_fp_ctrl_state_for_prempt(__cilkrts_stack_frame *sf) {
-    sysdep_save_fp_ctrl_state_for_prempt(sf);
+void __cilkrts_save_fp_ctrl_state_for_preempt(__cilkrts_stack_frame *sf) {
+    sysdep_save_fp_ctrl_state_for_preempt(sf);
 }
 
 void __cilkrts_sync(__cilkrts_stack_frame *sf) {
