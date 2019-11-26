@@ -1344,7 +1344,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                     while(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s != ACTIVE) {
                         usleep(TIME_EXIT_CTX_SWITCH); //important for delay avoid unknown sigfault due to inconsistent var
                     }
-                    printf("[PLATFORM %d]: invariant %d jumps to exit handling\n", , w->g->program->control_uid, w->self);
+                    printf("[PLATFORM %d]: invariant %d jumps to exit handling\n", w->g->program->control_uid, w->self);
                     if (w->current_stack_frame!=NULL) {
                         deque_unlock_self(w);
                         deque_unlock(w, w->g->program->last_do_exit_worker_id);
