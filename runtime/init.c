@@ -363,6 +363,8 @@ static local_state *worker_local_init(global_state *g, int worker_id) {
     l->elastic_pos_in_cpu_state_group = worker_id;
     l->run_at_beginning = 0;
     l->is_in_runtime = 0;
+    l->give_up_mugging = 0;
+    l->give_up_sleeping = 0;
     pthread_mutex_init(&(l->elastic_lock), NULL);
     pthread_cond_init(&(l->elastic_cond), NULL);
 

@@ -1064,6 +1064,8 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                     "[%d]: (do_what_it_says) Jump into user code.\n", w->self);
 
                 if( __builtin_setjmp(w->l->rts_ctx) == 0 ) {
+                    w->l->give_up_mugging = 0;
+                    w->l->give_up_sleeping = 0;
                     longjmp_to_user_code(w, t);
                 } else {
                     //Zhe: the hook for longjmp_to_runtime
@@ -1124,6 +1126,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
                                                     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                                         //deque_unlock_self(w);
+                                                        w->l->give_up_mugging = 1;
                                                         elastic_core_unlock(w);
                                                         return res;
                                                     }
@@ -1290,6 +1293,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         w->l->fiber_to_free = NULL;
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED)) {
                                             w->exc = w->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
+                                            w->l->give_up_sleeping = 1;
                                             deque_unlock_self(w);
                                             return res;
                                         }
@@ -1511,7 +1515,9 @@ stop_container_point:
         }
 worker_sleep_point:
         w = __cilkrts_get_tls_worker();
-        worker_sleep_handling(w);
+        if (w->l->give_up_sleeping==0 && w->l->give_up_mugging==0) {
+            worker_sleep_handling(w);
+        }
         
         if (w->g->program->job_finish==1) {
             goto job_finish_point;
