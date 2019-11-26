@@ -1,5 +1,6 @@
 #include "elastic.h"
 #include "membar.h"
+#include "jmpbuf.h"
 
 void elastic_core_lock(__cilkrts_worker *w) {
     cilk_mutex_lock(&(w->g->elastic_core->lock));
@@ -211,6 +212,12 @@ void elastic_mugging(__cilkrts_worker *w, int victim){
     w->g->workers[victim]->current_stack_frame->worker = w->g->workers[victim];//added 1109
     w->current_stack_frame = tmp_current_stack_frame;
     w->current_stack_frame->worker = w;
+
+    jmpbuf rts_ctx_tmp;
+    for(int i=0; i < JMPBUF_SIZE; i++) { rts_ctx_tmp[i] = w->g->workers[victim]->l->rts_ctx[i]; }
+    for(int i=0; i < JMPBUF_SIZE; i++) { w->g->workers[victim]->l->rts_ctx[i] = w->l->rts_ctx[i]; }
+    for(int i=0; i < JMPBUF_SIZE; i++) { w->l->rts_ctx[i] = rts_ctx_tmp[i]; }
+
 
     //printf("TEST[%d]: elastic_mugging of worker[%d] finished, %p\n", w->self, victim, w->current_stack_frame);
     deque_unlock_self(w);
