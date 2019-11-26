@@ -1486,9 +1486,6 @@ normal_point: //normal part, can not be preempted
                 if (elastic_safe(w)) {
                     if (w->l->elastic_s==ACTIVE) { //steal whole deque if has any, DO_MUGGING
                         elastic_core_lock(w);
-                        if (w->self==w->g->program->invariant_running_worker_id) {
-                            print_cpu_state_group(w->g->program);
-                        }
                         int victim = elastic_get_worker_id_sleeping_active_deque(w);
                         elastic_core_unlock(w);
                         
