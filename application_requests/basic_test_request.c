@@ -17,10 +17,7 @@
 #include "../runtime/cilk2c.h"
 #include "../handcomp_test/ktiming.h"
 #include "../handcomp_test/timespec_functions.h"
-
-#define SERVER_FIFO_NAME "/home/zhe.wang/cilk_fifo"
-#define PROGRAM_FIFO_NAME_BASE "/home/zhe.wang/cilk_fifo_p"
-#define BUF_SIZE 10240
+#include "../runtime/rts-config.h"
 
 //#define NumRequests 1000000
 //#define NumRequests 1000

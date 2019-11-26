@@ -19,8 +19,6 @@
 #include "../handcomp_test/ktiming.h"
 #include "../handcomp_test/timespec_functions.h"
 
-#define BUF_SIZE 10240
-
 //#define NumRequests 1000000
 #define NumRequests 100000
 //#define NumRequests 500
