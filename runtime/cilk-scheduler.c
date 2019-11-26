@@ -1565,11 +1565,13 @@ normal_point: //normal part, can not be preempted
                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim_worker_id]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {  
                             printf("2\n");
                             if (w->current_stack_frame!=NULL) {
-                                printf("3\n");
-                                deque_unlock_self(w);
-                                deque_unlock(w, victim_worker_id);
-                                elastic_core_unlock(w);
-                                sysdep_longjmp_to_sf(w->current_stack_frame);
+                                if (1) {
+                                    printf("3\n");
+                                    deque_unlock_self(w);
+                                    deque_unlock(w, victim_worker_id);
+                                    elastic_core_unlock(w);
+                                    sysdep_longjmp_to_sf(w->current_stack_frame);
+                                }
                             } else {
                                 printf("!!current_stack_frame==NULL\n");
                                 abort();
