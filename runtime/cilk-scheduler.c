@@ -1080,11 +1080,13 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         Closure *cl;
                                         cl = deque_xtract_bottom(w, w->self);
                                         if (cl!=NULL) {
-                                            //Closure_lock(w, cl);
+                                            Closure_lock(w, cl);
                                             if (cl->status==CLOSURE_RETURNING) { //give up mugging
                                                 w = __cilkrts_get_tls_worker();
+                                                Closure_unlock(w, cl);
                                                 cl = return_value(w, cl);
                                                 if (cl!=NULL) {
+                                                    Closure_lock(w, cl);
                                                     if (cl->status==CLOSURE_READY) {
                                                         deque_add_bottom(w, cl, w->self);
                                                         setup_for_execution(w, cl);
@@ -1104,12 +1106,13 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                         printf("ERROR: cl state error (should be CLOSURE_READY)\n");
                                                         abort();
                                                     }
+                                                    Closure_unlock(w, cl);
                                                 }
                                             } else {
+                                                Closure_unlock(w, cl);
                                                 printf("ERROR: wrong cl status at bottom [%d] when mugging\n", cl->status);
                                                 abort();
                                             }
-                                            //Closure_unlock(w, cl);
                                         }
                                         deque_unlock_self(w);
                                         
