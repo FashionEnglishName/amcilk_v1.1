@@ -20,7 +20,7 @@
 #include "../handcomp_test/timespec_functions.h"
 
 //#define NumRequests 1000000
-#define NumRequests 5000
+#define NumRequests 20000
 //#define NumRequests 500
 //#define NumRequests 200
 //#define NumRequests 100
