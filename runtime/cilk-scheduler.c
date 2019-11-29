@@ -438,6 +438,7 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
                 // for during abort process
                 t->status == CLOSURE_RETURNING);
 
+    w = __cilkrts_get_tls_worker();
     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, TO_SLEEP)) {
         if (w->head <= w->tail) {//zhe del =
             sysdep_save_fp_ctrl_state_for_preempt(w->current_stack_frame);
@@ -449,6 +450,8 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
             } else { //when whole deque thief jumps here, do normal routine as if nothing happens
                 //w = __cilkrts_get_tls_worker();
                 //printf("%d jumps at Cilk_exception_handler\n", w->self);
+                Closure_unlock(w, t);
+                deque_unlock_self(w);
                 return;
             }
         } else {// w->head>w->tail
@@ -465,8 +468,8 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
 
     } else { //normal routine
         if (w->head > w->tail) {
-            if (w->l->elastic_s==ACTIVE) {
-                w = __cilkrts_get_tls_worker(); //Chen: Added on 0620
+            if(w->l->elastic_s==ACTIVE) {
+                w = __cilkrts_get_tls_worker();
                 __cilkrts_alert(ALERT_EXCEPT, "[%d]: (Cilk_exception_handler) this is a steal!\n", w->self);
                 /*if (w->self==w->g->elastic_core->test_thief) {
                     printf("TEST[%d]: enter normal steal branch, current_stack_frame:%p\n", w->self, w->current_stack_frame);
