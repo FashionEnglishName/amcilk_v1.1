@@ -450,8 +450,6 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
             } else { //when whole deque thief jumps here, do normal routine as if nothing happens
                 //w = __cilkrts_get_tls_worker();
                 //printf("%d jumps at Cilk_exception_handler\n", w->self);
-                Closure_unlock(w, t);
-                deque_unlock_self(w);
                 return;
             }
         } else {// w->head>w->tail
