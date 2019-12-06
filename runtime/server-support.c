@@ -11,7 +11,6 @@ void * main_thread_new_program_receiver(void * arg) {
     platform_program_request * old_pr = NULL;
     platform_program_request * pr = NULL;
     int i = 0;
-    int control_uid = 0;
 
     //server start
     while(1) {
