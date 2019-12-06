@@ -8,9 +8,9 @@ pthread_cond_t timed_scheduling_sleep_cond;
 void * main_thread_new_program_receiver(void * arg) {
     platform_global_state * G = (platform_global_state *)arg;
 
-    /*platform_program_request * old_pr = NULL;
+    platform_program_request * old_pr = NULL;
     platform_program_request * pr = NULL;
-    int i = 0;*/
+    int i = 0;
 
     //server start
     while(1) {
@@ -44,10 +44,10 @@ void * main_thread_new_program_receiver(void * arg) {
         //printf("buffer size: %d\n", get_count_program_request_buffer(G));
 
         //see local buffer
-        /*for (i=0; i<CONTAINER_COUNT; i++) {
+        for (i=0; i<CONTAINER_COUNT; i++) {
             control_uid = i + 1;
             pr = platform_peek_first_request(G, control_uid);
-            if (pr!=NULL) {
+            if (pr!=NULL && G->nprogram_running<MINI_ACTIVE_CONTAIN_THRESHOLD) {
                 platform_program* p = get_container(G, pr->control_uid);
                 if (p!=NULL) {
                     platform_try_activate_worker(p, p->invariant_running_worker_id);
@@ -57,14 +57,14 @@ void * main_thread_new_program_receiver(void * arg) {
         }
         //see global buffer
         pr = platform_peek_first_request(G, 0);
-        if (pr==old_pr && pr!=NULL) {
+        if (pr==old_pr && pr!=NULL && G->nprogram_running<MINI_ACTIVE_CONTAIN_THRESHOLD) {
             platform_program* p = get_container(G, pr->control_uid);
             if (p!=NULL) {
                 platform_try_activate_worker(p, p->invariant_running_worker_id);
             }
             //usleep(TIME_CONTAINER_TRIGGER_INTERVAL);
         }
-        old_pr = pr;*/
+        old_pr = pr;
         usleep(TIME_REQUEST_RECEIVE_INTERVAL);
     }
     return 0;
