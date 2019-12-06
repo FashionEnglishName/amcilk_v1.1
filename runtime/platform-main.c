@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) {
     sleep(1);
 
     //container trigger, run on core 0
-    CPU_ZERO(&mask);
+    /*CPU_ZERO(&mask);
     CPU_SET(0, &mask);
     pthread_t thread_container_trigger;
     status = pthread_create(&thread_container_trigger, NULL, main_thread_thread_container_trigger, G);
@@ -126,7 +126,7 @@ int main(int argc, char* argv[]) {
     //printf("\t%d new program and scheduling finishes, to relase big lock\n", p->control_uid);
     if(status != 0) {
         printf("Cilk runtime error: thread join receiver thread failed: %d\n", status);
-    }
+    }*/
 
     //request receiver, run on core 1
     CPU_ZERO(&mask);
