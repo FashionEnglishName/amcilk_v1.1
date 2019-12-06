@@ -71,7 +71,7 @@ void * main_thread_thread_container_trigger(void * arg) {
         }
 
         //see global buffer
-        pthread_mutex_lock(&(w->g->program->G->lock));
+        pthread_mutex_lock(&(G->lock));
         pr = platform_peek_first_request(G, 0);
         if (pr==old_pr && pr!=NULL) {
             platform_program* p = get_container(G, pr->control_uid);
@@ -81,7 +81,7 @@ void * main_thread_thread_container_trigger(void * arg) {
             usleep(TIME_CONTAINER_TRIGGER_INTERVAL);
         }
         old_pr = pr;
-        pthread_mutex_unlock(&(w->g->program->G->lock));
+        pthread_mutex_unlock(&(G->lock));
     }
     return 0;
 }
