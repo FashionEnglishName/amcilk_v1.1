@@ -78,7 +78,7 @@ void * main_thread_thread_container_trigger(void * arg) {
     int i = 0;
     int control_uid = 0;
     while(1) {
-        if (G->nprogram_running>CONTAINER_COUNT_THRESHOLD) {
+        if (G->nprogram_running>MAX_ACTIVE_CONTAIN_THRESHOLD) {
             sleep(5);
             continue;
         }
