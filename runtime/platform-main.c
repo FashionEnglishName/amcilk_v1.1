@@ -130,7 +130,7 @@ int main(int argc, char* argv[]) {
 
     //request receiver, run on core 1
     CPU_ZERO(&mask);
-    CPU_SET(1, &mask);
+    CPU_SET(0, &mask);
     pthread_t thread_receiver;
     status = pthread_create(&thread_receiver, NULL, main_thread_new_program_receiver, G);
     if (status != 0) {
