@@ -84,12 +84,6 @@ int analyze_cpu_cycle_status(platform_program * p) {
 	}
 }
 
-void adjust_scheduling(platform_program * p) {
-	//adjust try_num_cpu and try_cpu_mask
-	int to_set_num_cpu = MIN(p->desired_num_cpu, p->try_num_cpu);
-	
-}
-
 void kunal_adaptive_scheduler(platform_global_state * G) {
     printf("do kunal_adaptive_scheduler\n");
     int i = 0;
