@@ -106,6 +106,7 @@ __attribute__((noreturn)) void invoke_main() {
 run_point:
     w = __cilkrts_get_tls_worker();
     sf = w->current_stack_frame;
+    w->g->program->job_init_finish = 1;
     //printf("\t%d, %d, new run section begin!\n", w->g->program->control_uid, w->self);
     char * rsp;
     char * nsp;

@@ -225,6 +225,7 @@ struct platform_program {
     volatile int pickable;
     volatile int hint_stop_container;
     volatile int job_finish;
+    volatile int job_init_finish;
     volatile int last_do_exit_worker_id;
     volatile int is_switching;
     volatile int run_request_before_block;
@@ -273,7 +274,7 @@ struct platform_program {
     volatile unsigned long long total_cycles;
     volatile unsigned long long total_stealing_cycles;
     volatile unsigned long long total_work_cycles;
-    
+
     int tmp_num_cpu;
     volatile int done_one;
     int run_times;

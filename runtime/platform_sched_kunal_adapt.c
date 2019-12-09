@@ -2,7 +2,7 @@
 #include "sched_stats.h"
 
 void reset_cpu_cycle_status(platform_program * p) {
-	if (p->begin_cpu_cycle_ts!=0) {
+	if (p->job_init_finish==1) {
 		int i = 0;
 		p->total_cycles = 0;
 	    p->total_stealing_cycles = 0;
@@ -17,7 +17,7 @@ void reset_cpu_cycle_status(platform_program * p) {
 }
 
 int get_cpu_cycle_status(platform_program * p) {
-	if (p->begin_cpu_cycle_ts!=0) {
+	if (p->job_init_finish==1) {
 		p->total_cycles = 0;
 		p->total_stealing_cycles = 0;
 		p->total_work_cycles = 0;

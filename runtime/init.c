@@ -219,6 +219,7 @@ void container_set_by_init(platform_program * p, int program_id, int input, int 
     p->pickable = 0;
     p->hint_stop_container = 0;
     p->job_finish = 0;
+    p->job_init_finish = 0;
     p->last_do_exit_worker_id = -1;
     p->is_switching = 0;
     p->run_request_before_block = 1;
@@ -289,6 +290,7 @@ void container_set_by_request(platform_program * p, platform_program_request * p
     p->pickable = 0;
     p->hint_stop_container = 0;
     p->job_finish = 0;
+    p->job_init_finish = 0;
     p->last_do_exit_worker_id = -1;
     for (i=0; i<p->G->nproc; i++) {
         p->g->workers[i]->l->stealing_cpu_cycles = 0;
