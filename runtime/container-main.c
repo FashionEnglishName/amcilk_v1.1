@@ -108,7 +108,7 @@ run_point:
     sf = w->current_stack_frame;
     int i;
     //printf("\t%d, %d, new run section begin!\n", w->g->program->control_uid, w->self);
-    for (i=0; i<w->g->p->G->nproc; i++) {
+    for (i=0; i<w->g->program->G->nproc; i++) {
         w->g->workers[i]->l->stealing_cpu_cycles = 0;
     }
     w->g->program->begin_cpu_cycle_ts = rdtsc(); //get time stamp
