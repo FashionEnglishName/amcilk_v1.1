@@ -20,7 +20,7 @@ void reset_cpu_cycle_status(platform_program * p) {
 }
 
 int analyze_cpu_cycle_status(platform_program * p) {
-	if (p->job_init_finish==1) {
+	if (1) {
 		p->total_cycles = 0;
 		p->total_stealing_cycles = 0;
 		p->total_work_cycles = 0;
