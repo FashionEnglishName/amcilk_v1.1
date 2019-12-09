@@ -35,9 +35,10 @@ int get_cpu_cycle_status(platform_program * p) {
 			p->total_stealing_cycles*(1.0)/p->total_cycles,
 			p->total_work_cycles,
 			p->total_work_cycles*(1.0)/p->total_cycles);*/
-		printf("(p%d, job finish:%d): non-steal: %f\n", 
+		printf("(p%d, job finish:%d, input:%d): non-steal: %f\n", 
 			p->control_uid,
 			p->job_finish,
+			p->input,
 			p->total_work_cycles*(1.0)/p->total_cycles);
 
 		return 0;
