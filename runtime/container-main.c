@@ -106,6 +106,7 @@ __attribute__((noreturn)) void invoke_main() {
 run_point:
     w = __cilkrts_get_tls_worker();
     sf = w->current_stack_frame;
+    int i;
     //printf("\t%d, %d, new run section begin!\n", w->g->program->control_uid, w->self);
     for (i=0; i<w->g->p->G->nproc; i++) {
         w->g->workers[i]->l->stealing_cpu_cycles = 0;
