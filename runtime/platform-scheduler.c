@@ -1,6 +1,7 @@
 #include "platform-scheduler.h"
 #include "membar.h"
 
+//get desired num cpu
 void platform_adjust_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) {
     int i = 0;
     //adjust try_cpu_mask: give up unnecessay cores
@@ -166,6 +167,7 @@ void platform_determine_scheduling(platform_global_state * G, enum PLATFORM_SCHE
 void platform_timed_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) {
     if (run_type==TIMED) {
         kunal_adaptive_scheduler(G);
+        printf("TIMED\n");
     } else {
         printf("[PLATFORM ERROR5]: type should not be any state other than platform_timed_scheduling\n");
     }
@@ -173,6 +175,7 @@ void platform_timed_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULE
 void platform_new_job_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) {
     if (run_type==NEW_PROGRAM) {
         platform_scheduler_DREP(G, run_type);
+        printf("NEW\n");
     } else {
         printf("[PLATFORM ERROR5]: type should not be any state other than platform_new_job_scheduling\n");
     }
@@ -180,6 +183,7 @@ void platform_new_job_scheduling(platform_global_state * G, enum PLATFORM_SCHEDU
 void platform_exit_job_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) {
     if (run_type==EXIT_PROGRAM) {
         platform_scheduler_DREP(G, run_type);
+        printf("EXIT\n");
     } else {
         printf("[PLATFORM ERROR5]: type should not be any state other than platform_exit_job_scheduling\n");
     }
