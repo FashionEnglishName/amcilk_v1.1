@@ -222,9 +222,7 @@ void container_set_by_init(platform_program * p, int program_id, int input, int 
     p->last_do_exit_worker_id = -1;
     p->is_switching = 0;
     p->run_request_before_block = 1;
-    for (i=0; i<p->G->nproc; i++) {
-        p->g->workers[i]->l->stealing_cpu_cycles = 0;
-    }
+    
     p->begin_cpu_cycle_ts = 0;
     p->total_cycles = 0;
     p->total_stealing_cycles = 0;
