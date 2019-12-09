@@ -1553,7 +1553,6 @@ normal_point: //normal part, can not be preempted
         CILK_STOP_TIMING(w, INTERVAL_SCHED);
 
         w = __cilkrts_get_tls_worker();
-        unsigned long long begin_stealing_ts = rdtsc();
         while(!t && !w->g->done) {
             w = __cilkrts_get_tls_worker();
             if (w->g->program->job_finish==1) {
@@ -1567,6 +1566,7 @@ normal_point: //normal part, can not be preempted
             CILK_START_TIMING(w, INTERVAL_IDLE);
 
             w = __cilkrts_get_tls_worker();
+            unsigned long long begin_stealing_ts = rdtsc();
             if (w->g->program->running_job==1 && w->g->program->job_finish==0) {
                 int victim_worker_id = w->g->elastic_core->cpu_state_group[rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque];
                 if(victim_worker_id != w->self && 
@@ -1580,6 +1580,7 @@ normal_point: //normal part, can not be preempted
                     //pass
                 }
             }
+            w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts);
 
 #if SCHED_STATS
             if(t) { // steal successful
@@ -1591,7 +1592,6 @@ normal_point: //normal part, can not be preempted
             }
 #endif
         }
-        w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts);
 
         CILK_START_TIMING(w, INTERVAL_SCHED);
         w = __cilkrts_get_tls_worker();
