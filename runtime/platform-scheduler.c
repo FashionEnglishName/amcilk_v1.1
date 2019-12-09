@@ -9,7 +9,7 @@ void platform_adjust_scheduling(platform_global_state * G, enum PLATFORM_SCHEDUL
     while(tmp_p!=NULL) {
         if (tmp_p->desired_num_cpu<tmp_p->try_num_cpu) {
             int tmp_diff_num_cpu = tmp_p->try_num_cpu - tmp_p->desired_num_cpu;
-            for (i=0; i<tmp_p->G->nproc; i++) {
+            for (i=2; i<tmp_p->G->nproc; i++) {
                 if (tmp_p->try_cpu_mask[i]==1 && tmp_diff_num_cpu>0) {
                     tmp_p->try_cpu_mask[i] = 0;
                     tmp_diff_num_cpu--;
@@ -34,6 +34,17 @@ void platform_adjust_scheduling(platform_global_state * G, enum PLATFORM_SCHEDUL
             printf("cpu %d is a idle core\n", i);
         }
     }
+}
+
+int platform_verify_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) {
+    platform_program * tmp_p = G->program_head->next;
+    while(tmp_p!=NULL) {
+        if (tmp_p->try_num_cpu>tmp_p->desired_num_cpu) {
+            return -1;
+        }
+        tmp_p = tmp_p->next;
+    }
+    return 0;
 }
 
 void platform_determine_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) {
@@ -204,6 +215,11 @@ void platform_scheduling(platform_global_state * G, platform_program * p, enum P
     }
     printf("ADJUST\n");
     platform_adjust_scheduling(G, run_type);
+    printf("VERIFY\n");
+    if (platform_verify_scheduling(G, run_type)==-1) {
+        printf("ERROR: scheduling verify failed\n");
+        abort();
+    }
 }
 
 void platform_preemption(platform_global_state * G, platform_program * p, enum PLATFORM_SCHEDULER_TYPE run_type) {

@@ -51,8 +51,9 @@ int analyze_cpu_cycle_status(platform_program * p) {
 			satisfied = 1;
 		} else if (p->desired_num_cpu > p->try_num_cpu) {
 			satisfied = 0;
-		} else { //??
-			satisfied = 1;
+		} else {
+			printf("BUG, %d, try_num_cpu (%d) > desired_num_cpu (%d)\n", p->control_uid, p->try_num_cpu, p->desired_num_cpu);
+			abort();
 		}
 		if (efficient==0) {
 			p->desired_num_cpu = MIN(MAX(p->desired_num_cpu/KUNAL_ADAPTIVE_FEEDBACK_RESPONSIVENESS_PARAMETER, 1), p->G->nproc-2);
