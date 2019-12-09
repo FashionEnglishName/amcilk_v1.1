@@ -35,7 +35,7 @@ int analyze_cpu_cycle_status(platform_program * p) {
 			p->total_stealing_cycles*(1.0)/p->total_cycles,
 			p->total_work_cycles,
 			non_steal_utilization);*/
-		non_steal_utilization = p->total_work_cycles*(1.0)/p->total_cycles;
+		float non_steal_utilization = p->total_work_cycles*(1.0)/p->total_cycles;
 		
 		int efficient = 0;
 		int satisfied = 0;
