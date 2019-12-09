@@ -47,12 +47,12 @@ int analyze_cpu_cycle_status(platform_program * p) {
 		} else {
 			efficient = 1;
 		}
-		if (p->desired_num_cpu == p->num_cpu) {
+		if (p->desired_num_cpu == p->try_num_cpu) {
 			satisfied = 1;
-		} else if (p->desired_num_cpu > p->num_cpu) {
+		} else if (p->desired_num_cpu > p->try_num_cpu) {
 			satisfied = 0;
 		} else {
-			printf("BUG, num_cpu > desired_num_cpu\n");
+			printf("BUG, try_num_cpu > desired_num_cpu\n");
 			abort();
 		}
 		if (efficient==0) {
@@ -72,7 +72,7 @@ int analyze_cpu_cycle_status(platform_program * p) {
 			p->control_uid,
 			p->job_finish,
 			p->input,
-			p->num_cpu,
+			p->try_num_cpu,
 			non_steal_utilization,
 			efficient,
 			satisfied,
