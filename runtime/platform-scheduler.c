@@ -202,6 +202,7 @@ void platform_scheduling(platform_global_state * G, platform_program * p, enum P
         printf("[PLATFORM ERROR5]: undefined RUN_TYPE\n");
         abort();
     }
+    printf("ADJUST\n");
     platform_adjust_scheduling(G, run_type);
 }
 
