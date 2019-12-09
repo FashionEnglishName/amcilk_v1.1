@@ -2,14 +2,18 @@
 #include "sched_stats.h"
 
 void reset_cpu_cycle_status(platform_program * p) {
-	int i = 0;
-	p->total_cycles = 0;
-    p->total_stealing_cycles = 0;
-    p->total_work_cycles = 0;
-    for (i=0; i<p->G->nproc; i++) {
-        p->g->workers[i]->l->stealing_cpu_cycles = 0;
-    }
-    p->begin_cpu_cycle_ts = rdtsc(); //get time stamp
+	if (p->begin_cpu_cycle_ts!=0) {
+		int i = 0;
+		p->total_cycles = 0;
+	    p->total_stealing_cycles = 0;
+	    p->total_work_cycles = 0;
+	    for (i=0; i<p->G->nproc; i++) {
+	        p->g->workers[i]->l->stealing_cpu_cycles = 0;
+	    }
+	    p->begin_cpu_cycle_ts = rdtsc(); //get time stamp
+	} else {
+		printf("kunal_adaptive_scheduler: reset_cpu_cycle_status failed (not start running)\n");
+	}
 }
 
 int get_cpu_cycle_status(platform_program * p) {
