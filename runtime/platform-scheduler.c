@@ -167,7 +167,6 @@ void platform_determine_scheduling(platform_global_state * G, enum PLATFORM_SCHE
 void platform_timed_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) {
     if (run_type==TIMED) {
         kunal_adaptive_scheduler(G);
-        printf("TIMED\n");
     } else {
         printf("[PLATFORM ERROR5]: type should not be any state other than platform_timed_scheduling\n");
     }
@@ -175,7 +174,6 @@ void platform_timed_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULE
 void platform_new_job_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) {
     if (run_type==NEW_PROGRAM) {
         platform_scheduler_DREP(G, run_type);
-        printf("NEW\n");
     } else {
         printf("[PLATFORM ERROR5]: type should not be any state other than platform_new_job_scheduling\n");
     }
@@ -183,7 +181,6 @@ void platform_new_job_scheduling(platform_global_state * G, enum PLATFORM_SCHEDU
 void platform_exit_job_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) {
     if (run_type==EXIT_PROGRAM) {
         platform_scheduler_DREP(G, run_type);
-        printf("EXIT\n");
     } else {
         printf("[PLATFORM ERROR5]: type should not be any state other than platform_exit_job_scheduling\n");
     }
@@ -193,10 +190,13 @@ void platform_exit_job_scheduling(platform_global_state * G, enum PLATFORM_SCHED
 void platform_scheduling(platform_global_state * G, platform_program * p, enum PLATFORM_SCHEDULER_TYPE run_type) {
     //printf("[SCHEDULING %d]: calculate core assignment in run_type: %d\n", p->control_uid, run_type);
     if (run_type==NEW_PROGRAM) {
+        printf("NEW\n");
         platform_new_job_scheduling(G, run_type);
     } else if (run_type==EXIT_PROGRAM) {
+        printf("EXIT\n");
         platform_exit_job_scheduling(G, run_type);
     } else if (run_type==TIMED) {
+        printf("TIMED\n");
         platform_timed_scheduling(G, run_type);
     } else {
         printf("[PLATFORM ERROR5]: undefined RUN_TYPE\n");
