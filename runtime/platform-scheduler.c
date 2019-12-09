@@ -203,11 +203,9 @@ void platform_scheduling(platform_global_state * G, platform_program * p, enum P
     if (run_type==NEW_PROGRAM) {
         printf("NEW\n");
         platform_new_job_scheduling(G, run_type);
-        platform_determine_scheduling(G, run_type);
     } else if (run_type==EXIT_PROGRAM) {
         printf("EXIT\n");
         platform_exit_job_scheduling(G, run_type);
-        platform_determine_scheduling(G, run_type);
     } else if (run_type==TIMED) {
         printf("TIMED\n");
         platform_timed_scheduling(G, run_type);
@@ -217,6 +215,7 @@ void platform_scheduling(platform_global_state * G, platform_program * p, enum P
     }
     printf("ADJUST\n");
     platform_adjust_scheduling(G, run_type);
+    platform_determine_scheduling(G, run_type);
     printf("VERIFY\n");
     if (platform_verify_scheduling(G, run_type)==-1) {
         printf("ERROR: scheduling verify failed\n");
