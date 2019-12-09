@@ -270,6 +270,7 @@ struct platform_program {
     int* try_cpu_mask;
     volatile int num_cpu;
     volatile int try_num_cpu;
+    volatile int desired_num_cpu;
     volatile unsigned long long begin_cpu_cycle_ts;
     volatile unsigned long long total_cycles;
     volatile unsigned long long total_stealing_cycles;

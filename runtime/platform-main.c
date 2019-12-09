@@ -90,6 +90,7 @@ int main(int argc, char* argv[]) {
         }
         p->num_cpu = p->G->nproc-2;
         p->try_num_cpu = p->G->nproc-2;
+        p->desired_num_cpu = p->G->nproc-2;
         platform_activate_container(p);
         run_program(G, p);
         for (j=0; j<2; j++) {

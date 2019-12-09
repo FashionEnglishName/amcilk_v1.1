@@ -202,6 +202,7 @@ platform_program *container_init(platform_global_state *G, int control_uid, int 
     }
     p->num_cpu = 0;
     p->try_num_cpu = 0;
+    p->desired_num_cpu = 0;
 
     p->t_s_dict_for_task_compress_par2 = (unsigned long long*) malloc(sizeof(unsigned long long)*(p->G->nproc));
     p->t_us_dict_for_task_compress_par2 = (unsigned long long*) malloc(sizeof(unsigned long long)*(p->G->nproc));

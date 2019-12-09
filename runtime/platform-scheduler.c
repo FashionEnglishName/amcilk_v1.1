@@ -45,8 +45,9 @@ void platform_determine_scheduling(platform_global_state * G, enum PLATFORM_SCHE
         }
         tmp_p = tmp_p->next;
     }
-    //now, try_num_cpu and try_cpu_mask is fixed, then set cpu_container_map based on try_num_cpu, and update num_cpu
-
+    //now, try_num_cpu and try_cpu_mask is fixed, 
+    //then set cpu_container_map based on try_num_cpu, 
+    //and update num_cpu
 
     //unset cpu map
     for(i=0; i<G->nproc; i++) {
