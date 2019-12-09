@@ -331,7 +331,7 @@ new_point:
     if (first_request==NULL) {
         first_request = platform_pop_first_request(w->g->program->G, 0);
         if (first_request!=NULL) {
-            printf("[NEW CONTAINER %d] input: %d\n", w->g->program->control_uid, w->g->program->input);
+            printf("[NEW CONTAINER %d] input: %d\n", w->g->program->control_uid, first_request->input);
             for (int i=2; i<w->g->program->G->nproc; i++) {
                 if (w->g->workers[i]->l->elastic_s==SLEEPING_ACTIVE_DEQUE) {
                     printf("ERROR: a worker is SLEEPING_ACTIVE_DEQUE before beginning\n");
