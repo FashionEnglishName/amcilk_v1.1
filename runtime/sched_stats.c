@@ -4,6 +4,12 @@
 #include "debug.h"
 #include "sched_stats.h"
 
+unsigned long long rdtsc() {
+    unsigned int lo, hi;
+    __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
+    return ((unsigned long long)hi << 32) | lo;
+}
+
 #if SCHED_STATS
 static const char *enum_to_str(enum timing_type t) {
     switch(t) {
@@ -21,12 +27,6 @@ static inline double cycles_to_micro_sec(unsigned long long cycle) {
 __attribute__((unused))
 static inline double micro_sec_to_sec(double micro_sec) {
     return micro_sec / 1000000.0;
-}
-
-unsigned long long rdtsc() {
-    unsigned int lo, hi;
-    __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
-    return ((unsigned long long)hi << 32) | lo;
 }
 
 static inline unsigned long long begin_cycle_count() {
