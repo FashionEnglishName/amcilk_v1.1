@@ -44,7 +44,7 @@ int analyze_cpu_cycle_status(platform_program * p) {
 		} else {
 			efficient = 1;
 		}
-		if (p->desired_num_cpu = p->num_cpu) {
+		if (p->desired_num_cpu == p->num_cpu) {
 			satisfied = 1;
 		} else if (p->desired_num_cpu > p->num_cpu) {
 			satisfied = 0;
