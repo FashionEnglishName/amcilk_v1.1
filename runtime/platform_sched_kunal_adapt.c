@@ -101,7 +101,7 @@ void kunal_adaptive_scheduler(platform_global_state * G) {
     while(tmp_p!=NULL) {
     	if (tmp_p->desired_num_cpu<tmp_p->try_num_cpu) {
     		int tmp_diff_num_cpu = tmp_p->try_num_cpu - tmp_p->desired_num_cpu;
-    		for (i=0; i<p->G->nproc; i++) {
+    		for (i=0; i<tmp_p->G->nproc; i++) {
     			if (tmp_p->try_cpu_mask[i]==1 && tmp_diff_num_cpu>0) {
     				tmp_p->try_cpu_mask[i] = 0;
     				tmp_diff_num_cpu--;
@@ -112,7 +112,7 @@ void kunal_adaptive_scheduler(platform_global_state * G) {
     	tmp_p = tmp_p->next;
     }
     //see idle cores
-    for (i=0; i<p->G->nproc; i++) {
+    for (i=0; i<G->nproc; i++) {
     	int flag = 0;
     	tmp_p = G->program_head->next;
     	while(tmp_p!=NULL) {
