@@ -12,7 +12,9 @@ int get_cpu_cycle_status(platform_program * p) {
 		}
 		p->total_cycles = rdtsc() - p->begin_cpu_cycle_ts;
 		p->total_work_cycles = p->total_cycles - p->total_stealing_cycles;
-		printf("total: %llu, steal: %llu (%f), non-steal: %llu (%f)\n", 
+		printf("(p%d, job finish:%d): total: %llu, steal: %llu (%f), non-steal: %llu (%f)\n", 
+			p->control_uid,
+			p->job_finish,
 			p->total_cycles, 
 			p->total_stealing_cycles, 
 			p->total_stealing_cycles*(1.0)/p->total_cycles,
