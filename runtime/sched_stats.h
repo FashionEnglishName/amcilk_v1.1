@@ -6,6 +6,8 @@
 
 typedef struct __cilkrts_worker __cilkrts_worker;
 
+unsigned long long rdtsc();
+
 #define SCHED_STATS CILK_STATS
 
 #if SCHED_STATS
@@ -32,7 +34,6 @@ void cilk_start_timing(__cilkrts_worker *w, enum timing_type t);
 void cilk_stop_timing(__cilkrts_worker *w, enum timing_type t);
 void cilk_drop_timing(__cilkrts_worker *w, enum timing_type t);
 void cilk_sched_stats_print(struct global_state *g);
-unsigned long long rdtsc();
 // void cilk_reset_timing(__cilkrts_worker *w, enum timing_type t);
 // FIXME: should have a header file that's user-code interfacing
 // void __cilkrts_reset_timing(); // user-code facing 
