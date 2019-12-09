@@ -77,7 +77,7 @@ void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_
         for(i=0; i<G->nproc; i++) {
             G->stop_program->try_cpu_mask[i] = 0;
         }
-        G->try_num_cpu = 0;
+        G->stop_program->try_num_cpu = 0;
     } else {
         printf("[PLATFORM ERROR3]: wrong input of run_type in platform_scheduler_DREP\n");
         abort();
