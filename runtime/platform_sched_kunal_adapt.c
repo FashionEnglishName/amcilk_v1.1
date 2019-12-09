@@ -20,7 +20,7 @@ void reset_cpu_cycle_status(platform_program * p) {
 }
 
 int analyze_cpu_cycle_status(platform_program * p) {
-	if (1) {
+	if (p->job_init_finish==1) {
 		p->total_cycles = 0;
 		p->total_stealing_cycles = 0;
 		p->total_work_cycles = 0;
@@ -56,9 +56,9 @@ int analyze_cpu_cycle_status(platform_program * p) {
 			abort();
 		}
 		if (efficient==0) {
-			p->desired_num_cpu = MAX(p->desired_num_cpu/KUNAL_ADAPTIVE_FEEDBACK_RESPONSIVENESS_PARAMETER, 1);
+			p->desired_num_cpu = MIN(MAX(p->desired_num_cpu/KUNAL_ADAPTIVE_FEEDBACK_RESPONSIVENESS_PARAMETER, 1), p->G->nproc-2);
 		} else if (satisfied==1) {
-			p->desired_num_cpu = MAX(p->desired_num_cpu*KUNAL_ADAPTIVE_FEEDBACK_RESPONSIVENESS_PARAMETER, 1);
+			p->desired_num_cpu = MIN(MAX(p->desired_num_cpu*KUNAL_ADAPTIVE_FEEDBACK_RESPONSIVENESS_PARAMETER, 1), p->G->nproc-2);
 		} else {
 			p->desired_num_cpu = p->desired_num_cpu;
 		}
