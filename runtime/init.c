@@ -294,7 +294,7 @@ void container_set_by_request(platform_program * p, platform_program_request * p
     p->job_init_finish = 0;
     p->last_do_exit_worker_id = -1;
 
-    pthread_spin_lock(&(p->G->cpu_cycle_status_lock));
+    pthread_spin_lock(&(p->cpu_cycle_status_lock));
     for (i=0; i<p->G->nproc; i++) {
         p->g->workers[i]->l->stealing_cpu_cycles = 0;
     }
@@ -302,7 +302,7 @@ void container_set_by_request(platform_program * p, platform_program_request * p
     p->total_cycles = 0;
     p->total_stealing_cycles = 0;
     p->total_work_cycles = 0;
-    pthread_spin_unlock(&(p->G->cpu_cycle_status_lock));
+    pthread_spin_unlock(&(p->cpu_cycle_status_lock));
     
     //periodic
     p->max_period_s = pr->max_period_s;
