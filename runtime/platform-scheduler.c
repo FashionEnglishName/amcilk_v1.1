@@ -1,6 +1,39 @@
 #include "platform-scheduler.h"
 #include "membar.h"
 
+void platform_adjust_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) {
+    //adjust try_cpu_mask: give up unnecessay cores
+    platform_program * tmp_p = G->program_head->next;
+    while(tmp_p!=NULL) {
+        if (tmp_p->desired_num_cpu<tmp_p->try_num_cpu) {
+            int tmp_diff_num_cpu = tmp_p->try_num_cpu - tmp_p->desired_num_cpu;
+            for (i=0; i<tmp_p->G->nproc; i++) {
+                if (tmp_p->try_cpu_mask[i]==1 && tmp_diff_num_cpu>0) {
+                    tmp_p->try_cpu_mask[i] = 0;
+                    tmp_diff_num_cpu--;
+                }
+            }
+            tmp_p->try_num_cpu = tmp_p->desired_num_cpu;
+        }
+        tmp_p = tmp_p->next;
+    }
+    //see idle cores
+    for (i=0; i<G->nproc; i++) {
+        int flag = 0;
+        tmp_p = G->program_head->next;
+        while(tmp_p!=NULL) {
+            if (tmp_p->try_cpu_mask[i]==1) {
+                flag = 1;
+            }
+            tmp_p = tmp_p->next;
+        }
+        if (flag==1) {
+            //cpu i is idle core
+            printf("cpu %d is a idle core\n", i);
+        }
+    }
+}
+
 void platform_determine_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) {
     //printf("\tplatform_determine_scheduling\n");
     platform_program * tmp_p;
@@ -168,6 +201,7 @@ void platform_scheduling(platform_global_state * G, platform_program * p, enum P
 
 void platform_preemption(platform_global_state * G, platform_program * p, enum PLATFORM_SCHEDULER_TYPE run_type) {
     //printf("[SCHEDULING %d]: do scheduling in run_type: %d\n", p->control_uid, run_type);
+    platform_adjust_scheduling(G, run_type);
     platform_determine_scheduling(G, run_type);
     platform_program * tmp_p = G->program_head->next;
     while(tmp_p!=NULL) {

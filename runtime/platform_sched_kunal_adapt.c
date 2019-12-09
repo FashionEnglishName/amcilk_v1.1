@@ -91,44 +91,6 @@ void kunal_adaptive_scheduler(platform_global_state * G) {
     while(tmp_p!=NULL) {
     	pthread_spin_lock(&(tmp_p->cpu_cycle_status_lock));
     	analyze_cpu_cycle_status(tmp_p);
-    	pthread_spin_unlock(&(tmp_p->cpu_cycle_status_lock));
-    	tmp_p = tmp_p->next;
-    }
-
-    //adjust cpu_mask: give up unnecessay cores
-    tmp_p = G->program_head->next;
-    while(tmp_p!=NULL) {
-    	if (tmp_p->desired_num_cpu<tmp_p->try_num_cpu) {
-    		int tmp_diff_num_cpu = tmp_p->try_num_cpu - tmp_p->desired_num_cpu;
-    		for (i=0; i<tmp_p->G->nproc; i++) {
-    			if (tmp_p->try_cpu_mask[i]==1 && tmp_diff_num_cpu>0) {
-    				tmp_p->try_cpu_mask[i] = 0;
-    				tmp_diff_num_cpu--;
-    			}
-    		}
-    		tmp_p->try_num_cpu = tmp_p->desired_num_cpu;
-    	}
-    	tmp_p = tmp_p->next;
-    }
-    //see idle cores
-    for (i=0; i<G->nproc; i++) {
-    	int flag = 0;
-    	tmp_p = G->program_head->next;
-    	while(tmp_p!=NULL) {
-    		if (tmp_p->try_cpu_mask[i]==1) {
-    			flag = 1;
-    		}
-    		tmp_p = tmp_p->next;
-    	}
-    	if (flag==1) {
-    		//cpu i is idle core
-    		printf("cpu %d is a idle core\n", i);
-    	}
-    }
-
-    tmp_p = G->program_head->next;
-    while(tmp_p!=NULL) {
-    	pthread_spin_lock(&(tmp_p->cpu_cycle_status_lock));
     	reset_cpu_cycle_status(tmp_p);
     	pthread_spin_unlock(&(tmp_p->cpu_cycle_status_lock));
     	tmp_p = tmp_p->next;
