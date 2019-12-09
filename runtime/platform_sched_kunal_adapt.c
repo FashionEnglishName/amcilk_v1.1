@@ -88,7 +88,6 @@ void kunal_adaptive_scheduler(platform_global_state * G) {
     printf("do kunal_adaptive_scheduler\n");
     int i = 0;
     platform_program * tmp_p = G->program_head->next;
-    platform_program * tmp_p2 = G->program_head->next;
     while(tmp_p!=NULL) {
     	pthread_spin_lock(&(tmp_p->cpu_cycle_status_lock));
     	analyze_cpu_cycle_status(tmp_p);
