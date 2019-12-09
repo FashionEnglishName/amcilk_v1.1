@@ -93,7 +93,7 @@ int main(int argc, char* argv[]) {
         platform_activate_container(p);
         run_program(G, p);
         for (j=0; j<2; j++) {
-            usleep(1000*1000); //to guarantee the correctness of the jump buffer: should be non-null (elastic_safe)
+            usleep(1000*400); //to guarantee the correctness of the jump buffer: should be non-null (elastic_safe)
         }
     }
     for (i=0; i<CONTAINER_COUNT; i++) {
