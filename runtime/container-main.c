@@ -108,6 +108,9 @@ run_point:
     sf = w->current_stack_frame;
     int i;
     //printf("\t%d, %d, new run section begin!\n", w->g->program->control_uid, w->self);
+    p->total_cycles = 0;
+    p->total_stealing_cycles = 0;
+    p->total_work_cycles = 0;
     for (i=0; i<w->g->program->G->nproc; i++) {
         w->g->workers[i]->l->stealing_cpu_cycles = 0;
     }

@@ -1,6 +1,16 @@
 #include "platform_sched_kunal_adapt.h"
 #include "sched_stats.h"
 
+void reset_cpu_cycle_status(platform_program * p) {
+	p->total_cycles = 0;
+    p->total_stealing_cycles = 0;
+    p->total_work_cycles = 0;
+    for (i=0; i<w->g->program->G->nproc; i++) {
+        w->g->workers[i]->l->stealing_cpu_cycles = 0;
+    }
+    p->begin_cpu_cycle_ts = rdtsc(); //get time stamp
+}
+
 int get_cpu_cycle_status(platform_program * p) {
 	if (p->begin_cpu_cycle_ts!=0) {
 		p->total_cycles = 0;
@@ -10,7 +20,7 @@ int get_cpu_cycle_status(platform_program * p) {
 		for (i=0; i<p->G->nproc; i++) {
 			p->total_stealing_cycles += p->g->workers[i]->l->stealing_cpu_cycles;
 		}
-		p->total_cycles = rdtsc() - p->begin_cpu_cycle_ts;
+		p->total_cycles = (rdtsc() - p->begin_cpu_cycle_ts)*p->G->nproc;
 		p->total_work_cycles = p->total_cycles - p->total_stealing_cycles;
 		printf("(p%d, job finish:%d): total: %llu, steal: %llu (%f), non-steal: %llu (%f)\n", 
 			p->control_uid,
@@ -34,6 +44,7 @@ void kunal_adaptive_scheduler(platform_global_state * G) {
     platform_program * tmp_p = G->program_head->next;
     while(tmp_p!=NULL) {
     	get_cpu_cycle_status(tmp_p);
+    	reset_cpu_cycle_status(tmp_p);
     	tmp_p = tmp_p->next;
     }
 }
