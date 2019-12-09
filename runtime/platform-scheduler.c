@@ -2,6 +2,7 @@
 #include "membar.h"
 
 void platform_adjust_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) {
+    int i = 0;
     //adjust try_cpu_mask: give up unnecessay cores
     platform_program * tmp_p = G->program_head->next;
     while(tmp_p!=NULL) {
