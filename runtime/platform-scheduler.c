@@ -19,7 +19,7 @@ void platform_adjust_scheduling(platform_global_state * G, enum PLATFORM_SCHEDUL
         tmp_p = tmp_p->next;
     }
     //see idle cores
-    for (i=0; i<G->nproc; i++) {
+    for (i=2; i<G->nproc; i++) {
         int flag = 0;
         tmp_p = G->program_head->next;
         while(tmp_p!=NULL) {
