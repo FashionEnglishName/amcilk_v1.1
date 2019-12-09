@@ -70,8 +70,6 @@ int main(int argc, char* argv[]) {
     if (status != 0) {
         __cilkrts_bug("ERROR: Could not set CPU affinity");
     }
-    signal(SIGALRM, timed_scheduling_signal_handler);
-    set_timer(&(G->timed_scheduling_itv), &(G->timed_scheduling_oldtv), G->timed_interval_sec, G->timed_interval_usec);
     //
 
     //create program containers
@@ -94,7 +92,9 @@ int main(int argc, char* argv[]) {
         p->try_num_cpu = p->G->nproc-2;
         platform_activate_container(p);
         run_program(G, p);
-        sleep(1); //to guarantee the correctness of the jump buffer: should be non-null (elastic_safe)
+        for (j=0; j<2; j++) {
+            usleep(1000*1000); //to guarantee the correctness of the jump buffer: should be non-null (elastic_safe)
+        }
     }
     for (i=0; i<CONTAINER_COUNT; i++) {
         while(G->program_container_pool[i]->pickable==0) {
@@ -110,6 +110,10 @@ int main(int argc, char* argv[]) {
         }
     }
     sleep(1);
+
+    //set timed scheduling
+    signal(SIGALRM, timed_scheduling_signal_handler);
+    set_timer(&(G->timed_scheduling_itv), &(G->timed_scheduling_oldtv), G->timed_interval_sec, G->timed_interval_usec);
 
     //container trigger, run on core 0
     CPU_ZERO(&mask);
