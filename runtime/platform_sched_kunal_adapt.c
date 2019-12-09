@@ -52,7 +52,7 @@ int analyze_cpu_cycle_status(platform_program * p) {
 		} else if (p->desired_num_cpu > p->try_num_cpu) {
 			satisfied = 0;
 		} else {
-			printf("BUG, try_num_cpu (%d) > desired_num_cpu (%d)\n", p->try_num_cpu, p->desired_num_cpu);
+			printf("BUG, %d, try_num_cpu (%d) > desired_num_cpu (%d)\n", p->control_uid, p->try_num_cpu, p->desired_num_cpu);
 			abort();
 		}
 		if (efficient==0) {
