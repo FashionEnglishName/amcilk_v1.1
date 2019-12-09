@@ -48,10 +48,10 @@ void kunal_adaptive_scheduler(platform_global_state * G) {
     printf("do kunal_adaptive_scheduler\n");
     platform_program * tmp_p = G->program_head->next;
     while(tmp_p!=NULL) {
-    	pthread_spin_lock(&(tmp_p->G->cpu_cycle_status_lock));
+    	pthread_spin_lock(&(tmp_p->cpu_cycle_status_lock));
     	get_cpu_cycle_status(tmp_p);
     	reset_cpu_cycle_status(tmp_p);
-    	pthread_spin_unlock(&(tmp_p->G->cpu_cycle_status_lock));
+    	pthread_spin_unlock(&(tmp_p->cpu_cycle_status_lock));
     	tmp_p = tmp_p->next;
     }
 }
