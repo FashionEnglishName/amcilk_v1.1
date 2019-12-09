@@ -213,6 +213,8 @@ void platform_scheduling(platform_global_state * G, platform_program * p, enum P
         printf("[PLATFORM ERROR5]: undefined RUN_TYPE\n");
         abort();
     }
+    printf("DETERMINE\n");
+    platform_determine_scheduling(G, run_type);
     printf("ADJUST\n");
     platform_adjust_scheduling(G, run_type);
     printf("VERIFY\n");
@@ -220,7 +222,6 @@ void platform_scheduling(platform_global_state * G, platform_program * p, enum P
         printf("ERROR: scheduling verify failed\n");
         abort();
     }
-    platform_determine_scheduling(G, run_type);
 }
 
 void platform_preemption(platform_global_state * G, platform_program * p, enum PLATFORM_SCHEDULER_TYPE run_type) {
