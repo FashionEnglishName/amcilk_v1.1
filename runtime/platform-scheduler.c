@@ -203,9 +203,11 @@ void platform_scheduling(platform_global_state * G, platform_program * p, enum P
     if (run_type==NEW_PROGRAM) {
         printf("NEW\n");
         platform_new_job_scheduling(G, run_type);
+        platform_determine_scheduling(G, run_type);
     } else if (run_type==EXIT_PROGRAM) {
         printf("EXIT\n");
         platform_exit_job_scheduling(G, run_type);
+        platform_determine_scheduling(G, run_type);
     } else if (run_type==TIMED) {
         printf("TIMED\n");
         platform_timed_scheduling(G, run_type);
@@ -224,7 +226,6 @@ void platform_scheduling(platform_global_state * G, platform_program * p, enum P
 
 void platform_preemption(platform_global_state * G, platform_program * p, enum PLATFORM_SCHEDULER_TYPE run_type) {
     //printf("[SCHEDULING %d]: do scheduling in run_type: %d\n", p->control_uid, run_type);
-    platform_determine_scheduling(G, run_type);
     platform_program * tmp_p = G->program_head->next;
     while(tmp_p!=NULL) {
         if ((tmp_p->periodic==0 || tmp_p->done_one==0)) { //add this for periodic
