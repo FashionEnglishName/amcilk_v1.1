@@ -50,6 +50,7 @@ int analyze_cpu_cycle_status(platform_program * p) {
 			satisfied = 0;
 		} else {
 			printf("BUG, num_cpu > desired_num_cpu\n");
+			satisfied = 1;
 			//abort();
 		}
 		if (efficient==0) {
