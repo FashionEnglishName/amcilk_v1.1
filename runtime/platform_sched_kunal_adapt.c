@@ -2,11 +2,12 @@
 #include "sched_stats.h"
 
 void reset_cpu_cycle_status(platform_program * p) {
+	int i = 0;
 	p->total_cycles = 0;
     p->total_stealing_cycles = 0;
     p->total_work_cycles = 0;
-    for (i=0; i<w->g->program->G->nproc; i++) {
-        w->g->workers[i]->l->stealing_cpu_cycles = 0;
+    for (i=0; i<p->G->nproc; i++) {
+        p->g->workers[i]->l->stealing_cpu_cycles = 0;
     }
     p->begin_cpu_cycle_ts = rdtsc(); //get time stamp
 }
