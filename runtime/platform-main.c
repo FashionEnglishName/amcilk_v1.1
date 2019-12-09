@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
     printf("Init platform data structure...\n");
     platform_global_state * G = platform_global_state_init(argc, argv);
     init_timed_sleep_lock_and_cond();
-    init_timed_scheduling(G, 1, KUNAL_ADAPTIVE_FEEDBACK_PERIOD_S, KUNAL_ADAPTIVE_FEEDBACK_PERIOD_US);
+    init_timed_scheduling(G, KUNAL_ADAPTIVE_FEEDBACK_ENABLE, KUNAL_ADAPTIVE_FEEDBACK_PERIOD_S, KUNAL_ADAPTIVE_FEEDBACK_PERIOD_US);
     signal(SIGPIPE, pipe_sig_handler);
     //
 
