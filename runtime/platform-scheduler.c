@@ -1,8 +1,7 @@
 #include "platform-scheduler.h"
 #include "membar.h"
 
-//get desired num cpu
-void platform_adjust_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) {
+void platform_alloted_feedback_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) {
     int i = 0;
     //adjust try_cpu_mask: give up unnecessay cores
     platform_program * tmp_p = G->program_head->next;
@@ -221,7 +220,7 @@ void platform_scheduling(platform_global_state * G, platform_program * p, enum P
     printf("DETERMINE\n");
     platform_invariant_guarantee(G, run_type);
     printf("ADJUST\n");
-    platform_adjust_scheduling(G, run_type);
+    platform_alloted_feedback_scheduling(G, run_type);
     printf("VERIFY\n");
     if (platform_verify_scheduling(G, run_type)==-1) {
         printf("ERROR: scheduling verify failed\n");
