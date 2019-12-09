@@ -28,7 +28,7 @@ void platform_adjust_scheduling(platform_global_state * G, enum PLATFORM_SCHEDUL
             }
             tmp_p = tmp_p->next;
         }
-        if (flag==1) {
+        if (flag==0) {
             //cpu i is idle core
             printf("cpu %d is a idle core\n", i);
         }
