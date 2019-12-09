@@ -1553,6 +1553,7 @@ normal_point: //normal part, can not be preempted
         CILK_STOP_TIMING(w, INTERVAL_SCHED);
 
         w = __cilkrts_get_tls_worker();
+        unsigned long long begin_stealing_ts = rdtsc();
         while(!t && !w->g->done) {
             w = __cilkrts_get_tls_worker();
             if (w->g->program->job_finish==1) {
@@ -1590,6 +1591,7 @@ normal_point: //normal part, can not be preempted
             }
 #endif
         }
+        w->l->total_stealing_cpu_cycles += (rdtsc() - begin_stealing_ts);
 
         CILK_START_TIMING(w, INTERVAL_SCHED);
         w = __cilkrts_get_tls_worker();

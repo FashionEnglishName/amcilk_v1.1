@@ -23,6 +23,12 @@ static inline double micro_sec_to_sec(double micro_sec) {
     return micro_sec / 1000000.0;
 }
 
+unsigned long long rdtsc() {
+    unsigned int lo, hi;
+    __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
+    return ((unsigned long long)hi << 32) | lo;
+}
+
 static inline unsigned long long begin_cycle_count() {
     unsigned int low, high;
     __asm__ volatile("cpuid\n\t"

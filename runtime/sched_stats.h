@@ -51,6 +51,9 @@ void cilk_sched_stats_print(struct global_state *g);
 #define CILK_START_TIMING(w, t)
 #define CILK_STOP_TIMING(w, t)
 #define CILK_DROP_TIMING(w, t)
+
+//
+unsigned long long rdtsc();
 #endif // SCHED_STATS
 
 #endif // __SCHED_STATS_HEADER__

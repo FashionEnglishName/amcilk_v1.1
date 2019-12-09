@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
     printf("Init platform data structure...\n");
     platform_global_state * G = platform_global_state_init(argc, argv);
     init_timed_sleep_lock_and_cond();
-    init_timed_scheduling(G, 0, 1, 0);
+    init_timed_scheduling(G, 1, 1, 0);
     signal(SIGPIPE, pipe_sig_handler);
     //
 
@@ -92,6 +92,7 @@ int main(int argc, char* argv[]) {
         }
         p->num_cpu = p->G->nproc-2;
         p->try_num_cpu = p->G->nproc-2;
+        p->desired_num_cpu = p->G->nproc-2;
         platform_activate_container(p);
         run_program(G, p);
         usleep(1000*500); //to guarantee the correctness of the jump buffer: should be non-null

@@ -269,6 +269,11 @@ struct platform_program {
     int* try_cpu_mask;
     volatile int num_cpu;
     volatile int try_num_cpu;
+    volatile unsigned long long begin_cpu_cycle_ts;
+    volatile unsigned long long total_cycles;
+    volatile unsigned long long total_stealing_cycles;
+    volatile unsigned long long total_work_cycles;
+    
     int tmp_num_cpu;
     volatile int done_one;
     int run_times;
@@ -449,6 +454,9 @@ struct local_state {
     //Zhe: platform
     int run_at_beginning;
     int is_in_runtime;
+
+    //Zhe: stealing overhead measurement
+    unsigned long long stealing_cpu_cycles;
 };
 
 /**

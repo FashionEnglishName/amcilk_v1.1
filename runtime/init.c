@@ -222,6 +222,13 @@ void container_set_by_init(platform_program * p, int program_id, int input, int 
     p->last_do_exit_worker_id = -1;
     p->is_switching = 0;
     p->run_request_before_block = 1;
+    for (i=0; i<p->G->nproc; i++) {
+        p->g->workers[i]->l->total_stealing_cpu_cycles = 0;
+    }
+    p->begin_cpu_cycle_ts = 0;
+    p->total_cycles = 0;
+    p->total_stealing_cycles = 0;
+    p->total_work_cycles = 0;
 
     //periodic
     p->max_period_s = max_period_s;
@@ -285,6 +292,13 @@ void container_set_by_request(platform_program * p, platform_program_request * p
     p->hint_stop_container = 0;
     p->job_finish = 0;
     p->last_do_exit_worker_id = -1;
+    for (i=0; i<p->G->nproc; i++) {
+        p->g->workers[i]->l->total_stealing_cpu_cycles = 0;
+    }
+    p->begin_cpu_cycle_ts = 0;
+    p->total_cycles = 0;
+    p->total_stealing_cycles = 0;
+    p->total_work_cycles = 0;
     
     //periodic
     p->max_period_s = pr->max_period_s;
@@ -365,6 +379,7 @@ static local_state *worker_local_init(global_state *g, int worker_id) {
     l->is_in_runtime = 0;
     pthread_mutex_init(&(l->elastic_lock), NULL);
     pthread_cond_init(&(l->elastic_cond), NULL);
+    l->stealing_cpu_cycles = 0;
 
     return l;
 }

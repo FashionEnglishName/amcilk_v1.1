@@ -24,6 +24,7 @@
 #include "platform-scheduler.h"
 #include "server-support.h"
 #include "container.h"
+#include "sched_stats.h"
 
 extern unsigned long ZERO;
 
@@ -106,7 +107,7 @@ run_point:
     w = __cilkrts_get_tls_worker();
     sf = w->current_stack_frame;
     //printf("\t%d, %d, new run section begin!\n", w->g->program->control_uid, w->self);
-
+    w->g->program->begin_cpu_cycle_ts = rdtsc(); //get time stamp
     char * rsp;
     char * nsp;
     int _tmp;
