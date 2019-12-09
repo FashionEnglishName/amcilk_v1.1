@@ -47,13 +47,11 @@ int platform_verify_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULE
     return 0;
 }
 
-void platform_determine_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) {
-    //printf("\tplatform_determine_scheduling\n");
+void platform_invariant_guarantee(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) {
     platform_program * tmp_p;
     platform_program * tmp_p2;
     int i = 0;
     int try_num_cpu = 0;
-    int count = 0;
 
     //init and set try_num_cpu
     tmp_p = G->program_head->next;
@@ -91,6 +89,13 @@ void platform_determine_scheduling(platform_global_state * G, enum PLATFORM_SCHE
         }
         tmp_p = tmp_p->next;
     }
+}
+
+void platform_determine_scheduling(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) {
+    //printf("\tplatform_determine_scheduling\n");
+    platform_program * tmp_p;
+    int i = 0;
+    int count = 0;
     //now, try_num_cpu and try_cpu_mask is fixed, 
     //then set cpu_container_map based on try_num_cpu, 
     //and update num_cpu
@@ -214,7 +219,7 @@ void platform_scheduling(platform_global_state * G, platform_program * p, enum P
         abort();
     }
     printf("DETERMINE\n");
-    platform_determine_scheduling(G, run_type);
+    platform_invariant_guarantee(G, run_type);
     printf("ADJUST\n");
     platform_adjust_scheduling(G, run_type);
     printf("VERIFY\n");
@@ -226,6 +231,7 @@ void platform_scheduling(platform_global_state * G, platform_program * p, enum P
 
 void platform_preemption(platform_global_state * G, platform_program * p, enum PLATFORM_SCHEDULER_TYPE run_type) {
     //printf("[SCHEDULING %d]: do scheduling in run_type: %d\n", p->control_uid, run_type);
+    platform_determine_scheduling(G, run_type);
     platform_program * tmp_p = G->program_head->next;
     while(tmp_p!=NULL) {
         if ((tmp_p->periodic==0 || tmp_p->done_one==0)) { //add this for periodic
