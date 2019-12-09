@@ -65,7 +65,6 @@ void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_
             if (G->stop_program->try_cpu_mask[i]==1) { //core i was used in the finished program
                 platform_program * p = rand_pick_unfinished_job(G);
                 if (p!=NULL) {
-
                     p->try_cpu_mask[i] = 1;
                     //printf("\t[platform_scheduler_DREP]: give core %d to %d after exit\n", i, p->control_uid);
                 } else {
@@ -75,6 +74,10 @@ void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_
             }
             //G->program_container_pool[G->most_recent_stop_container-1]->try_cpu_mask[i] = 0;
         }
+        for(i=0; i<G->nproc; i++) {
+            G->stop_program->try_cpu_mask[i] = 0;
+        }
+        G->try_num_cpu = 0;
     } else {
         printf("[PLATFORM ERROR3]: wrong input of run_type in platform_scheduler_DREP\n");
         abort();
