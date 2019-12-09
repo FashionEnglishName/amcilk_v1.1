@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
         p->try_num_cpu = p->G->nproc-2;
         platform_activate_container(p);
         run_program(G, p);
-        usleep(1000*500); //to guarantee the correctness of the jump buffer: should be non-null
+        usleep(1000*1000); //to guarantee the correctness of the jump buffer: should be non-null
     }
     for (i=0; i<CONTAINER_COUNT; i++) {
         while(G->program_container_pool[i]->pickable==0) {
