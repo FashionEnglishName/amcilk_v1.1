@@ -25,7 +25,7 @@ int get_cpu_cycle_status(platform_program * p) {
 		for (i=0; i<p->G->nproc; i++) {
 			p->total_stealing_cycles += p->g->workers[i]->l->stealing_cpu_cycles;
 		}
-		p->total_cycles = (rdtsc() - p->begin_cpu_cycle_ts)*p->G->nproc;
+		p->total_cycles = (rdtsc() - p->begin_cpu_cycle_ts) * p->G->nproc;
 		p->total_work_cycles = p->total_cycles - p->total_stealing_cycles;
 		printf("(p%d, job finish:%d): total: %llu, steal: %llu (%f), non-steal: %llu (%f)\n", 
 			p->control_uid,
@@ -48,8 +48,10 @@ void kunal_adaptive_scheduler(platform_global_state * G) {
     printf("do kunal_adaptive_scheduler\n");
     platform_program * tmp_p = G->program_head->next;
     while(tmp_p!=NULL) {
+    	pthread_spin_lock(&(tmp_p->G->cpu_cycle_status_lock));
     	get_cpu_cycle_status(tmp_p);
     	reset_cpu_cycle_status(tmp_p);
+    	pthread_spin_unlock(&(tmp_p->G->cpu_cycle_status_lock));
     	tmp_p = tmp_p->next;
     }
 }

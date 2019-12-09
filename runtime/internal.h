@@ -274,6 +274,7 @@ struct platform_program {
     volatile unsigned long long total_cycles;
     volatile unsigned long long total_stealing_cycles;
     volatile unsigned long long total_work_cycles;
+    pthread_spinlock_t cpu_cycle_status_lock;
 
     int tmp_num_cpu;
     volatile int done_one;
