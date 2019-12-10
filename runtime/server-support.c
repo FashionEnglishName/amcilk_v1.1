@@ -93,8 +93,8 @@ void* main_thread_timed_scheduling(void * arg) {
     while (G->enable_timed_scheduling==1) {
         pthread_mutex_lock(&(G->lock));
         //pthread_spin_lock(&(G->lock));
-        platform_scheduling(G, NULL, TIMED);
         if (G->nprogram_running!=0) {
+            platform_scheduling(G, NULL, TIMED);
             platform_preemption(G, NULL, TIMED);
         }
         pthread_mutex_unlock(&(G->lock));
