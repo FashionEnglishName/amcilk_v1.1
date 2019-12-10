@@ -203,10 +203,10 @@ void print_num_ancestor() {
         cl = cl->call_parent;
     }
     printf("\tprint_num_ancestor: spawn parent: %d, call parent: %d\n", count_spawn, count_call);
-    if (count_spawn!=1 || count_call!=1) {
+    /*if (count_spawn!=1 || count_call!=1) {
         printf("ERROR: num of ancestor is wrong! (spawn:%d, call:%d)\n", count_spawn, count_call);
         abort();
-    }
+    }*/
 }
 
 //Choice 1
