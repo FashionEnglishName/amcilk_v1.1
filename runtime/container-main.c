@@ -171,7 +171,7 @@ run_point:
             if (w->self!=w->g->program->invariant_running_worker_id) {
                 __cilkrts_save_fp_ctrl_state_for_switch(w->current_stack_frame);
                 if(!__builtin_setjmp(w->current_stack_frame->switch_ctx)) {
-                    if (__sync_bool_compare_and_swap(&(w->g->program->is_switching), 0, 1)) {
+                    if (__sync_bool_compare_and_swap(&(w->g->program->is_switching), 0, 1)) { //do switching
                         printf("[PLATFORM %d]: last worker %d jumps to runtime\n", w->g->program->control_uid, w->self);
                         longjmp_to_runtime(w);
                     } else {
@@ -195,7 +195,7 @@ run_point:
                     pthread_mutex_unlock(&(w->g->program->G->lock));
                     container_plugin_enable_run_cycle(w);
                     goto run_point; //new cycle  
-                } else if (__sync_bool_compare_and_swap(&(w->g->program->is_switching), 0, 0)) {
+                } else if (__sync_bool_compare_and_swap(&(w->g->program->is_switching), 0, 0)) { //no switching case
                     pthread_mutex_lock(&(w->g->program->G->lock));
                     program_print_result_acc(w->g->program);
                     if (w->g->program->mute==0) {

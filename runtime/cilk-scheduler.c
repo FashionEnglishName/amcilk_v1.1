@@ -1353,6 +1353,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                 printf("[PLATFORM]: switching, BAD behaviour!!!!!!!\n");
                 abort();
             }*/
+            printf("[PLATFORM %d]: invariant %d is going to switching\n", w->g->program->control_uid, w->self);
             if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING0, EXIT_SWITCHING1)) {
                 deque_lock(w, w->g->program->last_do_exit_worker_id);
                 deque_lock_self(w);
