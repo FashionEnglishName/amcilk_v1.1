@@ -1511,7 +1511,6 @@ job_finish_point:
             unsigned long long begin_stealing_ts = rdtsc();
             do_exit_switching_for_invariant_handling(w);
             reset_exception_pointer(w, t);
-            w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts);
         }
 stop_container_point:
         w = __cilkrts_get_tls_worker();
@@ -1524,6 +1523,7 @@ worker_sleep_point:
         worker_sleep_handling(w);
         
         if (w->g->program->job_finish==1) {
+            w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts);
             goto job_finish_point;
         } else if (w->g->program->hint_stop_container==1) {
             goto stop_container_point;
