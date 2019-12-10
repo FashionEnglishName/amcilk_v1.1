@@ -166,7 +166,8 @@ run_point:
     if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), 0, -1)) {
         w->g->cilk_main_return = _tmp;
         w->g->program->last_do_exit_worker_id = w->self; //must update before set job_finish.
-        CILK_WMB();
+        w->l->elastic_s = ACTIVE;
+        Cilk_fence();
         if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), -1, 1)) {
             if (w->self!=w->g->program->invariant_running_worker_id) {
                 __cilkrts_save_fp_ctrl_state_for_switch(w->current_stack_frame);
