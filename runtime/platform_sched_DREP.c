@@ -25,31 +25,6 @@ platform_program * rand_pick_unfinished_job(platform_global_state * G) {
     return NULL;
 }
 
-                //plugin parallism feedback control
-                platform_program * tmp_p = G->program_head->next;
-                int flag = 0;
-                while(tmp_p!=NULL) {
-                    if (tmp_p->try_cpu_mask[i]==1) {
-                        flag = 1;
-                        break;
-                    }
-                    tmp_p = tmp_p->next;
-                }
-                if (flag==0) { //cpu i is idle
-                    G->new_program->try_cpu_mask[i] = 1;
-                } else {
-                    //
-
-                G->new_program->try_cpu_mask[i] = 1; //make core i active for the new program
-                    //printf("[platform_scheduler_DREP]: pick core %d and assign it to the new program\n", i);
-                    platform_program * p = G->program_head->next;
-                    while(p!=NULL) {
-                        if (p->control_uid!=G->new_program->control_uid) {
-                            p->try_cpu_mask[i] = 0; //make core i sleep for all previous programs
-                        }
-                        p = p->next;
-                    }
-
 void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) { //To add lock
     int i;
     //unsigned long long begin, end;
@@ -105,6 +80,8 @@ void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_
                     break;
                 }
             }
+            free(allocate_cpu_mask);
+            free(idle_cpu_mask);
 
         } else { //if no running program exists, run on all cores except for core0 and core1
             for (i=2; i<G->nproc; i++) {
