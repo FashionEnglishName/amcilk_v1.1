@@ -45,7 +45,7 @@ void print_cpu_mask(platform_program * p);
 void print_try_cpu_mask(platform_program * p);
 
 void print_worker_deque(__cilkrts_worker *w);
-void assert_num_ancestor(int assert_spawn_count, int assert_call_count);
+void assert_num_ancestor(int assert_spawn_count, int assert_call_count, int assert_call_frame_count);
 
 void platform_try_sleep_worker(platform_program * p, int cpu_id);
 void platform_guarantee_sleep_worker(platform_program * p, int cpu_id);

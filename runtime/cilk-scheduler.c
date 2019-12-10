@@ -1559,7 +1559,7 @@ normal_point: //normal part, can not be preempted
         while(!t && !w->g->done) {
             w = __cilkrts_get_tls_worker();
             if (w->g->program->job_finish==1) {
-                assert_num_ancestor(0, 0);
+                assert_num_ancestor(0, 0, 0);
                 goto job_finish_point;
             } else if (w->g->program->hint_stop_container==1) {
                 goto stop_container_point;

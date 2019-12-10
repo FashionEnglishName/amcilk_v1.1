@@ -188,7 +188,7 @@ void elastic_worker_request_cpu_to_recover(__cilkrts_worker *w, int cpu_id) {
     }
 }
 
-void assert_num_ancestor(int assert_spawn_count, int assert_call_count) {
+void assert_num_ancestor(int assert_spawn_count, int assert_call_count, int assert_call_frame_count) {
     __cilkrts_worker * w = __cilkrts_get_tls_worker();
     Closure *cl = deque_peek_bottom(w, w->self);
     int count_spawn = 0;
@@ -213,8 +213,8 @@ void assert_num_ancestor(int assert_spawn_count, int assert_call_count) {
         }
     }
 
-    printf("\assert_num_ancestor_bottom: spawn parent: %d, call parent: %d, call frame parent: %d\n", count_spawn, count_call, count_call_frame);
-    if (count_spawn!=assert_spawn_count || count_call!=assert_call_count) {
+    //printf("assert_num_ancestor_bottom: spawn parent: %d, call parent: %d, call frame parent: %d\n", count_spawn, count_call, count_call_frame);
+    if (count_spawn!=assert_spawn_count || count_call!=assert_call_count || count_call_frame!=assert_call_frame_count) {
         printf("ERROR: num of ancestor is wrong! (spawn:%d, call:%d), should be (%d, %d)\n", count_spawn, count_call, assert_spawn_count, assert_call_count);
         abort();
     }
