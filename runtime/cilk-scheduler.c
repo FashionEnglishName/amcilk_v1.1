@@ -1356,7 +1356,8 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
             deque_lock_self(w);
             elastic_mugging(w, w->g->program->last_do_exit_worker_id);
             if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING1, EXIT_SWITCHING2)) {
-                while(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s != ACTIVE) {
+                while(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s!=ACTIVE||
+                    w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s!=SLEEP_REQUESTED) {
                     usleep(TIME_EXIT_CTX_SWITCH); //important for delay avoid unknown sigfault due to inconsistent var
                 }
                 printf("[PLATFORM %d]: invariant %d jumps to exit handling\n", w->g->program->control_uid, w->self);
@@ -1379,6 +1380,15 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVE, EXIT_SWITCHING0)) {
                 printf("[PLATFORM %d]: worker %d enters to runtime\n", w->g->program->control_uid, w->self);
                 while(!__sync_bool_compare_and_swap(&(w->l->elastic_s), EXIT_SWITCHING2, ACTIVE)) {
+                    //printf("\tlast w wait, %d %d %d\n", w->g->program->control_uid, w->self, w->l->elastic_s);
+                    usleep(TIME_EXIT_CTX_SWITCH);
+                }
+                while(!__sync_bool_compare_and_swap(&(w->g->program->is_switching), 2, 0)) {
+                    usleep(TIME_EXIT_CTX_SWITCH);
+                }
+            } else if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, EXIT_SWITCHING0)) {
+                printf("[PLATFORM %d]: worker %d enters to runtime\n", w->g->program->control_uid, w->self);
+                while(!__sync_bool_compare_and_swap(&(w->l->elastic_s), EXIT_SWITCHING2, SLEEP_REQUESTED)) {
                     //printf("\tlast w wait, %d %d %d\n", w->g->program->control_uid, w->self, w->l->elastic_s);
                     usleep(TIME_EXIT_CTX_SWITCH);
                 }
