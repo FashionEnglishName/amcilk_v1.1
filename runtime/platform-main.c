@@ -42,8 +42,6 @@ int main(int argc, char* argv[]) {
     unlink(SERVER_FIFO_NAME);
     printf("Init platform data structure...\n");
     platform_global_state * G = platform_global_state_init(argc, argv);
-    init_timed_sleep_lock_and_cond();
-    init_timed_scheduling(G, KUNAL_ADAPTIVE_FEEDBACK_ENABLE, KUNAL_ADAPTIVE_FEEDBACK_PERIOD_S, KUNAL_ADAPTIVE_FEEDBACK_PERIOD_US);
     signal(SIGPIPE, pipe_sig_handler);
     //
 
@@ -113,6 +111,8 @@ int main(int argc, char* argv[]) {
     sleep(1);
 
     //set timed scheduling
+    init_timed_sleep_lock_and_cond();
+    init_timed_scheduling(G, KUNAL_ADAPTIVE_FEEDBACK_ENABLE, KUNAL_ADAPTIVE_FEEDBACK_PERIOD_S, KUNAL_ADAPTIVE_FEEDBACK_PERIOD_US);
     signal(SIGALRM, timed_scheduling_signal_handler);
     set_timer(&(G->timed_scheduling_itv), &(G->timed_scheduling_oldtv), G->timed_interval_sec, G->timed_interval_usec);
 
