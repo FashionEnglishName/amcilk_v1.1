@@ -182,6 +182,7 @@ run_point:
             printf("[PLATFORM %d]: invariant %d enters to exit handling\n", w->g->program->control_uid, w->self);
             if (w->self==w->g->program->invariant_running_worker_id) {
                 w->g->program->is_switching = 0;
+                Cilk_fence();
                 pthread_mutex_lock(&(w->g->program->G->lock));
                 program_print_result_acc(w->g->program);
                 if (w->g->program->mute==0) {
