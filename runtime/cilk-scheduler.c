@@ -1348,68 +1348,33 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
     if (__sync_bool_compare_and_swap(&(w->g->program->is_switching), 1, 1)) {
         //for switching: inv enter exit rountine
         if (w->self==w->g->program->invariant_running_worker_id) {
-            /*Closure * tmp_cl = deque_peek_bottom(w, w->self);
-            if (tmp_cl!=NULL) {
-                printf("[PLATFORM]: switching, BAD behaviour!!!!!!!\n");
-                abort();
-            }*/
             printf("[PLATFORM %d]: invariant %d is going to switching\n", w->g->program->control_uid, w->self);
             while(!__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING0, EXIT_SWITCHING1)) {
                 usleep(TIME_EXIT_CTX_SWITCH);
             }
-            //if (!__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING0, EXIT_SWITCHING1)) {
-                printf("1\n");               
-                deque_lock(w, w->g->program->last_do_exit_worker_id);
-                printf("2\n");     
-                deque_lock_self(w);
-                /*Closure * cl_w = deque_peek_top(w, w->self);
-                if (cl_w!=NULL) {
-                    Closure_lock(w, cl_w);
-                }
-                Closure * cl_l = deque_peek_top(w, w->g->program->last_do_exit_worker_id);
-                if (cl_l!=NULL) {
-                    Closure_lock(w, cl_l);
+            deque_lock(w, w->g->program->last_do_exit_worker_id);
+            deque_lock_self(w);
+            elastic_mugging(w, w->g->program->last_do_exit_worker_id);
+            if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING1, EXIT_SWITCHING2)) {
+                /*while(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s != ACTIVE) {
+                    usleep(TIME_EXIT_CTX_SWITCH); //important for delay avoid unknown sigfault due to inconsistent var
                 }*/
-                printf("3\n");     
-                elastic_mugging(w, w->g->program->last_do_exit_worker_id);
-                printf("4\n"); 
-                if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING1, EXIT_SWITCHING2)) {
-                    /*while(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s != ACTIVE) {
-                        usleep(TIME_EXIT_CTX_SWITCH); //important for delay avoid unknown sigfault due to inconsistent var
-                    }*/
-                    printf("[PLATFORM %d]: invariant %d jumps to exit handling\n", w->g->program->control_uid, w->self);
-                    if (w->current_stack_frame!=NULL) {
-                        /*if (cl_l!=NULL) {
-                            Closure_unlock(w, cl_l);
-                        }
-                        if (cl_w!=NULL) {
-                            Closure_unlock(w, cl_w);
-                        }*/
-                        deque_unlock_self(w);
-                        deque_unlock(w, w->g->program->last_do_exit_worker_id);
-                        sysdep_longjmp_to_sf_for_switch(w->current_stack_frame);
-                    } else {
-                        printf("[ERROR]: current_stack_frame=NULL in do_exit_switching_for_invariant_handling\n");
-                        abort();
-                    }
+                printf("[PLATFORM %d]: invariant %d jumps to exit handling\n", w->g->program->control_uid, w->self);
+                if (w->current_stack_frame!=NULL) {
+                    deque_unlock_self(w);
+                    deque_unlock(w, w->g->program->last_do_exit_worker_id);
+                    sysdep_longjmp_to_sf_for_switch(w->current_stack_frame);
                 } else {
-                    if (w->g->program->last_do_exit_worker_id!=-1) {
-                        printf("%d %d last %d\n", w->g->program->control_uid, w->self, w->g->program->last_do_exit_worker_id);
-                        printf("[ERROR]: set last w %d elastic_s failed! elastic_s %d\n", w->g->program->last_do_exit_worker_id, w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s);
-                        abort();
-                    } else {
-                        printf("5???\n"); 
-                    }
+                    printf("[ERROR]: current_stack_frame=NULL in do_exit_switching_for_invariant_handling\n");
+                    abort();
                 }
-                /*if (cl_l!=NULL) {
-                    Closure_unlock(w, cl_l);
-                }
-                if (cl_w!=NULL) {
-                    Closure_unlock(w, cl_w);
-                }*/
-                deque_unlock_self(w);
-                deque_unlock(w, w->g->program->last_do_exit_worker_id);
-            //}
+            } else {
+                printf("%d %d last %d\n", w->g->program->control_uid, w->self, w->g->program->last_do_exit_worker_id);
+                printf("[ERROR]: set last w %d elastic_s failed! elastic_s %d\n", w->g->program->last_do_exit_worker_id, w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s);
+                abort();
+            }
+            deque_unlock_self(w);
+            deque_unlock(w, w->g->program->last_do_exit_worker_id);
         } else if (w->self==w->g->program->last_do_exit_worker_id) {
             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVE, EXIT_SWITCHING0)) {
                 printf("[PLATFORM %d]: worker %d enters to runtime\n", w->g->program->control_uid, w->self);
@@ -1420,7 +1385,6 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                 while(!__sync_bool_compare_and_swap(&(w->g->program->is_switching), 2, 0)) {
                     usleep(TIME_EXIT_CTX_SWITCH);
                 }
-                //w->g->program->is_switching = 0;
             } else if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, EXIT_SWITCHING0)) {
                 printf("[PLATFORM %d]: worker %d enters to runtime\n", w->g->program->control_uid, w->self);
                 while(!__sync_bool_compare_and_swap(&(w->l->elastic_s), EXIT_SWITCHING2, SLEEP_REQUESTED)) {
@@ -1430,7 +1394,6 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                 while(!__sync_bool_compare_and_swap(&(w->g->program->is_switching), 2, 0)) {
                     usleep(TIME_EXIT_CTX_SWITCH);
                 }
-                //w->g->program->is_switching = 0;
             } else {
                 printf("[ERROR]: last w %d enter runtime failed! (state %d is not ACTIVE or SLEEP_REQUESTED)\n", w->self, w->l->elastic_s);
                 abort();
