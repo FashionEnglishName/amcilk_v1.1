@@ -1032,7 +1032,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
 
     Closure *res = NULL;
     __cilkrts_stack_frame *f;
-do_what_it_says_handler:
     w = __cilkrts_get_tls_worker();
     if (t!=NULL) { //worker TO_SLEEP deque is empty
         __cilkrts_alert(ALERT_SCHED, "[%d]: (do_what_it_says) closure %p\n", w->self, t);
