@@ -1506,7 +1506,9 @@ stop_container_point:
         }
 worker_sleep_point:
         w = __cilkrts_get_tls_worker();
-        worker_sleep_handling(w);
+        if (w->g->program->job_finish!=1 && w->g->program->hint_stop_container!=1) {
+            worker_sleep_handling(w);
+        }
         
         if (w->g->program->job_finish==1) {
             w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts1);
