@@ -1503,12 +1503,13 @@ void worker_scheduler(__cilkrts_worker *w, Closure *t) {
     rts_srand(w, w->self * 162347);  
     CILK_START_TIMING(w, INTERVAL_SCHED);
     w = __cilkrts_get_tls_worker();
+    unsigned long long begin_stealing_ts1, begin_stealing_ts2;
     while(!w->g->done) {//!w->g->done, meaningless, just kept for original structure
         //printf("%d %d: w->g->program->done_one = %d\n", w->g->program->done_one, w->g->program->control_uid, w->self);
 job_finish_point:
         w = __cilkrts_get_tls_worker();
         if (w->g->program->job_finish==1) { //job_finish must compare with 1 since it may set as -1
-            unsigned long long begin_stealing_ts = rdtsc();
+            begin_stealing_ts1 = rdtsc();
             do_exit_switching_for_invariant_handling(w);
             reset_exception_pointer(w, t);
         }
@@ -1523,7 +1524,7 @@ worker_sleep_point:
         worker_sleep_handling(w);
         
         if (w->g->program->job_finish==1) {
-            w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts);
+            w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts1);
             goto job_finish_point;
         } else if (w->g->program->hint_stop_container==1) {
             goto stop_container_point;
@@ -1568,7 +1569,7 @@ normal_point: //normal part, can not be preempted
             CILK_START_TIMING(w, INTERVAL_IDLE);
 
             w = __cilkrts_get_tls_worker();
-            unsigned long long begin_stealing_ts = rdtsc();
+            begin_stealing_ts2 = rdtsc();
             if (w->g->program->running_job==1 && w->g->program->job_finish==0) {
                 int victim_worker_id = w->g->elastic_core->cpu_state_group[rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque];
                 if(victim_worker_id != w->self && 
@@ -1582,7 +1583,7 @@ normal_point: //normal part, can not be preempted
                     //pass
                 }
             }
-            w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts);
+            w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts2);
 
 #if SCHED_STATS
             if(t) { // steal successful
