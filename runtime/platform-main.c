@@ -111,6 +111,7 @@ int main(int argc, char* argv[]) {
     sleep(1);
 
     //set timed scheduling
+    printf("INIT timed scheduling...\n");
     init_timed_sleep_lock_and_cond();
     init_timed_scheduling(G, KUNAL_ADAPTIVE_FEEDBACK_ENABLE, KUNAL_ADAPTIVE_FEEDBACK_PERIOD_S, KUNAL_ADAPTIVE_FEEDBACK_PERIOD_US);
     signal(SIGALRM, timed_scheduling_signal_handler);
