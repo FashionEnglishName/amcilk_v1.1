@@ -1087,9 +1087,9 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                     cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
                                                 }
                                                 w->l->fiber_to_free = NULL;
-                                                //cl = return_value(w, cl);
-                                                //if (cl!=NULL) {
-                                                    /*if (cl->status==CLOSURE_READY) {
+                                                cl = return_value(w, cl);
+                                                if (cl!=NULL) {
+                                                    if (cl->status==CLOSURE_READY) {
                                                         deque_add_bottom(w, cl, w->self);
                                                         setup_for_execution(w, cl);
                                                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
@@ -1106,14 +1106,8 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                     } else {
                                                         printf("ERROR: cl state error (should be CLOSURE_READY)\n");
                                                         abort();
-                                                    }*/
-                                                    if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
-                                                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {     
-                                                            res = return_value(w, cl);
-                                                            break;
-                                                        }
                                                     }
-                                                //}
+                                                }
                                             } else {
                                                 printf("ERROR: wrong cl status at bottom [%d] when mugging\n", cl->status);
                                                 abort();
@@ -1270,7 +1264,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                         }
                                         w->l->fiber_to_free = NULL;
 
-                                        /*cl = return_value(w, cl);
+                                        cl = return_value(w, cl);
                                         if (cl!=NULL) {
                                             if (cl->status==CLOSURE_READY) {
                                                 deque_add_bottom(w, cl, w->self);
@@ -1283,11 +1277,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 printf("ERROR: error2 cl status %d\n", cl->status);
                                                 abort();
                                             }
-                                        }*/
-                                        __sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED);
-                                        w->exc = w->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
-                                        res = return_value(w, cl);
-                                        break;
+                                        }
                                     } else {
                                         printf("ERROR: wrong cl status at bottom [%d] when deque is empty and go to sleep\n", cl->status);
                                         abort();
