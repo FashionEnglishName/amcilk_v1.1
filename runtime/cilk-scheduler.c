@@ -1088,8 +1088,8 @@ do_what_it_says_handler:
                                                     cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
                                                 }
                                                 w->l->fiber_to_free = NULL;
-                                                cl = return_value(w, cl);
-                                                if (cl!=NULL) {
+                                                //cl = return_value(w, cl);
+                                                //if (cl!=NULL) {
                                                     /*if (cl->status==CLOSURE_READY) {
                                                         deque_add_bottom(w, cl, w->self);
                                                         setup_for_execution(w, cl);
@@ -1108,8 +1108,13 @@ do_what_it_says_handler:
                                                         printf("ERROR: cl state error (should be CLOSURE_READY)\n");
                                                         abort();
                                                     }*/
-                                                    goto do_what_it_says_handler;
-                                                }
+                                                    if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
+                                                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {     
+                                                            res = return_value(w, cl);
+                                                            break;
+                                                        }
+                                                    }
+                                                //}
                                             } else {
                                                 printf("ERROR: wrong cl status at bottom [%d] when mugging\n", cl->status);
                                                 abort();
@@ -1266,9 +1271,9 @@ do_what_it_says_handler:
                                         }
                                         w->l->fiber_to_free = NULL;
 
-                                        cl = return_value(w, cl);
+                                        /*cl = return_value(w, cl);
                                         if (cl!=NULL) {
-                                            /*if (cl->status==CLOSURE_READY) {
+                                            if (cl->status==CLOSURE_READY) {
                                                 deque_add_bottom(w, cl, w->self);
                                                 setup_for_execution(w, cl);
                                                 __sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED);
@@ -1278,9 +1283,12 @@ do_what_it_says_handler:
                                             } else {
                                                 printf("ERROR: error2 cl status %d\n", cl->status);
                                                 abort();
-                                            }*/
-                                            goto do_what_it_says_handler;
-                                        }
+                                            }
+                                        }*/
+                                        __sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED);
+                                        w->exc = w->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
+                                        res = return_value(w, cl);
+                                        break;
                                     } else {
                                         printf("ERROR: wrong cl status at bottom [%d] when deque is empty and go to sleep\n", cl->status);
                                         abort();
