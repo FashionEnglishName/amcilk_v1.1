@@ -1358,7 +1358,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
             if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING1, EXIT_SWITCHING2)) {
                 while(!__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), ACTIVE, ACTIVE) &&
                     !__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), SLEEP_REQUESTED, SLEEP_REQUESTED)) {
-                    usleep(TIME_EXIT_CTX_SWITCH); //important for delay avoid unknown sigfault due to inconsistent var
+                    usleep(TIME_EXIT_CTX_SWITCH);
                 }
                 printf("[PLATFORM %d]: invariant %d jumps to exit handling\n", w->g->program->control_uid, w->self);
                 if (w->current_stack_frame!=NULL) {
