@@ -36,7 +36,6 @@ void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_
         G->new_program->try_cpu_mask[0] = 0; //core0 is used for scheduling and not available
         G->new_program->try_cpu_mask[1] = 0; //core1 is used for task generator and not available
         if (G->nprogram_running!=0) { //if running programs exist
-            int allocate_num_cpu = 0;
             int idle_num_cpu = 0;
             for (i=0; i<G->nproc; i++) {
                 G->new_program->drep_allot_tmp_cpu_mask[i] = 0; //allocate
