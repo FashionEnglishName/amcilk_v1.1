@@ -1508,8 +1508,10 @@ void worker_scheduler(__cilkrts_worker *w, Closure *t) {
 job_finish_point:
         w = __cilkrts_get_tls_worker();
         if (w->g->program->job_finish==1) { //job_finish must compare with 1 since it may set as -1
+            unsigned long long begin_stealing_ts = rdtsc();
             do_exit_switching_for_invariant_handling(w);
             reset_exception_pointer(w, t);
+            w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts);
         }
 stop_container_point:
         w = __cilkrts_get_tls_worker();
