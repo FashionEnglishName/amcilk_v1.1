@@ -1372,6 +1372,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                 }*/
                 printf("3\n");     
                 elastic_mugging(w, w->g->program->last_do_exit_worker_id);
+                printf("4\n"); 
                 if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING1, EXIT_SWITCHING2)) {
                     while(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s != ACTIVE) {
                         usleep(TIME_EXIT_CTX_SWITCH); //important for delay avoid unknown sigfault due to inconsistent var
@@ -1396,6 +1397,8 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                         printf("%d %d last %d\n", w->g->program->control_uid, w->self, w->g->program->last_do_exit_worker_id);
                         printf("[ERROR]: set last w %d elastic_s failed! elastic_s %d\n", w->g->program->last_do_exit_worker_id, w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s);
                         abort();
+                    } else {
+                        printf("5???\n"); 
                     }
                 }
                 /*if (cl_l!=NULL) {
