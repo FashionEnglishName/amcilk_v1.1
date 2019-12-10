@@ -68,7 +68,7 @@ int analyze_cpu_cycle_status(platform_program * p) {
 			abort();
 		}
 
-		/*printf("(p%d, job finish:%d, input:%d, cpu num:%d): non-steal: %f, efficient: %d, satisfied: %d, desired: %d\n", 
+		printf("(p%d, job finish:%d, input:%d, cpu num:%d): non-steal: %f, efficient: %d, satisfied: %d, desired: %d\n", 
 			p->control_uid,
 			p->job_finish,
 			p->input,
@@ -76,7 +76,7 @@ int analyze_cpu_cycle_status(platform_program * p) {
 			non_steal_utilization,
 			efficient,
 			satisfied,
-			p->desired_num_cpu);*/
+			p->desired_num_cpu);
 		return 0;
 	} else {
 		printf("kunal_adaptive_scheduler: analyze_cpu_cycle_status failed (not start running)\n");
