@@ -25,7 +25,7 @@ platform_program * rand_pick_unfinished_job(platform_global_state * G) {
     return NULL;
 }
 
-void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) { //To add lock
+/*void platform_scheduler_DREP_v2(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) { //To add lock
     int i;
     //unsigned long long begin, end;
     //begin = micro_get_clock();
@@ -118,9 +118,9 @@ void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_
         }
         tmptmpp = tmptmpp->next;
     }
-}
+}*/
 
-/*void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) { //To add lock
+void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) { //To add lock
     int i;
     //unsigned long long begin, end;
     //begin = micro_get_clock();
@@ -222,9 +222,9 @@ void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_
         }
         tmptmpp = tmptmpp->next;
     }
-}*/
+}
 
-/*void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) { //To add lock
+/*void platform_scheduler_DREP_v1(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) { //To add lock
     int i;
     //unsigned long long begin, end;
     //begin = micro_get_clock();
