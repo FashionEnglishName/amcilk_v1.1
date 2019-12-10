@@ -55,21 +55,6 @@ int main(int argc, char* argv[]) {
     }
     //
 
-    printf("Init adaptive scheduler thread...\n");
-    pthread_t scheduling_thread;
-    int status = pthread_create(&scheduling_thread, NULL, main_thread_timed_scheduling, G);
-    if (status != 0) {
-        __cilkrts_bug("Cilk: thread creation scheduling thread failed: %d\n", status);
-    }
-    cpu_set_t mask;
-    CPU_ZERO(&mask);
-    CPU_SET(0, &mask);
-    status = pthread_setaffinity_np(scheduling_thread, sizeof(mask), &mask);
-    if (status != 0) {
-        __cilkrts_bug("ERROR: Could not set CPU affinity");
-    }
-    //
-
     //create program containers
     int i = 0;
     for (i=0; i<CONTAINER_COUNT; i++) {
@@ -111,11 +96,24 @@ int main(int argc, char* argv[]) {
     sleep(1);
 
     //set timed scheduling
-    printf("INIT timed scheduling...\n");
+    printf("Init adaptive scheduler thread...\n");
     init_timed_sleep_lock_and_cond();
     init_timed_scheduling(G, KUNAL_ADAPTIVE_FEEDBACK_ENABLE, KUNAL_ADAPTIVE_FEEDBACK_PERIOD_S, KUNAL_ADAPTIVE_FEEDBACK_PERIOD_US);
     signal(SIGALRM, timed_scheduling_signal_handler);
     set_timer(&(G->timed_scheduling_itv), &(G->timed_scheduling_oldtv), G->timed_interval_sec, G->timed_interval_usec);
+    pthread_t scheduling_thread;
+    int status = pthread_create(&scheduling_thread, NULL, main_thread_timed_scheduling, G);
+    if (status != 0) {
+        __cilkrts_bug("Cilk: thread creation scheduling thread failed: %d\n", status);
+    }
+    cpu_set_t mask;
+    CPU_ZERO(&mask);
+    CPU_SET(0, &mask);
+    status = pthread_setaffinity_np(scheduling_thread, sizeof(mask), &mask);
+    if (status != 0) {
+        __cilkrts_bug("ERROR: Could not set CPU affinity");
+    }
+    //
 
     //container trigger, run on core 0
     CPU_ZERO(&mask);
