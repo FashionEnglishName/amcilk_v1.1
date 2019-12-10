@@ -1413,7 +1413,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                 //w->g->program->is_switching = 0;
             } else if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, EXIT_SWITCHING0)) {
                 printf("[PLATFORM %d]: worker %d enters to runtime\n", w->g->program->control_uid, w->self);
-                while(!__sync_bool_compare_and_swap(&(w->l->elastic_s), EXIT_SWITCHING3, SLEEP_REQUESTED)) {
+                while(!__sync_bool_compare_and_swap(&(w->l->elastic_s), EXIT_SWITCHING2, SLEEP_REQUESTED)) {
                     //printf("\tlast w wait, %d %d %d\n", w->g->program->control_uid, w->self, w->l->elastic_s);
                     usleep(TIME_EXIT_CTX_SWITCH);
                 }
