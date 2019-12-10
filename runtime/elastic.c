@@ -188,7 +188,7 @@ void elastic_worker_request_cpu_to_recover(__cilkrts_worker *w, int cpu_id) {
     }
 }
 
-void print_num_ancestor() {
+void assert_num_ancestor_bottom(int assert_spawn_count, int assert_call_count) {
     __cilkrts_worker * w = __cilkrts_get_tls_worker();
     Closure *cl = deque_peek_bottom(w, w->self);
     int count_spawn = 0;
@@ -202,12 +202,40 @@ void print_num_ancestor() {
         count_call++;
         cl = cl->call_parent;
     }
-    printf("\tprint_num_ancestor: spawn parent: %d, call parent: %d\n", count_spawn, count_call);
-    /*if (count_spawn!=1 || count_call!=1) {
-        printf("ERROR: num of ancestor is wrong! (spawn:%d, call:%d)\n", count_spawn, count_call);
+
+    int count_call_frame = 0;
+    Closure * cl_top = deque_peek_top(w, w->self);
+    if (cl_top!=NULL) {
+        __cilkrts_stack_frame * cl_frame = cl_top->frame;
+        while(cl_frame!=NULL) {
+            count_call++;
+            cl_frame = cl_frame->call_parent;
+        }
+    }
+
+    printf("\assert_num_ancestor_bottom: spawn parent: %d, call parent: %d, call frame parent: %d\n", count_spawn, count_call, count_call_frame);
+    if (count_spawn!=assert_spawn_count || count_call!=assert_call_count) {
+        printf("ERROR: num of ancestor is wrong! (spawn:%d, call:%d), should be (%d, %d)\n", count_spawn, count_call, assert_spawn_count, assert_call_count);
         abort();
-    }*/
+    }
 }
+
+void assert_num_ancestor_top(int assert_call_count) {
+    __cilkrts_worker * w = __cilkrts_get_tls_worker();
+    Closure *cl = deque_peek_top(w, w->self);
+    __cilkrts_stack_frame cl_frame = cl->frame;
+    int count_call = 0;
+    while(cl_frame!=NULL) {
+        count_call++;
+        cl_frame = cl_frame->call_parent;
+    }
+    printf("\assert_num_ancestor_top: call parent: %d\n", count_spawn, count_call);
+    if (count_spawn!=assert_spawn_count || count_call!=assert_call_count) {
+        printf("ERROR: num of ancestor is wrong! (spawn:%d, call:%d), should be (%d, %d)\n", count_spawn, count_call, assert_spawn_count, assert_call_count);
+        abort();
+    }
+}
+
 
 //Choice 1
 /*inline int elastic_get_worker_id_sleeping_active_deque(__cilkrts_worker *w) {
