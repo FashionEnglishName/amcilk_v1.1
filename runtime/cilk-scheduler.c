@@ -1358,7 +1358,9 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                 usleep(TIME_EXIT_CTX_SWITCH);
             }
             //if (!__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING0, EXIT_SWITCHING1)) {
+                printf("1\n");               
                 deque_lock(w, w->g->program->last_do_exit_worker_id);
+                printf("2\n");     
                 deque_lock_self(w);
                 /*Closure * cl_w = deque_peek_top(w, w->self);
                 if (cl_w!=NULL) {
@@ -1368,6 +1370,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                 if (cl_l!=NULL) {
                     Closure_lock(w, cl_l);
                 }*/
+                printf("3\n");     
                 elastic_mugging(w, w->g->program->last_do_exit_worker_id);
                 if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING1, EXIT_SWITCHING2)) {
                     while(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s != ACTIVE) {
