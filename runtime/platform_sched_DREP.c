@@ -25,7 +25,7 @@ platform_program * rand_pick_unfinished_job(platform_global_state * G) {
     return NULL;
 }
 
-void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) { //To add lock
+/*void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) { //To add lock
     int i;
     //unsigned long long begin, end;
     //begin = micro_get_clock();
@@ -120,15 +120,9 @@ void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_
         }
         tmptmpp = tmptmpp->next;
     }
-    /*printf("\tDREP assigned cpu count: %d, run type: %d\n", cpu_count, run_type);
-    if (G->new_program!=NULL) {
-        printf("\tnew p: %d\n", G->new_program->control_uid);
-    }*/
-    //end = micro_get_clock();
-    //printf("DREP: %f\n", (end-begin)/1000/1000/1000.0);
-}
+}*/
 
-/*void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) { //To add lock
+void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) { //To add lock
     int i;
     //unsigned long long begin, end;
     //begin = micro_get_clock();
@@ -140,20 +134,6 @@ void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_
         G->new_program->try_cpu_mask[1] = 0; //core1 is used for task generator and not available
         if (G->nprogram_running!=0) { //if running programs exist
             for (i=2; i<G->nproc; i++) {
-                //plugin parallism feedback control
-                platform_program * tmp_p = G->program_head->next;
-                int flag = 0;
-                while(tmp_p!=NULL) {
-                    if (tmp_p->try_cpu_mask[i]==1) {
-                        flag = 1;
-                        break;
-                    }
-                    tmp_p = tmp_p->next;
-                }
-                if (flag==0) { //cpu i is idle
-                    G->new_program->try_cpu_mask[i] = 1;
-                } else {
-                    //
                     int num = platform_scheduler_rand(G)%(G->nprogram_running) + 1;  //the new program has not registered yet
                     //printf("[platform_scheduler_DREP]: run, the number is %d\n", num);
                     if (num==1) {
@@ -169,7 +149,6 @@ void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_
                     } else {
                         G->new_program->try_cpu_mask[i] = 0; //make core i sleep for the new program
                     }
-                }
             }
         } else { //if no running program exists, run on all cores except for core0 and core1
             for (i=2; i<G->nproc; i++) {
@@ -214,4 +193,4 @@ void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_
     }
     //end = micro_get_clock();
     //printf("DREP: %f\n", (end-begin)/1000/1000/1000.0);
-}*/
+}
