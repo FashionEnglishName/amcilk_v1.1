@@ -486,9 +486,9 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
                 //printf("TEST[%d]: bug branch, current_stack_frame:%p, elastic_state: %d\n", w->self, w->current_stack_frame, w->l->elastic_s);
             }
         } else {
-            if (w->self==w->g->elastic_core->test_thief) {
-                //printf("TEST[%d]: no stealing alarm, current_stack_frame:%p\n", w->self, w->current_stack_frame);
-            }
+            /*if (w->self==w->g->elastic_core->test_thief) {
+                printf("TEST[%d]: no stealing alarm, current_stack_frame:%p\n", w->self, w->current_stack_frame);
+            }*/
             Closure_unlock(w, t);
             deque_unlock_self(w);
             return;
@@ -1032,6 +1032,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
 
     Closure *res = NULL;
     __cilkrts_stack_frame *f;
+do_what_it_says_handler:
     w = __cilkrts_get_tls_worker();
     if (t!=NULL) { //worker TO_SLEEP deque is empty
         __cilkrts_alert(ALERT_SCHED, "[%d]: (do_what_it_says) closure %p\n", w->self, t);
@@ -1089,7 +1090,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                 w->l->fiber_to_free = NULL;
                                                 cl = return_value(w, cl);
                                                 if (cl!=NULL) {
-                                                    if (cl->status==CLOSURE_READY) {
+                                                    /*if (cl->status==CLOSURE_READY) {
                                                         deque_add_bottom(w, cl, w->self);
                                                         setup_for_execution(w, cl);
                                                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
@@ -1106,7 +1107,8 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                                     } else {
                                                         printf("ERROR: cl state error (should be CLOSURE_READY)\n");
                                                         abort();
-                                                    }
+                                                    }*/
+                                                    goto do_what_it_says_handler;
                                                 }
                                             } else {
                                                 printf("ERROR: wrong cl status at bottom [%d] when mugging\n", cl->status);
@@ -1266,7 +1268,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
 
                                         cl = return_value(w, cl);
                                         if (cl!=NULL) {
-                                            if (cl->status==CLOSURE_READY) {
+                                            /*if (cl->status==CLOSURE_READY) {
                                                 deque_add_bottom(w, cl, w->self);
                                                 setup_for_execution(w, cl);
                                                 __sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED);
@@ -1276,7 +1278,8 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                                             } else {
                                                 printf("ERROR: error2 cl status %d\n", cl->status);
                                                 abort();
-                                            }
+                                            }*/
+                                            goto do_what_it_says_handler;
                                         }
                                     } else {
                                         printf("ERROR: wrong cl status at bottom [%d] when deque is empty and go to sleep\n", cl->status);
