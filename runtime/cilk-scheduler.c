@@ -1374,9 +1374,9 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                 elastic_mugging(w, w->g->program->last_do_exit_worker_id);
                 printf("4\n"); 
                 if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING1, EXIT_SWITCHING2)) {
-                    while(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s != ACTIVE) {
+                    /*while(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s != ACTIVE) {
                         usleep(TIME_EXIT_CTX_SWITCH); //important for delay avoid unknown sigfault due to inconsistent var
-                    }
+                    }*/
                     printf("[PLATFORM %d]: invariant %d jumps to exit handling\n", w->g->program->control_uid, w->self);
                     if (w->current_stack_frame!=NULL) {
                         /*if (cl_l!=NULL) {
