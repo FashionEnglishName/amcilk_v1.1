@@ -46,6 +46,7 @@ platform_global_state * platform_global_state_init(int argc, char* argv[]) {
     G->a_container_activated_no_preemption = 0;
     pthread_spin_init(&(G->request_buffer_lock), PTHREAD_PROCESS_PRIVATE);
     pthread_mutex_init(&(G->lock), NULL);
+
     //pthread_spin_init(&(G->lock), PTHREAD_PROCESS_PRIVATE);
     G->nproc = -1;
     int available_cores = 0;
@@ -81,6 +82,11 @@ platform_global_state * platform_global_state_init(int argc, char* argv[]) {
     for (i=0; i<G->nproc; i++) {
         G->giveup_core_containers[i] = -1;
         G->receive_core_containers[i] = -1;
+    }
+
+    G->idle_cpu_mask = (int*) malloc(sizeof(int)*G->nproc);
+    for (i=0; i<G->nproc; i++) {
+        G->idle_cpu_mask[i] = 0;
     }
 
     G->nprogram_running = 0;
@@ -200,13 +206,9 @@ platform_program *container_init(platform_global_state *G, int control_uid, int 
     for (i=0; i<G->nproc; i++) {
         p->try_cpu_mask[i] = 0;
     }
-    p->tmp1_cpu_mask = (int*) malloc(sizeof(int)*G->nproc);
+    p->drep_allot_tmp_cpu_mask = (int*) malloc(sizeof(int)*G->nproc);
     for (i=0; i<G->nproc; i++) {
-        p->tmp1_cpu_mask[i] = 0;
-    }
-    p->tmp2_cpu_mask = (int*) malloc(sizeof(int)*G->nproc);
-    for (i=0; i<G->nproc; i++) {
-        p->tmp2_cpu_mask[i] = 0;
+        p->drep_allot_tmp_cpu_mask[i] = 0;
     }
     p->num_cpu = 0;
     p->try_num_cpu = 0;

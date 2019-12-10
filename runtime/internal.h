@@ -268,8 +268,7 @@ struct platform_program {
 
     int* cpu_mask;
     int* try_cpu_mask;
-    int* tmp1_cpu_mask;
-    int* tmp2_cpu_mask;
+    int* drep_allot_tmp_cpu_mask;
     volatile int num_cpu;
     volatile int try_num_cpu;
     volatile int desired_num_cpu;
@@ -319,6 +318,7 @@ struct platform_global_state {
     volatile int nprogram_running;
     unsigned int rand_next;
     pthread_mutex_t lock;
+    int* idle_cpu_mask;
     //pthread_spinlock_t lock;
 
     int giveup_core_containers[CONTAINER_COUNT];

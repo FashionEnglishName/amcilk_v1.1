@@ -25,7 +25,7 @@ platform_program * rand_pick_unfinished_job(platform_global_state * G) {
     return NULL;
 }
 
-/*void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) { //To add lock
+void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) { //To add lock
     int i;
     //unsigned long long begin, end;
     //begin = micro_get_clock();
@@ -39,13 +39,13 @@ platform_program * rand_pick_unfinished_job(platform_global_state * G) {
             int allocate_num_cpu = 0;
             int idle_num_cpu = 0;
             for (i=0; i<G->nproc; i++) {
-                G->new_program->tmp1_cpu_mask[i] = 0; //allocate
-                G->new_program->tmp2_cpu_mask[i] = 0; //idle
+                G->new_program->drep_allot_tmp_cpu_mask[i] = 0; //allocate
+                G->idle_cpu_mask[i] = 0; //idle
             }
             for (i=2; i<G->nproc; i++) {
                 int num = platform_scheduler_rand(G)%(G->nprogram_running) + 1;  //the new program has not registered yet
                 if (num==1) {
-                    G->new_program->tmp1_cpu_mask[i] = 1;
+                    G->new_program->drep_allot_tmp_cpu_mask[i] = 1;
                     allocate_num_cpu++;
                 }
                 platform_program * tmp_p = G->program_head->next;
@@ -58,12 +58,12 @@ platform_program * rand_pick_unfinished_job(platform_global_state * G) {
                     tmp_p = tmp_p->next;
                 }
                 if (flag==0) { //cpu i is idle
-                    G->new_program->tmp2_cpu_mask[i] = 1;
+                    G->idle_cpu_mask[i] = 1;
                     idle_num_cpu++;
                 }
             }
             for (i=2; i<G->nproc; i++) {
-                if (G->new_program->tmp2_cpu_mask[i]==1 && allocate_num_cpu>0) {
+                if (G->idle_cpu_mask[i]==1 && allocate_num_cpu>0) {
                     G->new_program->try_cpu_mask[i] = 1;
                     allocate_num_cpu--;
                 } else if (allocate_num_cpu<=0) {
@@ -71,9 +71,16 @@ platform_program * rand_pick_unfinished_job(platform_global_state * G) {
                 }
             }
             for (i=2; i<G->nproc; i++) {
-                if (G->new_program->tmp1_cpu_mask[i]==1 && allocate_num_cpu>0) {
+                if (G->new_program->drep_allot_tmp_cpu_mask[i]==1 && allocate_num_cpu>0) {
                     G->new_program->try_cpu_mask[i] = 1;
                     allocate_num_cpu--;
+                    platform_program * tmp_p = G->program_head->next;
+                    while(tmp_p!=NULL) {
+                        if (tmp_p->control_uid!=G->new_program->control_uid) {
+                            tmp_p->try_cpu_mask[i] = 0; //make core i sleep for all previous programs
+                        }
+                        tmp_p = tmp_p->next;
+                    }
                 } else if (allocate_num_cpu<=0) {
                     break;
                 }
@@ -120,9 +127,9 @@ platform_program * rand_pick_unfinished_job(platform_global_state * G) {
         }
         tmptmpp = tmptmpp->next;
     }
-}*/
+}
 
-void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) { //To add lock
+/*void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_TYPE run_type) { //To add lock
     int i;
     //unsigned long long begin, end;
     //begin = micro_get_clock();
@@ -193,4 +200,4 @@ void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_
     }
     //end = micro_get_clock();
     //printf("DREP: %f\n", (end-begin)/1000/1000/1000.0);
-}
+}*/
