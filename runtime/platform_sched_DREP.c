@@ -36,18 +36,16 @@ void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_
         G->new_program->try_cpu_mask[0] = 0; //core0 is used for scheduling and not available
         G->new_program->try_cpu_mask[1] = 0; //core1 is used for task generator and not available
         if (G->nprogram_running!=0) { //if running programs exist
-            int * allocate_cpu_mask = (int*) malloc(sizeof(int)*G->nproc);
-            int * idle_cpu_mask = (int*) malloc(sizeof(int)*G->nproc);
             int allocate_num_cpu = 0;
             int idle_num_cpu = 0;
             for (i=0; i<G->nproc; i++) {
-                allocate_cpu_mask[i] = 0;
-                idle_cpu_mask[i] = 0;
+                G->new_program->tmp1_cpu_mask[i] = 0; //allocate
+                G->new_program->tmp2_cpu_mask[i] = 0; //idle
             }
             for (i=2; i<G->nproc; i++) {
                 int num = platform_scheduler_rand(G)%(G->nprogram_running) + 1;  //the new program has not registered yet
                 if (num==1) {
-                    allocate_cpu_mask[i] = 1;
+                    G->new_program->tmp1_cpu_mask[i] = 1;
                     allocate_num_cpu++;
                 }
                 platform_program * tmp_p = G->program_head->next;
@@ -60,12 +58,12 @@ void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_
                     tmp_p = tmp_p->next;
                 }
                 if (flag==0) { //cpu i is idle
-                    idle_cpu_mask[i] = 1;
+                    G->new_program->tmp2_cpu_mask[i] = 1;
                     idle_num_cpu++;
                 }
             }
             for (i=2; i<G->nproc; i++) {
-                if (idle_cpu_mask[i]==1 && allocate_num_cpu>0) {
+                if (G->new_program->tmp2_cpu_mask[i]==1 && allocate_num_cpu>0) {
                     G->new_program->try_cpu_mask[i] = 1;
                     allocate_num_cpu--;
                 } else if (allocate_num_cpu<=0) {
@@ -73,15 +71,13 @@ void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_
                 }
             }
             for (i=2; i<G->nproc; i++) {
-                if (allocate_cpu_mask[i]==1 && allocate_num_cpu>0) {
+                if (G->new_program->tmp1_cpu_mask[i]==1 && allocate_num_cpu>0) {
                     G->new_program->try_cpu_mask[i] = 1;
                     allocate_num_cpu--;
                 } else if (allocate_num_cpu<=0) {
                     break;
                 }
             }
-            free(allocate_cpu_mask);
-            free(idle_cpu_mask);
 
         } else { //if no running program exists, run on all cores except for core0 and core1
             for (i=2; i<G->nproc; i++) {

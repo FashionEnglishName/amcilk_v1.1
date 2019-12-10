@@ -200,6 +200,14 @@ platform_program *container_init(platform_global_state *G, int control_uid, int 
     for (i=0; i<G->nproc; i++) {
         p->try_cpu_mask[i] = 0;
     }
+    p->tmp1_cpu_mask = (int*) malloc(sizeof(int)*G->nproc);
+    for (i=0; i<G->nproc; i++) {
+        p->tmp1_cpu_mask[i] = 0;
+    }
+    p->tmp2_cpu_mask = (int*) malloc(sizeof(int)*G->nproc);
+    for (i=0; i<G->nproc; i++) {
+        p->tmp2_cpu_mask[i] = 0;
+    }
     p->num_cpu = 0;
     p->try_num_cpu = 0;
     p->desired_num_cpu = 0;

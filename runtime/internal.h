@@ -268,6 +268,8 @@ struct platform_program {
 
     int* cpu_mask;
     int* try_cpu_mask;
+    int* tmp1_cpu_mask;
+    int* tmp2_cpu_mask;
     volatile int num_cpu;
     volatile int try_num_cpu;
     volatile int desired_num_cpu;
