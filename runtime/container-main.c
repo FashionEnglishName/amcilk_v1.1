@@ -169,10 +169,10 @@ run_point:
         CILK_WMB();
         if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), -1, 1)) {
             //pthread_mutex_lock(&(w->g->program->G->lock));
-            program_print_result_acc(w->g->program);
+            /*program_print_result_acc(w->g->program);
             if (w->g->program->mute==0) {
                 platform_response_to_client(w->g->program);
-            }
+            }*/
             //pthread_mutex_unlock(&(w->g->program->G->lock));
             if (w->self!=w->g->program->invariant_running_worker_id) {
                 __cilkrts_save_fp_ctrl_state_for_switch(w->current_stack_frame);
