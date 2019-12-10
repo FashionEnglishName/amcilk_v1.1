@@ -1391,12 +1391,12 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                         abort();
                     }
                 }
-                if (cl_l!=NULL) {
+                /*if (cl_l!=NULL) {
                     Closure_unlock(w, cl_l);
                 }
                 if (cl_w!=NULL) {
                     Closure_unlock(w, cl_w);
-                }
+                }*/
                 deque_unlock_self(w);
                 deque_unlock(w, w->g->program->last_do_exit_worker_id);
             }
