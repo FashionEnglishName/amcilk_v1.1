@@ -77,9 +77,11 @@ int analyze_cpu_cycle_status(platform_program * p) {
 			efficient,
 			satisfied,
 			p->desired_num_cpu);*/
-		printf("(p%d, job finish:%d): total: %llu, steal: %llu (%f), non-steal: %llu (%f), efficient: %d, satisfied: %d, desired: %d\n", 
+		printf("(p%d, job finish:%d, input:%d, cpu num:%d): total: %llu, steal: %llu (%f), non-steal: %llu (%f), efficient: %d, satisfied: %d, desired: %d\n", 
 			p->control_uid,
 			p->job_finish,
+			p->input,
+			p->try_num_cpu,
 			p->total_cycles, 
 			p->total_stealing_cycles, 
 			p->total_stealing_cycles*(1.0)/p->total_cycles,
