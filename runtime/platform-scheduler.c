@@ -25,6 +25,7 @@ void platform_alloted_feedback_scheduling(platform_global_state * G, enum PLATFO
         while(tmp_p!=NULL) {
             if (tmp_p->try_cpu_mask[i]==1) {
                 flag = 1;
+                break;
             }
             tmp_p = tmp_p->next;
         }

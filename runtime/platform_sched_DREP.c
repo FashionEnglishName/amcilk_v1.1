@@ -37,20 +37,35 @@ void platform_scheduler_DREP(platform_global_state * G, enum PLATFORM_SCHEDULER_
         G->new_program->try_cpu_mask[1] = 0; //core1 is used for task generator and not available
         if (G->nprogram_running!=0) { //if running programs exist
             for (i=2; i<G->nproc; i++) {
-                int num = platform_scheduler_rand(G)%(G->nprogram_running) + 1;  //the new program has not registered yet
-                //printf("[platform_scheduler_DREP]: run, the number is %d\n", num);
-                if (num==1) {
-                    G->new_program->try_cpu_mask[i] = 1; //make core i active for the new program
-                    //printf("[platform_scheduler_DREP]: pick core %d and assign it to the new program\n", i);
-                    platform_program * p = G->program_head->next;
-                    while(p!=NULL) {
-                        if (p->control_uid!=G->new_program->control_uid) {
-                            p->try_cpu_mask[i] = 0; //make core i sleep for all previous programs
-                        }
-                        p = p->next;
+                //plugin parallism feedback control
+                platform_program * tmp_p = G->program_head->next;
+                int flag = 0;
+                while(tmp_p!=NULL) {
+                    if (tmp_p->try_cpu_mask[i]==1) {
+                        flag = 1;
+                        break;
                     }
+                    tmp_p = tmp_p->next;
+                }
+                if (flag==0) { //cpu i is idle
+                    G->new_program->try_cpu_mask[i] = 1;
                 } else {
-                    G->new_program->try_cpu_mask[i] = 0; //make core i sleep for the new program
+                    //
+                    int num = platform_scheduler_rand(G)%(G->nprogram_running) + 1;  //the new program has not registered yet
+                    //printf("[platform_scheduler_DREP]: run, the number is %d\n", num);
+                    if (num==1) {
+                        G->new_program->try_cpu_mask[i] = 1; //make core i active for the new program
+                        //printf("[platform_scheduler_DREP]: pick core %d and assign it to the new program\n", i);
+                        platform_program * p = G->program_head->next;
+                        while(p!=NULL) {
+                            if (p->control_uid!=G->new_program->control_uid) {
+                                p->try_cpu_mask[i] = 0; //make core i sleep for all previous programs
+                            }
+                            p = p->next;
+                        }
+                    } else {
+                        G->new_program->try_cpu_mask[i] = 0; //make core i sleep for the new program
+                    }
                 }
             }
         } else { //if no running program exists, run on all cores except for core0 and core1
