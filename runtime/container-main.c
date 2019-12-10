@@ -186,7 +186,8 @@ run_point:
             printf("[PLATFORM %d]: invariant %d enters to exit handling\n", w->g->program->control_uid, w->self);
             if (w->self==w->g->program->invariant_running_worker_id) {
                 //w->g->program->is_switching = 0;
-                if (__sync_bool_compare_and_swap(&(w->g->program->is_switching), 1, 2)) {
+                if (__sync_bool_compare_and_swap(&(w->g->program->is_switching), 1, 2) ||
+                    __sync_bool_compare_and_swap(&(w->g->program->is_switching), 0, 0) ) {
                     pthread_mutex_lock(&(w->g->program->G->lock));
                     program_print_result_acc(w->g->program);
                     if (w->g->program->mute==0) {
@@ -195,17 +196,10 @@ run_point:
                     pthread_mutex_unlock(&(w->g->program->G->lock));
                     container_plugin_enable_run_cycle(w);
                     goto run_point; //new cycle  
-                } else if (__sync_bool_compare_and_swap(&(w->g->program->is_switching), 0, 0)) { //no switching case
-                    pthread_mutex_lock(&(w->g->program->G->lock));
-                    program_print_result_acc(w->g->program);
-                    if (w->g->program->mute==0) {
-                        platform_response_to_client(w->g->program);
-                    }
-                    pthread_mutex_unlock(&(w->g->program->G->lock));
-                    container_plugin_enable_run_cycle(w);
-                    goto run_point; //new cycle  
+                } else {
+                    printf("ERROR: is_switching error: not 1 nor 0\n");
+                    abort();
                 }
-
             } else {
                 printf("ERROR: a non-inv worker jumps to exiting handling\n");
                 abort();
