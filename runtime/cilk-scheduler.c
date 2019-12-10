@@ -1407,8 +1407,10 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                     //printf("\tlast w wait, %d %d %d\n", w->g->program->control_uid, w->self, w->l->elastic_s);
                     usleep(TIME_EXIT_CTX_SWITCH);
                 }
+                Cilk_fence();
                 while(w->g->program->is_switching==1) {
                     usleep(TIME_EXIT_CTX_SWITCH);
+                    Cilk_fence();
                 }
                 //w->g->program->is_switching = 0;
             } else if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, EXIT_SWITCHING0)) {
@@ -1417,8 +1419,10 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                     //printf("\tlast w wait, %d %d %d\n", w->g->program->control_uid, w->self, w->l->elastic_s);
                     usleep(TIME_EXIT_CTX_SWITCH);
                 }
+                Cilk_fence();
                 while(w->g->program->is_switching==1) {
                     usleep(TIME_EXIT_CTX_SWITCH);
+                    Cilk_fence();
                 }
                 //w->g->program->is_switching = 0;
             } else {
