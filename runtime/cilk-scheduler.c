@@ -1345,7 +1345,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
 
 void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
     w = __cilkrts_get_tls_worker();
-    if (w->g->program->is_switching==1) {
+    if (__sync_bool_compare_and_swap(&(w->g->program->is_switching), 1, 2)) {
         //for switching: inv enter exit rountine
         if (w->self==w->g->program->invariant_running_worker_id) {
             /*Closure * tmp_cl = deque_peek_bottom(w, w->self);
@@ -1407,7 +1407,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                     //printf("\tlast w wait, %d %d %d\n", w->g->program->control_uid, w->self, w->l->elastic_s);
                     usleep(TIME_EXIT_CTX_SWITCH);
                 }
-                while(__sync_bool_compare_and_swap(&(w->g->program->is_switching), 2, 0)) {
+                while(!__sync_bool_compare_and_swap(&(w->g->program->is_switching), 3, 0)) {
                     usleep(TIME_EXIT_CTX_SWITCH);
                 }
                 //w->g->program->is_switching = 0;
@@ -1417,7 +1417,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                     //printf("\tlast w wait, %d %d %d\n", w->g->program->control_uid, w->self, w->l->elastic_s);
                     usleep(TIME_EXIT_CTX_SWITCH);
                 }
-                while(__sync_bool_compare_and_swap(&(w->g->program->is_switching), 2, 0)) {
+                while(!__sync_bool_compare_and_swap(&(w->g->program->is_switching), 3, 0)) {
                     usleep(TIME_EXIT_CTX_SWITCH);
                 }
                 //w->g->program->is_switching = 0;
