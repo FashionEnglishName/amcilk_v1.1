@@ -171,9 +171,13 @@ run_point:
             if (w->self!=w->g->program->invariant_running_worker_id) {
                 __cilkrts_save_fp_ctrl_state_for_switch(w->current_stack_frame);
                 if(!__builtin_setjmp(w->current_stack_frame->switch_ctx)) {
-                    w->g->program->is_switching = 1;
-                    printf("[PLATFORM %d]: last worker %d jumps to runtime\n", w->g->program->control_uid, w->self);
-                    longjmp_to_runtime(w);
+                    if (__sync_bool_compare_and_swap(&(w->g->program->is_switching), 0, 1)) {
+                        printf("[PLATFORM %d]: last worker %d jumps to runtime\n", w->g->program->control_uid, w->self);
+                        longjmp_to_runtime(w);
+                    } else {
+                        printf("ERROR: is_switching is not 0 which is wrong at beginning\n");
+                        abort();
+                    }
                 }
             }
 
@@ -182,15 +186,25 @@ run_point:
             printf("[PLATFORM %d]: invariant %d enters to exit handling\n", w->g->program->control_uid, w->self);
             if (w->self==w->g->program->invariant_running_worker_id) {
                 w->g->program->is_switching = 0;
-                Cilk_fence();
-                pthread_mutex_lock(&(w->g->program->G->lock));
-                program_print_result_acc(w->g->program);
-                if (w->g->program->mute==0) {
-                    platform_response_to_client(w->g->program);
+                if (__sync_bool_compare_and_swap(&(w->g->program->is_switching), 1, 2)) {
+                    pthread_mutex_lock(&(w->g->program->G->lock));
+                    program_print_result_acc(w->g->program);
+                    if (w->g->program->mute==0) {
+                        platform_response_to_client(w->g->program);
+                    }
+                    pthread_mutex_unlock(&(w->g->program->G->lock));
+                    container_plugin_enable_run_cycle(w);
+                    goto run_point; //new cycle  
+                } else if (__sync_bool_compare_and_swap(&(w->g->program->is_switching), 0, 0)) {
+                    pthread_mutex_lock(&(w->g->program->G->lock));
+                    program_print_result_acc(w->g->program);
+                    if (w->g->program->mute==0) {
+                        platform_response_to_client(w->g->program);
+                    }
+                    pthread_mutex_unlock(&(w->g->program->G->lock));
+                    container_plugin_enable_run_cycle(w);
+                    goto run_point; //new cycle  
                 }
-                pthread_mutex_unlock(&(w->g->program->G->lock));
-                container_plugin_enable_run_cycle(w);
-                goto run_point; //new cycle  
 
             } else {
                 printf("ERROR: a non-inv worker jumps to exiting handling\n");
