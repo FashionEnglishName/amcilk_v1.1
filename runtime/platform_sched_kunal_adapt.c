@@ -56,9 +56,9 @@ int analyze_cpu_cycle_status(platform_program * p) {
 			abort();
 		}
 		if (efficient==0) {
-			p->desired_num_cpu = MIN(MAX(floor(p->desired_num_cpu/KUNAL_ADAPTIVE_FEEDBACK_RESPONSIVENESS_PARAMETER), 1), p->G->nproc-2);
+			p->desired_num_cpu = MIN(MAX(floor(p->desired_num_cpu*1.0/KUNAL_ADAPTIVE_FEEDBACK_RESPONSIVENESS_PARAMETER), 1), p->G->nproc-2);
 		} else if (satisfied==1) {
-			p->desired_num_cpu = MIN(MAX(ceil(p->desired_num_cpu*KUNAL_ADAPTIVE_FEEDBACK_RESPONSIVENESS_PARAMETER), 1), p->G->nproc-2);
+			p->desired_num_cpu = MIN(MAX(ceil(p->desired_num_cpu*1.0*KUNAL_ADAPTIVE_FEEDBACK_RESPONSIVENESS_PARAMETER), 1), p->G->nproc-2);
 		} else {
 			p->desired_num_cpu = p->desired_num_cpu;
 		}
