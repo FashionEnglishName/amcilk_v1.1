@@ -9,7 +9,7 @@ void platform_alloted_feedback_scheduling(platform_global_state * G, enum PLATFO
         if (tmp_p->desired_num_cpu<tmp_p->try_num_cpu) {
             int tmp_diff_num_cpu = tmp_p->try_num_cpu - tmp_p->desired_num_cpu;
             for (i=2; i<tmp_p->G->nproc; i++) {
-                if (tmp_p->try_cpu_mask[i]==1 && tmp_diff_num_cpu>0) {
+                if (tmp_p->try_cpu_mask[i]==1 && tmp_diff_num_cpu>0 && i!=tmp_p->invariant_running_worker_id) {
                     tmp_p->try_cpu_mask[i] = 0;
                     tmp_diff_num_cpu--;
                 }
@@ -221,7 +221,7 @@ void platform_scheduling(platform_global_state * G, platform_program * p, enum P
     printf("INVARIANT GUARANTEE\n");
     platform_invariant_guarantee(G, run_type);
     printf("ADJUST\n");
-    platform_alloted_feedback_scheduling(G, run_type);
+    platform_alloted_feedback_scheduling(G, run_type); //keep the invariant
     printf("VERIFY\n");
     if (platform_verify_scheduling(G, run_type)==-1) {
         printf("ERROR: scheduling verify failed\n");
