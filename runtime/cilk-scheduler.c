@@ -1356,7 +1356,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
             deque_lock_self(w);
             elastic_mugging(w, w->g->program->last_do_exit_worker_id);
             if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING1, EXIT_SWITCHING2)) {
-                while(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s!=ACTIVE||
+                while(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s!=ACTIVE &&
                     w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s!=SLEEP_REQUESTED) {
                     usleep(TIME_EXIT_CTX_SWITCH); //important for delay avoid unknown sigfault due to inconsistent var
                 }
