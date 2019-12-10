@@ -1354,7 +1354,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                 abort();
             }*/
             printf("[PLATFORM %d]: invariant %d is going to switching\n", w->g->program->control_uid, w->self);
-            if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING0, EXIT_SWITCHING1)) {
+            while (!__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING0, EXIT_SWITCHING1)) {
                 deque_lock(w, w->g->program->last_do_exit_worker_id);
                 deque_lock_self(w);
                 /*Closure * cl_w = deque_peek_top(w, w->self);
@@ -1366,7 +1366,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                     Closure_lock(w, cl_l);
                 }*/
                 elastic_mugging(w, w->g->program->last_do_exit_worker_id);
-                if (__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING1, EXIT_SWITCHING2)) {
+                while (!__sync_bool_compare_and_swap(&(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s), EXIT_SWITCHING1, EXIT_SWITCHING2)) {
                     while(w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s != ACTIVE) {
                         usleep(TIME_EXIT_CTX_SWITCH); //important for delay avoid unknown sigfault due to inconsistent var
                     }
@@ -1383,12 +1383,6 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                         sysdep_longjmp_to_sf_for_switch(w->current_stack_frame);
                     } else {
                         printf("[ERROR]: current_stack_frame=NULL in do_exit_switching_for_invariant_handling\n");
-                        abort();
-                    }
-                } else {
-                    if (w->g->program->last_do_exit_worker_id!=-1) {
-                        printf("%d %d last %d\n", w->g->program->control_uid, w->self, w->g->program->last_do_exit_worker_id);
-                        printf("[ERROR]: set last w %d elastic_s failed! elastic_s %d\n", w->g->program->last_do_exit_worker_id, w->g->workers[w->g->program->last_do_exit_worker_id]->l->elastic_s);
                         abort();
                     }
                 }
