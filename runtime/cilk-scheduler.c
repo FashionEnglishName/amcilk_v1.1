@@ -1452,6 +1452,10 @@ void worker_sleep_handling(__cilkrts_worker *w) {
         Cilk_fence();
         if (w->head>w->tail) {
             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {
+                if (w->head <= w->tail) {
+                    printf("ERROR: (p%d, w%d) worker_sleep_handling error!\n", w->g->program->control_uid, w->self);
+                    abort();
+                }
                 elastic_core_lock(w);
                 w->g->elastic_core->ptr_sleeping_inactive_deque--;
                 elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
