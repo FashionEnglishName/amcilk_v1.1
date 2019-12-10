@@ -1451,7 +1451,7 @@ void worker_sleep_handling(__cilkrts_worker *w) {
     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, SLEEPING_ADAPTING_DEQUE)) {
         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {
             if (w->head <= w->tail) {
-                printf("ERROR: worker_sleep_handling error!\n", );
+                printf("ERROR: worker_sleep_handling error!\n");
                 abort();
             }
             elastic_core_lock(w);
