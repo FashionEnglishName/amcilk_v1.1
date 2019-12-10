@@ -1450,7 +1450,10 @@ void worker_sleep_handling(__cilkrts_worker *w) {
     w = __cilkrts_get_tls_worker();
     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, SLEEPING_ADAPTING_DEQUE)) {
         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {
-
+            if (w->head <= w->tail) {
+                printf("ERROR: worker_sleep_handling error!\n", );
+                abort();
+            }
             elastic_core_lock(w);
             w->g->elastic_core->ptr_sleeping_inactive_deque--;
             elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
