@@ -1474,10 +1474,10 @@ void worker_sleep_handling(__cilkrts_worker *w) {
                 }
             }
         } else if (w->head==w->tail) {
-            printf("ERROR: (p%d, w%d) worker_sleep_handling error, h:%p, t:%p, job_finish:%d, hint_stop_container:%d\n", 
-                w->g->program->control_uid, w->self, w->head, w->tail, w->g->program->job_finish, w->g->program->hint_stop_container);
-            abort();
-            /*if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {
+            //printf("ERROR: (p%d, w%d) worker_sleep_handling error, h:%p, t:%p, job_finish:%d, hint_stop_container:%d\n", 
+            //    w->g->program->control_uid, w->self, w->head, w->tail, w->g->program->job_finish, w->g->program->hint_stop_container);
+            //abort();
+            if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {
                 elastic_core_lock(w);
                 w->g->elastic_core->ptr_sleeping_inactive_deque--;
                 elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
@@ -1498,7 +1498,7 @@ void worker_sleep_handling(__cilkrts_worker *w) {
                     printf("ERROR p%d, LAST W GOTO SLEEP FAILED\n", w->g->program->control_uid);
                     abort();
                 }
-            }*/
+            }
         } else {
             printf("ERROR: (p%d, w%d) worker_sleep_handling error, h:%p, t:%p!\n", w->g->program->control_uid, w->self, w->head, w->tail);
             abort();
