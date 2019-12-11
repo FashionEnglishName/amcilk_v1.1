@@ -1593,13 +1593,6 @@ normal_point: //normal part, can not be preempted
         if (!w->g->done) {
             t = do_what_it_says(w, t);
         }
-        if (w->g->program->hint_stop_container==1) {
-            goto stop_container_point;
-        } else if (w->g->program->job_finish==1) {
-            goto job_finish_point;
-        } else {
-            goto normal_point;
-        }
     }
 }
 
