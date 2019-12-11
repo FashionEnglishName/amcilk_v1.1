@@ -1526,7 +1526,7 @@ stop_container_point:
             do_exit_blocking_container_handling(w);
             reset_exception_pointer(w, t);
         }
-worker_sleep_point:
+//worker_sleep_point:
         w = __cilkrts_get_tls_worker();
         worker_sleep_handling(w);
         
