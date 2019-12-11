@@ -1475,55 +1475,27 @@ void worker_sleep_handling(__cilkrts_worker *w) {
             }
         } else if (w->head==w->tail) {
             //???
-            elastic_core_lock(w);
-            w->g->elastic_core->ptr_sleeping_active_deque++;
-            elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque]]);
-            elastic_core_unlock(w);
-            if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
+            if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {
+                elastic_core_lock(w);
+                w->g->elastic_core->ptr_sleeping_inactive_deque--;
+                elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
+                elastic_core_unlock(w);
                 elastic_do_cond_sleep(w);
 
-
                 //activated
-                                    w = __cilkrts_get_tls_worker();
-                                    deque_lock_self(w);
-                                    Closure *cl = deque_peek_bottom(w, w->self);
-                                    if (cl!=NULL) {
-                                        printf("1\n");
-                                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
-                                            elastic_core_lock(w);
-                                            elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque]]);
-                                            w->g->elastic_core->ptr_sleeping_active_deque--;
-                                            elastic_core_unlock(w);
-                                            if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
-                                                //pass
-                                            } else {
-                                                printf("ERROR: ACTIVATING2 is changed by others\n");
-                                                abort();
-                                            }
-                                        } else {
-                                            printf("ERROR: activated without requested2\n");
-                                            abort();
-                                        }
-                                    } else { //be mugged
-                                        printf("2\n");
-                                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
-                                            elastic_core_lock(w);
-                                            elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
-                                            w->g->elastic_core->ptr_sleeping_inactive_deque++;
-                                            elastic_core_unlock(w);
-                                            if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
-                                                //res = NULL;
-                                                //pass
-                                            } else {
-                                                printf("ERROR: ACTIVATING3 is changed by others\n");
-                                                abort();
-                                            }
-                                        } else {
-                                            printf("ERROR: activated without requested3\n");
-                                            abort();
-                                        }
-                                    }
-                                    deque_unlock_self(w);
+                w = __cilkrts_get_tls_worker();
+                if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
+                    elastic_core_lock(w);
+                    elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
+                    w->g->elastic_core->ptr_sleeping_inactive_deque++;
+                    elastic_core_unlock(w);
+                    if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {         
+                        //pass
+                    }
+                } else {
+                    printf("ERROR p%d, LAST W GOTO SLEEP FAILED\n", w->g->program->control_uid);
+                    abort();
+                }
             }
         } else {
             printf("ERROR: (p%d, w%d) worker_sleep_handling error, h:%p, t:%p!\n", w->g->program->control_uid, w->self, w->head, w->tail);
