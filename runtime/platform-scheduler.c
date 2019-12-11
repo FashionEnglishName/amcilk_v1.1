@@ -31,7 +31,7 @@ void platform_alloted_feedback_scheduling(platform_global_state * G, enum PLATFO
         }
         if (flag==0) {
             //cpu i is idle core
-            printf("cpu %d is a idle core\n", i);
+            //printf("cpu %d is a idle core\n", i);
         }
     }
 }
@@ -147,11 +147,11 @@ void platform_determine_scheduling(platform_global_state * G, enum PLATFORM_SCHE
     //cpu_contain_map is done, then finish allocation by setting cpu_mask
 
     //see container map
-    printf("\tcontainer map: ");
+    /*printf("\tcontainer map: ");
     for(i=0; i<G->nproc; i++) {
         printf("%d ", G->cpu_container_map[i]);
     }
-    printf("\n");
+    printf("\n");*/
 
     if (count_running_container!=G->nprogram_running) {
         printf("ERROR: inconsistency between scheduler and nprogram_running.\n");
