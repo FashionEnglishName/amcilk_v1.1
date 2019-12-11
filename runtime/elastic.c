@@ -317,7 +317,7 @@ void platform_guarantee_sleep_inactive_deque_worker(platform_program * p, int cp
     if (elastic_safe(p->g->workers[cpu_id])) {
         Cilk_fence();
         while(p->g->workers[cpu_id]->l->elastic_s!=SLEEPING_INACTIVE_DEQUE) {
-            __sync_bool_compare_and_swap(&(p->g->workers[cpu_id]->l->elastic_s), ACTIVE, SLEEP_REQUESTED);
+            //__sync_bool_compare_and_swap(&(p->g->workers[cpu_id]->l->elastic_s), ACTIVE, SLEEP_REQUESTED);
             //usleep(TIME_MAKE_SURE_TO_SLEEP);
             p->g->workers[cpu_id]->exc = p->g->workers[cpu_id]->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
             usleep(TIME_MAKE_SURE_TO_SLEEP);
