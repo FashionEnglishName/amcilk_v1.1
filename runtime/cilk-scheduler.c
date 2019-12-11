@@ -1537,7 +1537,7 @@ stop_container_point:
         } else if (w->g->program->hint_stop_container==1) {
             goto stop_container_point;
         } else if (w->l->elastic_s==SLEEP_REQUESTED) {
-            //goto worker_sleep_point;
+            goto worker_sleep_point;
         }
 
 normal_point: //normal part, can not be preempted
@@ -1554,7 +1554,7 @@ normal_point: //normal part, can not be preempted
                     } else if (w->g->program->hint_stop_container==1) {
                         goto stop_container_point;
                     } else if (w->l->elastic_s==SLEEP_REQUESTED) {
-                        //goto worker_sleep_point;
+                        goto worker_sleep_point;
                     }
                 }
             }
@@ -1572,7 +1572,7 @@ normal_point: //normal part, can not be preempted
             } else if (w->g->program->hint_stop_container==1) {
                 goto stop_container_point;
             } else if (w->l->elastic_s==SLEEP_REQUESTED) {
-                //goto worker_sleep_point;
+                goto worker_sleep_point;
             }
             CILK_START_TIMING(w, INTERVAL_SCHED);
             CILK_START_TIMING(w, INTERVAL_IDLE);
@@ -1610,9 +1610,17 @@ normal_point: //normal part, can not be preempted
         if (!w->g->done) {
             t = do_what_it_says(w, t);
         }
-        if (t!=NULL) {
+        /*if (t!=NULL) {
             goto normal_point;
         } else if (w->g->program->job_finish==1) {
+            goto job_finish_point;
+        } else if (w->g->program->hint_stop_container==1) {
+            goto stop_container_point;
+        } else {
+            //goto worker_sleep_point;
+            goto normal_point;//??
+        }*/
+        if (w->g->program->job_finish==1) {
             goto job_finish_point;
         } else if (w->g->program->hint_stop_container==1) {
             goto stop_container_point;
