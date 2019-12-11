@@ -1494,18 +1494,7 @@ void worker_sleep_handling(__cilkrts_worker *w) {
                                             w->g->elastic_core->ptr_sleeping_active_deque--;
                                             elastic_core_unlock(w);
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
-                                                if (cl->status==CLOSURE_RUNNING) {
-                                                    if (w->current_stack_frame!=NULL) {
-                                                        deque_unlock_self(w);
-                                                        sysdep_longjmp_to_sf_for_preempt(w->current_stack_frame);
-                                                    } else {
-                                                        printf("ERROR: w->current_stack_frame==NULL when being activated (be not mugged case)\n");
-                                                        abort();
-                                                    }
-                                                } else {
-                                                    printf("ERROR: error1 cl status %d\n", cl->status);
-                                                    abort();
-                                                }
+                                                //pass
                                             } else {
                                                 printf("ERROR: ACTIVATING2 is changed by others\n");
                                                 abort();
@@ -1523,6 +1512,7 @@ void worker_sleep_handling(__cilkrts_worker *w) {
                                             elastic_core_unlock(w);
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
                                                 //res = NULL;
+                                                //pass
                                             } else {
                                                 printf("ERROR: ACTIVATING3 is changed by others\n");
                                                 abort();
