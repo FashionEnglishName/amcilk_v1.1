@@ -232,7 +232,7 @@ void assert_num_ancestor(int assert_spawn_count, int assert_call_count, int asse
 }*/
 
 //Choice 2, best
-/*inline int elastic_get_worker_id_sleeping_active_deque(__cilkrts_worker *w) {
+inline int elastic_get_worker_id_sleeping_active_deque(__cilkrts_worker *w) {
     if (w->g->elastic_core->ptr_sleeping_active_deque>=0) {
         w->l->rand_next = w->l->rand_next * 1103515245 + 12345;
         int id = w->l->rand_next >> 16;
@@ -240,7 +240,7 @@ void assert_num_ancestor(int assert_spawn_count, int assert_call_count, int asse
     } else {
         return -1;
     }
-}*/
+}
 //correct standard
 /*inline int elastic_get_worker_id_sleeping_active_deque(__cilkrts_worker *w) {
     for (int i=0; i<w->g->program->G->nproc; i++) {
@@ -251,7 +251,7 @@ void assert_num_ancestor(int assert_spawn_count, int assert_call_count, int asse
     return -1;
 }*/
 
-inline int elastic_get_worker_id_sleeping_active_deque(__cilkrts_worker *w) {
+/*inline int elastic_get_worker_id_sleeping_active_deque(__cilkrts_worker *w) {
     int i = 0;
     while(1) {
         if (w->g->workers[w->g->elastic_core->cpu_state_group[i]]->l->elastic_s==SLEEPING_ACTIVE_DEQUE) { //TODO, Lockfree implementation
@@ -263,7 +263,7 @@ inline int elastic_get_worker_id_sleeping_active_deque(__cilkrts_worker *w) {
         }
     }
     return -1;
-}
+}*/
 
 void print_worker_deque(__cilkrts_worker *w) {
     deque_lock_self(w);
