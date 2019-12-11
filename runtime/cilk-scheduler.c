@@ -1513,19 +1513,6 @@ void worker_scheduler(__cilkrts_worker *w, Closure *t) {
     unsigned long long begin_stealing_ts1, begin_stealing_ts2;
     while(!w->g->done) {//!w->g->done, meaningless, just kept for original structure
         //printf("%d %d: w->g->program->done_one = %d\n", w->g->program->done_one, w->g->program->control_uid, w->self);
-job_finish_point:
-        w = __cilkrts_get_tls_worker();
-        if (w->g->program->job_finish==1) { //job_finish must compare with 1 since it may set as -1
-            begin_stealing_ts1 = rdtsc();
-            do_exit_switching_for_invariant_handling(w);
-            reset_exception_pointer(w, t);
-        }
-        if (w->g->program->job_finish==1) {
-            w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts1);
-            goto job_finish_point;
-        } else if (w->g->program->hint_stop_container==1) {
-            goto stop_container_point;
-        }
 
 stop_container_point:
         w = __cilkrts_get_tls_worker();
@@ -1537,6 +1524,20 @@ stop_container_point:
             goto stop_container_point;
         }
 
+job_finish_point:
+        w = __cilkrts_get_tls_worker();
+        if (w->g->program->job_finish==1) { //job_finish must compare with 1 since it may set as -1
+            begin_stealing_ts1 = rdtsc();
+            do_exit_switching_for_invariant_handling(w);
+            reset_exception_pointer(w, t);
+        }
+        if (w->g->program->hint_stop_container==1) {
+            goto stop_container_point;
+        } else if (w->g->program->job_finish==1) {
+            w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts1);
+            goto job_finish_point;
+        }
+
 normal_point: //normal part, can not be preempted
         w = __cilkrts_get_tls_worker();
         if(!t) {
@@ -1546,10 +1547,10 @@ normal_point: //normal part, can not be preempted
                 if (deque_trylock(w, w->self)==1) {
                     break;
                 } else {
-                    if (w->g->program->job_finish==1) {
-                        goto job_finish_point;
-                    } else if (w->g->program->hint_stop_container==1) {
+                    if (w->g->program->hint_stop_container==1) {
                         goto stop_container_point;
+                    } else if (w->g->program->job_finish==1) {
+                        goto job_finish_point;
                     } else if (w->l->elastic_s==SLEEP_REQUESTED) {
                         worker_sleep_handling(w);
                     }
@@ -1562,11 +1563,11 @@ normal_point: //normal part, can not be preempted
         w = __cilkrts_get_tls_worker();
         while(!t && !w->g->done) {
             w = __cilkrts_get_tls_worker();
-            if (w->g->program->job_finish==1) {
+            if (w->g->program->hint_stop_container==1) {
+                goto stop_container_point;
+            } else if (w->g->program->job_finish==1) {
                 assert_num_ancestor(0, 0, 0);
                 goto job_finish_point;
-            } else if (w->g->program->hint_stop_container==1) {
-                goto stop_container_point;
             } else if (w->l->elastic_s==SLEEP_REQUESTED) {
                 worker_sleep_handling(w);
             }
@@ -1593,11 +1594,10 @@ normal_point: //normal part, can not be preempted
         if (!w->g->done) {
             t = do_what_it_says(w, t);
         }
-
-        if (w->g->program->job_finish==1) {
-            goto job_finish_point;
-        } else if (w->g->program->hint_stop_container==1) {
+        if (w->g->program->hint_stop_container==1) {
             goto stop_container_point;
+        } else if (w->g->program->job_finish==1) {
+            goto job_finish_point;
         } else {
             goto normal_point;
         }
