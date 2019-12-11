@@ -1554,7 +1554,7 @@ normal_point: //normal part, can not be preempted
                     } else if (w->g->program->hint_stop_container==1) {
                         goto stop_container_point;
                     } else if (w->l->elastic_s==SLEEP_REQUESTED) {
-                        goto worker_sleep_point;
+                        //goto worker_sleep_point;
                     }
                 }
             }
