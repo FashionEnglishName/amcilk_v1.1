@@ -1499,6 +1499,7 @@ void worker_sleep_handling(__cilkrts_worker *w) {
                     abort();
                 }
             }*/
+            __sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED);
         } else {
             printf("ERROR: (p%d, w%d) worker_sleep_handling error, h:%p, t:%p!\n", w->g->program->control_uid, w->self, w->head, w->tail);
             abort();
