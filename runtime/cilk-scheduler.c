@@ -1540,7 +1540,7 @@ worker_sleep_point:
             goto worker_sleep_point;
         }
 
-normal_point: //normal part, can not be preempted
+//normal_point: //normal part, can not be preempted
         w = __cilkrts_get_tls_worker();
         if(!t) {
             // try to get work from our local queue
