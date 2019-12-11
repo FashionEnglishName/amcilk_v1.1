@@ -1492,7 +1492,6 @@ stop_container_point:
         w = __cilkrts_get_tls_worker();
         if (w->g->program->hint_stop_container==1) {
             do_exit_blocking_container_handling(w);
-            //reset_exception_pointer(w, t);
         }
 
 job_finish_point:
@@ -1500,7 +1499,6 @@ job_finish_point:
         if (w->g->program->job_finish==1) { //job_finish must compare with 1 since it may set as -1
             begin_stealing_ts1 = rdtsc();
             do_exit_switching_for_invariant_handling(w);
-            //reset_exception_pointer(w, t);
         }
         if (w->l->elastic_s==SLEEP_REQUESTED) {
             worker_sleep_handling(w);
