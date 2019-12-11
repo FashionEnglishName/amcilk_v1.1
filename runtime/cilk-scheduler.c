@@ -1488,6 +1488,7 @@ void worker_sleep_handling(__cilkrts_worker *w) {
                                     deque_lock_self(w);
                                     Closure *cl = deque_peek_bottom(w, w->self);
                                     if (cl!=NULL) {
+                                        printf("1\n");
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
                                             elastic_core_lock(w);
                                             elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque]]);
@@ -1504,6 +1505,7 @@ void worker_sleep_handling(__cilkrts_worker *w) {
                                             abort();
                                         }
                                     } else { //be mugged
+                                        printf("2\n");
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
                                             elastic_core_lock(w);
                                             elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
