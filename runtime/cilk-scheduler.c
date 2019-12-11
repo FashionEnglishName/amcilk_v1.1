@@ -1376,6 +1376,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
             }
             deque_unlock_self(w);
             deque_unlock(w, w->g->program->last_do_exit_worker_id);
+
         } else if (w->self==w->g->program->last_do_exit_worker_id) {
             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVE, EXIT_SWITCHING0)) {
                 printf("[PLATFORM %d]: worker %d enters to runtime\n", w->g->program->control_uid, w->self);
@@ -1449,7 +1450,6 @@ void do_exit_blocking_container_handling(__cilkrts_worker *w) {
 void worker_sleep_handling(__cilkrts_worker *w) {
     w = __cilkrts_get_tls_worker();
     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, SLEEPING_ADAPTING_DEQUE)) {
-        Cilk_fence();
         if (w->head>w->tail) {
             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {
                 if (w->head <= w->tail) {
@@ -1506,9 +1506,7 @@ stop_container_point:
         }
 worker_sleep_point:
         w = __cilkrts_get_tls_worker();
-        if (w->g->program->job_finish!=1 && w->g->program->hint_stop_container!=1) {
-            worker_sleep_handling(w);
-        }
+        worker_sleep_handling(w);
         
         if (w->g->program->job_finish==1) {
             w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts1);
