@@ -1520,9 +1520,6 @@ stop_container_point:
             do_exit_blocking_container_handling(w);
             reset_exception_pointer(w, t);
         }
-        if (w->g->program->hint_stop_container==1) {
-            goto stop_container_point;
-        }
 
 job_finish_point:
         w = __cilkrts_get_tls_worker();
