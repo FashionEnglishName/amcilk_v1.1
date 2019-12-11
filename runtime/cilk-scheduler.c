@@ -1509,7 +1509,6 @@ void worker_sleep_handling(__cilkrts_worker *w) {
 void worker_scheduler(__cilkrts_worker *w, Closure *t) {
     CILK_ASSERT(w, w == __cilkrts_get_tls_worker());
     rts_srand(w, w->self * 162347);  
-    CILK_START_TIMING(w, INTERVAL_SCHED);
     w = __cilkrts_get_tls_worker();
     unsigned long long begin_stealing_ts1, begin_stealing_ts2;
     while(!w->g->done) {//!w->g->done, meaningless, just kept for original structure
@@ -1559,7 +1558,6 @@ normal_point: //normal part, can not be preempted
             t = deque_xtract_bottom(w, w->self);
             deque_unlock_self(w);
         }
-        CILK_STOP_TIMING(w, INTERVAL_SCHED);
 
         w = __cilkrts_get_tls_worker();
         while(!t && !w->g->done) {
@@ -1572,8 +1570,6 @@ normal_point: //normal part, can not be preempted
             } else if (w->l->elastic_s==SLEEP_REQUESTED) {
                 worker_sleep_handling(w);
             }
-            CILK_START_TIMING(w, INTERVAL_SCHED);
-            CILK_START_TIMING(w, INTERVAL_IDLE);
 
             w = __cilkrts_get_tls_worker();
             begin_stealing_ts2 = rdtsc();
@@ -1591,19 +1587,8 @@ normal_point: //normal part, can not be preempted
                 }
             }
             w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts2);
-
-#if SCHED_STATS
-            if(t) { // steal successful
-                CILK_STOP_TIMING(w, INTERVAL_SCHED);
-                CILK_DROP_TIMING(w, INTERVAL_IDLE);
-            } else { // steal unsuccessful
-                CILK_STOP_TIMING(w, INTERVAL_IDLE);
-                CILK_DROP_TIMING(w, INTERVAL_SCHED);
-            }
-#endif
         }
 
-        CILK_START_TIMING(w, INTERVAL_SCHED);
         w = __cilkrts_get_tls_worker();
         if (!w->g->done) {
             t = do_what_it_says(w, t);
@@ -1617,6 +1602,5 @@ normal_point: //normal part, can not be preempted
             goto normal_point;
         }
     }
-    CILK_STOP_TIMING(w, INTERVAL_SCHED);
 }
 
