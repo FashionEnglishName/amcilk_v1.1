@@ -1183,7 +1183,7 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                             elastic_core_unlock(w);
                         }
                         
-                        if (w->head <= w->tail) { //the worker is set to sleep and its deque is not empty;   
+                        if (w->head < w->tail) { //the worker is set to sleep and its deque is not empty;    <= 1210
                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), TO_SLEEP, SLEEPING_ADAPTING_DEQUE)) {
                                 deque_lock_self(w);
                                 elastic_core_lock(w);
