@@ -1618,6 +1618,7 @@ normal_point: //normal part, can not be preempted
             goto stop_container_point;
         } else {
             //goto worker_sleep_point;
+            goto normal_point;//??
         }
     }
     CILK_STOP_TIMING(w, INTERVAL_SCHED);
