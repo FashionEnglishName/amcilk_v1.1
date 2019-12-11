@@ -1503,7 +1503,6 @@ void worker_sleep_handling(__cilkrts_worker *w) {
                                             printf("ERROR: activated without requested2\n");
                                             abort();
                                         }
-                                        deque_unlock_self(w);
                                     } else { //be mugged
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
                                             elastic_core_lock(w);
@@ -1521,8 +1520,8 @@ void worker_sleep_handling(__cilkrts_worker *w) {
                                             printf("ERROR: activated without requested3\n");
                                             abort();
                                         }
-                                        deque_unlock_self(w);
                                     }
+                                    deque_unlock_self(w);
             }
         } else {
             printf("ERROR: (p%d, w%d) worker_sleep_handling error, h:%p, t:%p!\n", w->g->program->control_uid, w->self, w->head, w->tail);
