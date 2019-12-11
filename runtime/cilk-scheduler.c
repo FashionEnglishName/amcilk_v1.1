@@ -1450,7 +1450,7 @@ void do_exit_blocking_container_handling(__cilkrts_worker *w) {
 void worker_sleep_handling(__cilkrts_worker *w) {
     w = __cilkrts_get_tls_worker();
     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, SLEEPING_ADAPTING_DEQUE)) {
-        if (w->head>=w->tail) { //why has the case of "="?
+        if (w->head>=w->tail) { //why has the case of "="? == when init
             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {
                 elastic_core_lock(w);
                 w->g->elastic_core->ptr_sleeping_inactive_deque--;
@@ -1492,7 +1492,7 @@ stop_container_point:
         w = __cilkrts_get_tls_worker();
         if (w->g->program->hint_stop_container==1) {
             do_exit_blocking_container_handling(w);
-            reset_exception_pointer(w, t);
+            //reset_exception_pointer(w, t);
         }
 
 job_finish_point:
@@ -1500,7 +1500,7 @@ job_finish_point:
         if (w->g->program->job_finish==1) { //job_finish must compare with 1 since it may set as -1
             begin_stealing_ts1 = rdtsc();
             do_exit_switching_for_invariant_handling(w);
-            reset_exception_pointer(w, t);
+            //reset_exception_pointer(w, t);
         }
         if (w->l->elastic_s==SLEEP_REQUESTED) {
             worker_sleep_handling(w);
