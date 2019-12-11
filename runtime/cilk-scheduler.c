@@ -1452,10 +1452,10 @@ void worker_sleep_handling(__cilkrts_worker *w) {
     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, SLEEPING_ADAPTING_DEQUE)) {
         //if (w->head>w->tail) {
             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {
-                /*if (w->head <= w->tail) {
-                    printf("ERROR: (p%d, w%d) worker_sleep_handling error!\n", w->g->program->control_uid, w->self);
+                if (w->head <= w->tail) {
+                    printf("ERROR: (p%d, w%d) worker_sleep_handling error, h:%p, t:%p!\n", w->g->program->control_uid, w->self, w->head, w->tail);
                     abort();
-                }*/
+                }
                 elastic_core_lock(w);
                 w->g->elastic_core->ptr_sleeping_inactive_deque--;
                 elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
@@ -1504,9 +1504,9 @@ stop_container_point:
             do_exit_blocking_container_handling(w);
             reset_exception_pointer(w, t);
         }
-//worker_sleep_point:
+worker_sleep_point:
         w = __cilkrts_get_tls_worker();
-        //worker_sleep_handling(w);
+        worker_sleep_handling(w);
         
         if (w->g->program->job_finish==1) {
             w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts1);
@@ -1514,7 +1514,7 @@ stop_container_point:
         } else if (w->g->program->hint_stop_container==1) {
             goto stop_container_point;
         } else if (w->l->elastic_s==SLEEP_REQUESTED) {
-            //goto worker_sleep_point;
+            goto worker_sleep_point;
         }
 
 normal_point: //normal part, can not be preempted
@@ -1531,7 +1531,7 @@ normal_point: //normal part, can not be preempted
                     } else if (w->g->program->hint_stop_container==1) {
                         goto stop_container_point;
                     } else if (w->l->elastic_s==SLEEP_REQUESTED) {
-                        //goto worker_sleep_point;
+                        goto worker_sleep_point;
                     }
                 }
             }
@@ -1549,7 +1549,7 @@ normal_point: //normal part, can not be preempted
             } else if (w->g->program->hint_stop_container==1) {
                 goto stop_container_point;
             } else if (w->l->elastic_s==SLEEP_REQUESTED) {
-                //goto worker_sleep_point;
+                goto worker_sleep_point;
             }
             CILK_START_TIMING(w, INTERVAL_SCHED);
             CILK_START_TIMING(w, INTERVAL_IDLE);
@@ -1594,7 +1594,7 @@ normal_point: //normal part, can not be preempted
         } else if (w->g->program->hint_stop_container==1) {
             goto stop_container_point;
         } else {
-            //goto worker_sleep_point;
+            goto worker_sleep_point;
         }
     }
     CILK_STOP_TIMING(w, INTERVAL_SCHED);
