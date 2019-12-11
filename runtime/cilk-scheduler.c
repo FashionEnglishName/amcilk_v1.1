@@ -1474,7 +1474,8 @@ void worker_sleep_handling(__cilkrts_worker *w) {
                 }
             }
         } else if (w->head==w->tail) {
-            printf("ERROR: (p%d, w%d) worker_sleep_handling error, h:%p, t:%p!\n", w->g->program->control_uid, w->self, w->head, w->tail);
+            printf("ERROR: (p%d, w%d) worker_sleep_handling error, h:%p, t:%p, job_finish:%d, hint_stop_container:%d\n", 
+                w->g->program->control_uid, w->self, w->head, w->tail, w->g->program->job_finish, w->g->program->hint_stop_container);
             abort();
             /*if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {
                 elastic_core_lock(w);
