@@ -1528,7 +1528,9 @@ job_finish_point:
             do_exit_switching_for_invariant_handling(w);
             reset_exception_pointer(w, t);
         }
-        if (w->g->program->hint_stop_container==1) {
+        if (w->l->elastic_s==SLEEP_REQUESTED) {
+            worker_sleep_handling(w);
+        } else if (w->g->program->hint_stop_container==1) {
             goto stop_container_point;
         } else if (w->g->program->job_finish==1) {
             w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts1);
