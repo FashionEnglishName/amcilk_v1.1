@@ -1547,8 +1547,7 @@ job_finish_point:
             begin_stealing_ts2 = rdtsc();
             if (w->g->program->running_job==1 && w->g->program->job_finish==0) {
                 int victim_worker_id = w->g->elastic_core->cpu_state_group[rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque];
-                if(victim_worker_id != w->self) {
-
+                if(victim_worker_id != w->self) { //ACTIVE, SLEEP_REQUEST, TO_SLEEP
                     w = __cilkrts_get_tls_worker();
                     t = Closure_steal(w, victim_worker_id);
                 } else {
