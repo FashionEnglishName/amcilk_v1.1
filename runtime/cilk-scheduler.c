@@ -1069,11 +1069,12 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                 } else {
                     //Zhe: the hook for longjmp_to_runtime
                     w = __cilkrts_get_tls_worker();
+                    int victim = -1;
                     if (elastic_safe(w)) {
                         if (w->l->elastic_s==ACTIVE) { //steal whole deque if has any, DO_MUGGING
                             elastic_core_lock(w);
 mugging:
-                            int victim = elastic_get_worker_id_sleeping_active_deque(w);
+                            victim = elastic_get_worker_id_sleeping_active_deque(w);
                             //elastic_core_unlock(w);
                             if (w->self!=victim && victim!=-1) {
                                 if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVE, DO_MUGGING)) {
