@@ -447,16 +447,12 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
                 Closure_unlock(w, t);
                 deque_unlock_self(w);
                 longjmp_to_runtime(w);
-            } else { //when whole deque thief jumps here, do normal routine as if nothing happens
-                //w = __cilkrts_get_tls_worker();
-                //printf("%d jumps at Cilk_exception_handler\n", w->self);
-                //pass
-                //return;
             }
         }
     }
 
     w = __cilkrts_get_tls_worker();
+    Cilk_fence();
     if (w->head > w->tail) {
         w = __cilkrts_get_tls_worker();
         __cilkrts_alert(ALERT_EXCEPT, "[%d]: (Cilk_exception_handler) this is a steal!\n", w->self);
