@@ -1497,7 +1497,6 @@ job_finish_point:
 
             w = __cilkrts_get_tls_worker();
             if (w->g->program->hint_stop_container==1) {
-                assert_num_ancestor(0, 0, 0);
                 do_exit_blocking_container_handling(w);
             }
 
