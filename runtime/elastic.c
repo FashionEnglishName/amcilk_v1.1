@@ -190,8 +190,8 @@ void elastic_worker_request_cpu_to_recover(__cilkrts_worker *w, int cpu_id) {
 void assert_num_ancestor(int assert_spawn_count, int assert_call_count, int assert_call_frame_count) {
     __cilkrts_worker * w = __cilkrts_get_tls_worker();
     Closure *cl = deque_peek_bottom(w, w->self);
-    int count_spawn = 0;
-    int count_call = 0;
+    int count_spawn = -1;
+    int count_call = -1;
     while(cl!=NULL) {
         cl = cl->spawn_parent;
         count_spawn++;
@@ -202,7 +202,7 @@ void assert_num_ancestor(int assert_spawn_count, int assert_call_count, int asse
         count_call++;
     }
 
-    int count_call_frame = 0;
+    int count_call_frame = -1;
     Closure * cl_top = deque_peek_top(w, w->self);
     if (cl_top!=NULL) {
         __cilkrts_stack_frame * cl_frame = cl_top->frame;
