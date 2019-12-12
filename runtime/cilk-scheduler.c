@@ -451,33 +451,34 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
                 //w = __cilkrts_get_tls_worker();
                 //printf("%d jumps at Cilk_exception_handler\n", w->self);
                 //pass
-                return;
+                //return;
             }
         }
     }
- w = __cilkrts_get_tls_worker();
-        if (w->head > w->tail) {
-                w = __cilkrts_get_tls_worker();
-                __cilkrts_alert(ALERT_EXCEPT, "[%d]: (Cilk_exception_handler) this is a steal!\n", w->self);
-                /*if (w->self==w->g->elastic_core->test_thief) {
-                    printf("TEST[%d]: enter normal steal branch, current_stack_frame:%p\n", w->self, w->current_stack_frame);
-                }*/
-                if(t->status == CLOSURE_RUNNING) {
-                    CILK_ASSERT(w, Closure_has_children(t) == 0);
-                    t->status = CLOSURE_RETURNING;
-                }
-                Closure_unlock(w, t);
-                deque_unlock_self(w);
-                //printf("%d enter Cilk_exception_handler for stealing\n", w->self);
-                longjmp_to_runtime(w); // NOT returning back to user code
-        } else {
-            /*if (w->self==w->g->elastic_core->test_thief) {
-                printf("TEST[%d]: no stealing alarm, current_stack_frame:%p\n", w->self, w->current_stack_frame);
-            }*/
-            Closure_unlock(w, t);
-            deque_unlock_self(w);
-            return;
+
+    w = __cilkrts_get_tls_worker();
+    if (w->head > w->tail) {
+        w = __cilkrts_get_tls_worker();
+        __cilkrts_alert(ALERT_EXCEPT, "[%d]: (Cilk_exception_handler) this is a steal!\n", w->self);
+        /*if (w->self==w->g->elastic_core->test_thief) {
+            printf("TEST[%d]: enter normal steal branch, current_stack_frame:%p\n", w->self, w->current_stack_frame);
+        }*/
+        if(t->status == CLOSURE_RUNNING) {
+            CILK_ASSERT(w, Closure_has_children(t) == 0);
+            t->status = CLOSURE_RETURNING;
         }
+        Closure_unlock(w, t);
+        deque_unlock_self(w);
+        //printf("%d enter Cilk_exception_handler for stealing\n", w->self);
+        longjmp_to_runtime(w); // NOT returning back to user code
+    } else {
+        /*if (w->self==w->g->elastic_core->test_thief) {
+            printf("TEST[%d]: no stealing alarm, current_stack_frame:%p\n", w->self, w->current_stack_frame);
+        }*/
+        Closure_unlock(w, t);
+        deque_unlock_self(w);
+        return;
+    }
 }
 
 // ==============================================
