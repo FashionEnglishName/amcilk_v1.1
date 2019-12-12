@@ -1039,6 +1039,12 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
 
         switch (t->status) {
             case CLOSURE_READY:
+                w = __cilkrts_get_tls_worker();
+                if(w->l->fiber_to_free) { 
+                    cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
+                }
+                w->l->fiber_to_free = NULL;
+
                 // ANGE: anything we need to free must have been freed at this point
                 CILK_ASSERT(w, w->l->fiber_to_free == NULL);
 
