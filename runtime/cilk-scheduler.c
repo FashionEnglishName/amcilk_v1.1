@@ -1490,7 +1490,7 @@ void worker_scheduler(__cilkrts_worker *w, Closure *t) {
 job_finish_point:
         w = __cilkrts_get_tls_worker();
         if (w->g->program->job_finish==1) { //job_finish must compare with 1 since it may set as -1
-            assert_num_ancestor(0, 0, 0);
+            //assert_num_ancestor(0, 0, 0);
             begin_stealing_ts1 = rdtsc();
             do_exit_switching_for_invariant_handling(w);
 stop_container_point:
