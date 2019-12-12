@@ -1483,17 +1483,17 @@ void worker_scheduler(__cilkrts_worker *w, Closure *t) {
     CILK_ASSERT(w, w == __cilkrts_get_tls_worker());
     rts_srand(w, w->self * 162347);  
     w = __cilkrts_get_tls_worker();
-    unsigned long long begin_stealing_ts1, begin_stealing_ts2;
+    unsigned long long begin_stealing_ts2;
     while(!w->g->done) {//!w->g->done, meaningless, just kept for original structure
         //printf("%d %d: w->g->program->done_one = %d\n", w->g->program->done_one, w->g->program->control_uid, w->self);
 
-stop_container_point:
+//stop_container_point:
         w = __cilkrts_get_tls_worker();
         if (w->g->program->hint_stop_container==1) {
             do_exit_blocking_container_handling(w);
         }
 
-job_finish_point:
+//job_finish_point:
         w = __cilkrts_get_tls_worker();
         if (w->g->program->job_finish==1) { //job_finish must compare with 1 since it may set as -1
             //begin_stealing_ts1 = rdtsc();
