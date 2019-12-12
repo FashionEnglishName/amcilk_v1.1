@@ -27,8 +27,8 @@
 #define BUF_SIZE 10240
 //server end spec
 #define CONTAINER_COUNT 14
-#define TIME_MAKE_SURE_TO_SLEEP 500//100 //important! depends of the size of a single frame
-#define TIME_MAKE_SURE_TO_ACTIVATE 500//100 //important! depends of implementation of block/activate mechanism
+#define TIME_MAKE_SURE_TO_SLEEP 100//100 //important! depends of the size of a single frame
+#define TIME_MAKE_SURE_TO_ACTIVATE 100//100 //important! depends of implementation of block/activate mechanism
 #define TIME_EXIT_CTX_SWITCH 100 //important! can not be too small for the efficiency
 #define TIME_REQUEST_RECEIVE_INTERVAL 40000//25000//Bing: (12500 best! for disable the feedback) 50000, 45000, 75301; Finance:
 #define TIME_CONTAINER_TRIGGER_INTERVAL TIME_REQUEST_RECEIVE_INTERVAL //important! when workload is high
@@ -41,7 +41,7 @@
 #define KUNAL_ADAPTIVE_FEEDBACK_PERIOD_US TIME_REQUEST_RECEIVE_INTERVAL/10
 #define KUNAL_ADAPTIVE_FEEDBACK_INEFFICIENT_THRESHOLD 0.95 //0.8~0.95
 #define KUNAL_ADAPTIVE_FEEDBACK_RESPONSIVENESS_PARAMETER 2 //1.2~2.0
-#define KUNAL_ADAPTIVE_FEEDBACK_ENABLE 0 //0 or 1
+#define KUNAL_ADAPTIVE_FEEDBACK_ENABLE 1 //0 or 1
 
 
 /*
