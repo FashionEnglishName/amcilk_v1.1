@@ -1072,7 +1072,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                     int victim = -1;
                     if (elastic_safe(w)) {
                         if (w->l->elastic_s==ACTIVE) { //steal whole deque if has any, DO_MUGGING
-                            //elastic_core_lock(w);
 mugging:
                             victim = elastic_get_worker_id_sleeping_active_deque(w);
                             if (w->self!=victim && victim!=-1) {
@@ -1101,7 +1100,6 @@ mugging:
                                                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
                                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                                                 printf("p%d, w%d: GIVE UP MUGGING\n", w->g->program->control_uid, w->self);
-                                                                //elastic_core_unlock(w);
                                                                 longjmp_to_user_code(w, cl);
                                                             }
                                                         } else {
@@ -1114,7 +1112,7 @@ mugging:
                                                         abort();
                                                     }
                                                 } else {
-                                                    res = NULL;
+                                                    //res = NULL;
                                                 }
                                             } else {
                                                 printf("ERROR: wrong cl status at bottom [%d] when mugging\n", cl->status);
@@ -1142,7 +1140,6 @@ mugging:
                                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {    
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                                 if (w->current_stack_frame!=NULL) {
-                                                    //elastic_core_unlock(w);
                                                     sysdep_longjmp_to_sf_for_preempt(w->current_stack_frame);
                                                 } else {
                                                     printf("ERROR: current_stack_frame==NULL in MUGGING after entering runtime\n");
@@ -1168,7 +1165,6 @@ mugging:
                                     }
                                 }
                             }
-                            //elastic_core_unlock(w);
                         }
                         
                         if (w->head <= w->tail) { //the worker is set to sleep and its deque is not empty;   
@@ -1222,12 +1218,12 @@ mugging:
                                             w->g->elastic_core->ptr_sleeping_inactive_deque++;
                                             elastic_core_unlock(w);
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
-                                                res = NULL;
-                                                w = __cilkrts_get_tls_worker();
+                                                //res = NULL;
+                                                /*w = __cilkrts_get_tls_worker();
                                                 if(w->l->fiber_to_free) { 
                                                     cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
                                                 }
-                                                w->l->fiber_to_free = NULL;
+                                                w->l->fiber_to_free = NULL;*/
                                             } else {
                                                 printf("ERROR: ACTIVATING3 is changed by others\n");
                                                 abort();
