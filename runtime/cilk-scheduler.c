@@ -1501,6 +1501,7 @@ job_finish_point:
         }
         if (w->l->elastic_s==SLEEP_REQUESTED) {
             worker_sleep_handling(w);
+            goto normal_point;
         } else if (w->g->program->hint_stop_container==1) {
             goto stop_container_point;
         } else if (w->g->program->job_finish==1) {
@@ -1509,6 +1510,7 @@ job_finish_point:
         }
 
 //normal part, can not be preempted
+normal_point:
         w = __cilkrts_get_tls_worker();
         if(!t) {
             // try to get work from our local queue
@@ -1523,6 +1525,7 @@ job_finish_point:
                         goto job_finish_point;
                     } else if (w->l->elastic_s==SLEEP_REQUESTED) {
                         worker_sleep_handling(w);
+                        goto normal_point;
                     }
                 }
             }
@@ -1540,6 +1543,7 @@ job_finish_point:
                 goto job_finish_point;
             } else if (w->l->elastic_s==SLEEP_REQUESTED) {
                 worker_sleep_handling(w);
+                goto normal_point;
             }
 
             w = __cilkrts_get_tls_worker();
