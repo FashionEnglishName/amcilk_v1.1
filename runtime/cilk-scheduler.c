@@ -1504,7 +1504,7 @@ normal_point:
             w = __cilkrts_get_tls_worker();
             if(!t) {
                 // try to get work from our local queue
-                deque_lock_self(w);
+                //deque_lock_self(w);
                 while(1) {
                     if (deque_trylock(w, w->self)==1) {
                         break;
