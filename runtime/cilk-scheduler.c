@@ -1097,11 +1097,10 @@ mugging:
                                                         Closure_unlock(w, cl);
                                                         deque_lock_self(w);
                                                         deque_add_bottom(w, cl, w->self);
-                                                        //deque_unlock_self(w);
+                                                        deque_unlock_self(w);
                                                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
                                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                                                 printf("p%d, w%d: GIVE UP MUGGING\n", w->g->program->control_uid, w->self);
-                                                                deque_unlock_self(w);
                                                                 elastic_core_unlock(w);
                                                                 longjmp_to_user_code(w, cl);
                                                             }
@@ -1129,6 +1128,8 @@ mugging:
                                         deque_lock(w, victim);
                                         deque_lock_self(w);
                                         elastic_mugging(w, victim);
+                                        deque_unlock_self(w);
+                                        deque_unlock(w, victim);
 
                                         w->g->elastic_core->ptr_sleeping_inactive_deque--;
                                         int tmp_victim_cpu_state_group_pos = w->g->workers[victim]->l->elastic_pos_in_cpu_state_group;
@@ -1139,8 +1140,6 @@ mugging:
                                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {    
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                                 if (w->current_stack_frame!=NULL) {
-                                                    deque_unlock_self(w);
-                                                    deque_unlock(w, victim);
                                                     elastic_core_unlock(w);
                                                     sysdep_longjmp_to_sf_for_preempt(w->current_stack_frame);
                                                 } else {
@@ -1264,10 +1263,9 @@ mugging:
                                                 Closure_unlock(w, cl);
                                                 deque_lock_self(w);
                                                 deque_add_bottom(w, cl, w->self);
-                                                //deque_unlock_self(w);
+                                                deque_unlock_self(w);
                                                 __sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED);
                                                 w->exc = w->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
-                                                deque_unlock_self(w);
                                                 longjmp_to_user_code(w, cl);
                                             } else {
                                                 Closure_unlock(w, cl);
