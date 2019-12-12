@@ -1399,6 +1399,7 @@ void do_exit_switching_for_invariant_handling(__cilkrts_worker *w) {
                 printf("[ERROR]: last w %d enter runtime failed! (state %d is not ACTIVE or SLEEP_REQUESTED)\n", w->self, w->l->elastic_s);
                 abort();
             }
+            w->g->program->last_do_exit_worker_id = -1; //MUST reset
             printf("[PLATFORM %d]: worker %d enters to runtime loop! elastic_s: %d\n", w->g->program->control_uid, w->self, w->l->elastic_s);
         }
     }
@@ -1487,17 +1488,15 @@ void worker_scheduler(__cilkrts_worker *w, Closure *t) {
     while(!w->g->done) {//!w->g->done, meaningless, just kept for original structure
         //printf("%d %d: w->g->program->done_one = %d\n", w->g->program->done_one, w->g->program->control_uid, w->self);
 
-job_finish_point:
         w = __cilkrts_get_tls_worker();
         if (w->g->program->job_finish==1) { //job_finish must compare with 1 since it may set as -1
+job_finish_point:
             //assert_num_ancestor(0, 0, 0);
             do_exit_switching_for_invariant_handling(w); //last worker (not inv) comes here
-stop_container_point:
+
             w = __cilkrts_get_tls_worker();
             if (w->g->program->hint_stop_container==1) {
                 do_exit_blocking_container_handling(w);
-            } else {
-                goto stop_container_point;
             }
         }
 
