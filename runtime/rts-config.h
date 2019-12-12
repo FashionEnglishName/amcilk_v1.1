@@ -27,9 +27,9 @@
 #define BUF_SIZE 10240
 //server end spec
 #define CONTAINER_COUNT 14
-#define TIME_MAKE_SURE_TO_SLEEP 100//100 //important! depends of the size of a single frame
-#define TIME_MAKE_SURE_TO_ACTIVATE 100//100 //important! depends of implementation of block/activate mechanism
-#define TIME_EXIT_CTX_SWITCH 100 //important! can not be too small for the efficiency
+#define TIME_MAKE_SURE_TO_SLEEP 200//100 //important! depends of the size of a single frame
+#define TIME_MAKE_SURE_TO_ACTIVATE 200//100 //important! depends of implementation of block/activate mechanism
+#define TIME_EXIT_CTX_SWITCH 200 //important! can not be too small for the efficiency
 #define TIME_REQUEST_RECEIVE_INTERVAL 40000//25000//Bing: (12500 best! for disable the feedback) 50000, 45000, 75301; Finance:
 #define TIME_CONTAINER_TRIGGER_INTERVAL TIME_REQUEST_RECEIVE_INTERVAL //important! when workload is high
 #define GUARANTEE_PREMPT_WAITING_TIME 10000
