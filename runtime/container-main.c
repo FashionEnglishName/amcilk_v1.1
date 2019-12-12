@@ -162,17 +162,6 @@ run_point:
     }
 
     //a job is completed
-    w = __cilkrts_get_tls_worker();
-    deque_lock_self(w);
-    Closure *cl = deque_peek_bottom(w, w->self);
-    Closure_lock(w, cl);
-    if(cl!=NULL) {
-        cl->call_parent = NULL;
-        cl->spawn_parent = NULL;
-    }
-    Closure_unlock(w, cl);
-    deque_unlock_self(w);
-
     assert_num_ancestor(0, 0, 0);
     if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), 0, -1)) {
         w->g->cilk_main_return = _tmp;
