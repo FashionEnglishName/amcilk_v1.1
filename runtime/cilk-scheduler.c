@@ -1039,12 +1039,6 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
 
         switch (t->status) {
             case CLOSURE_READY:
-                w = __cilkrts_get_tls_worker();
-                if(w->l->fiber_to_free) { 
-                    cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
-                }
-                w->l->fiber_to_free = NULL;
-
                 // ANGE: anything we need to free must have been freed at this point
                 CILK_ASSERT(w, w->l->fiber_to_free == NULL);
 
@@ -1084,17 +1078,17 @@ mugging:
                             if (w->self!=victim && victim!=-1) {
                                 if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVE, DO_MUGGING)) {
                                     if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
+                                        w = __cilkrts_get_tls_worker();
+                                        if(w->l->fiber_to_free) { 
+                                            cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
+                                        }
+                                        w->l->fiber_to_free = NULL;
                                         deque_lock_self(w);
                                         Closure *cl;
                                         cl = deque_xtract_bottom(w, w->self);
                                         deque_unlock_self(w);
                                         if (cl!=NULL) {
                                             if (cl->status==CLOSURE_RETURNING) { //give up mugging
-                                                w = __cilkrts_get_tls_worker();
-                                                if(w->l->fiber_to_free) { 
-                                                    cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
-                                                }
-                                                w->l->fiber_to_free = NULL;
                                                 cl = return_value(w, cl);
                                                 if (cl!=NULL) {
                                                     Closure_lock(w, cl);
@@ -1120,6 +1114,8 @@ mugging:
                                                         printf("ERROR: cl state error (should be CLOSURE_READY)\n");
                                                         abort();
                                                     }
+                                                } else {
+                                                    res = NULL;
                                                 }
                                             } else {
                                                 printf("ERROR: wrong cl status at bottom [%d] when mugging\n", cl->status);
@@ -1244,18 +1240,17 @@ mugging:
                             }
                         } else { //deque is empty
                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), TO_SLEEP, SLEEPING_ADAPTING_DEQUE)) {
+                                w = __cilkrts_get_tls_worker();
+                                if(w->l->fiber_to_free) { 
+                                    cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
+                                }
+                                w->l->fiber_to_free = NULL;
                                 deque_lock_self(w);
                                 Closure *cl;
                                 cl = deque_xtract_bottom(w, w->self);
                                 deque_unlock_self(w);
                                 if (cl!=NULL) {
                                     if (cl->status==CLOSURE_RETURNING) { //give up
-                                        w = __cilkrts_get_tls_worker();
-                                        if(w->l->fiber_to_free) { 
-                                            cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
-                                        }
-                                        w->l->fiber_to_free = NULL;
-
                                         cl = return_value(w, cl);
                                         if (cl!=NULL) {
                                             Closure_lock(w, cl);
@@ -1274,6 +1269,8 @@ mugging:
                                                 printf("ERROR: error2 cl status %d\n", cl->status);
                                                 abort();
                                             }
+                                        } else {
+                                            res = NULL;
                                         }
                                     } else {
                                         printf("ERROR: wrong cl status at bottom [%d] when deque is empty and go to sleep\n", cl->status);
