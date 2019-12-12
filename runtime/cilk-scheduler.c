@@ -1094,14 +1094,14 @@ mugging:
                                                     Closure_lock(w, cl);
                                                     if (cl->status==CLOSURE_READY) {
                                                         setup_for_execution(w, cl);
-                                                        USE_UNUSED(cl->frame);
                                                         Closure_unlock(w, cl);
                                                         deque_lock_self(w);
                                                         deque_add_bottom(w, cl, w->self);
-                                                        deque_unlock_self(w);
+                                                        //deque_unlock_self(w);
                                                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
                                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                                                 printf("p%d, w%d: GIVE UP MUGGING\n", w->g->program->control_uid, w->self);
+                                                                deque_unlock_self(w);
                                                                 elastic_core_unlock(w);
                                                                 longjmp_to_user_code(w, cl);
                                                             }
@@ -1261,13 +1261,13 @@ mugging:
                                             Closure_lock(w, cl);
                                             if (cl->status==CLOSURE_READY) {
                                                 setup_for_execution(w, cl);
-                                                USE_UNUSED(cl->frame);
                                                 Closure_unlock(w, cl);
                                                 deque_lock_self(w);
                                                 deque_add_bottom(w, cl, w->self);
-                                                deque_unlock_self(w);
+                                                //deque_unlock_self(w);
                                                 __sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED);
                                                 w->exc = w->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
+                                                deque_unlock_self(w);
                                                 longjmp_to_user_code(w, cl);
                                             } else {
                                                 Closure_unlock(w, cl);
