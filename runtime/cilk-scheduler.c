@@ -440,7 +440,7 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
 
     w = __cilkrts_get_tls_worker();
     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, TO_SLEEP)) {
-        if (w->head < w->tail) {//zhe del =
+        if (w->head <= w->tail) {
             sysdep_save_fp_ctrl_state_for_preempt(w->current_stack_frame);
             if(!__builtin_setjmp(w->current_stack_frame->prempt_ctx)) {
                 //printf("TEST[%d]: goto TO_SLEEP state (to_sleep), current_stack_frame:%p, closure status:%d, E:%p\n", w->self, w->current_stack_frame, t->status, w->exc);
@@ -450,21 +450,11 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
             } else { //when whole deque thief jumps here, do normal routine as if nothing happens
                 //w = __cilkrts_get_tls_worker();
                 //printf("%d jumps at Cilk_exception_handler\n", w->self);
-                return;
+                //pass
             }
-        } else {// w->head>w->tail
-            __cilkrts_alert(ALERT_EXCEPT, "[%d]: (Cilk_exception_handler) this is a steal!\n", w->self);
-            //printf("TEST[%d]: goto TO_SLEEP state (steal&to_sleep), current_stack_frame:%p, closure status:%d, E:%p\n", w->self, w->current_stack_frame, t->status, w->exc);
-            if(t->status == CLOSURE_RUNNING) {
-                CILK_ASSERT(w, Closure_has_children(t) == 0);
-                t->status = CLOSURE_RETURNING;
-            }
-            Closure_unlock(w, t);
-            deque_unlock_self(w);
-            longjmp_to_runtime(w); // NOT returning back to user code  
         }
+    }
 
-    } else { //normal routine
         if (w->head > w->tail) {
             if(w->l->elastic_s==ACTIVE) {
                 w = __cilkrts_get_tls_worker();
@@ -493,7 +483,6 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
             deque_unlock_self(w);
             return;
         }
-    }
 }
 
 // ==============================================
