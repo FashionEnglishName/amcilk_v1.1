@@ -440,7 +440,7 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
 
     w = __cilkrts_get_tls_worker();
     if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEP_REQUESTED, TO_SLEEP)) {
-        if (w->head < w->tail) {//zhe del = //<=
+        if (w->head < w->tail) {//zhe del =
             sysdep_save_fp_ctrl_state_for_preempt(w->current_stack_frame);
             if(!__builtin_setjmp(w->current_stack_frame->prempt_ctx)) {
                 //printf("TEST[%d]: goto TO_SLEEP state (to_sleep), current_stack_frame:%p, closure status:%d, E:%p\n", w->self, w->current_stack_frame, t->status, w->exc);
@@ -465,7 +465,7 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
         }
 
     } else { //normal routine
-        if (w->head >= w->tail) { //>
+        if (w->head > w->tail) {
             if(w->l->elastic_s==ACTIVE) {
                 w = __cilkrts_get_tls_worker();
                 __cilkrts_alert(ALERT_EXCEPT, "[%d]: (Cilk_exception_handler) this is a steal!\n", w->self);
