@@ -1120,9 +1120,7 @@ mugging:
                                                 printf("ERROR: wrong cl status at bottom [%d] when mugging\n", cl->status);
                                                 abort();
                                             }
-                                        }
-                                        deque_unlock_self(w);
-                                        
+                                        }                                        
 
                                         w = __cilkrts_get_tls_worker();
                                         deque_lock(w, victim);
@@ -1171,14 +1169,11 @@ mugging:
                         
                         if (w->head <= w->tail) { //the worker is set to sleep and its deque is not empty;   
                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), TO_SLEEP, SLEEPING_ADAPTING_DEQUE)) {
-                                deque_lock_self(w);
                                 elastic_core_lock(w);
                                 w->g->elastic_core->ptr_sleeping_active_deque++;
                                 elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque]]);
                                 elastic_core_unlock(w);
                                 if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
-                                    deque_unlock_self(w);
-
                                     elastic_do_cond_sleep(w);
 
                                     //activated
@@ -1238,7 +1233,6 @@ mugging:
                                     }
                                 } else {
                                     printf("ERROR: SLEEPING_ADAPTING_DEQUE is changed by others\n");
-                                    deque_unlock_self(w);
                                     abort();
                                 }
                             }
