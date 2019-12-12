@@ -1498,59 +1498,63 @@ job_finish_point:
             if (w->g->program->hint_stop_container==1) {
                 do_exit_blocking_container_handling(w);
             }
-        }
 
-//normal part, can not be preempted
+        } else {
 normal_point:
-        w = __cilkrts_get_tls_worker();
-        if(!t) {
-            // try to get work from our local queue
-            deque_lock_self(w);
-            /*while(1) {
-                if (deque_trylock(w, w->self)==1) {
-                    break;
-                } else {
-                    if (w->g->program->job_finish==1) {
-                        goto job_finish_point;
+            w = __cilkrts_get_tls_worker();
+            if(!t) {
+                // try to get work from our local queue
+                deque_lock_self(w);
+                while(1) {
+                    if (deque_trylock(w, w->self)==1) {
+                        break;
+                    } else {
+                        w = __cilkrts_get_tls_worker();
+                        if (w->g->program->job_finish==1) {
+                            goto job_finish_point;
+                        }
+                        w = __cilkrts_get_tls_worker();
+                        if (w->l->elastic_s==SLEEP_REQUESTED) {
+                            worker_sleep_handling(w);
+                            goto normal_point;
+                        }
                     }
                 }
-            }*/
-            t = deque_xtract_bottom(w, w->self);
-            deque_unlock_self(w);
-        }
-
-        w = __cilkrts_get_tls_worker();
-        while(!t && !w->g->done) {
-            w = __cilkrts_get_tls_worker();
-            if (w->g->program->job_finish==1) {
-                goto job_finish_point;
-            }
-            if (w->l->elastic_s==SLEEP_REQUESTED) {
-                worker_sleep_handling(w);
-                goto normal_point;
+                t = deque_xtract_bottom(w, w->self);
+                deque_unlock_self(w);
             }
 
             w = __cilkrts_get_tls_worker();
-            begin_stealing_ts2 = rdtsc();
-            if (w->g->program->running_job==1 && w->g->program->job_finish==0) {
-                int victim_worker_id = w->g->elastic_core->cpu_state_group[rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque];
-                if(victim_worker_id != w->self && (w->g->workers[victim_worker_id]->l->elastic_s==ACTIVE||
-                    w->g->workers[victim_worker_id]->l->elastic_s==SLEEP_REQUESTED)) {
-                    w = __cilkrts_get_tls_worker();
-                    t = Closure_steal(w, victim_worker_id);
-                } else {
-                    //pass
+            while(!t && !w->g->done) {
+                w = __cilkrts_get_tls_worker();
+                if (w->g->program->job_finish==1) {
+                    goto job_finish_point;
                 }
-            }
-            w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts2);
-        }
+                w = __cilkrts_get_tls_worker();
+                if (w->l->elastic_s==SLEEP_REQUESTED) {
+                    worker_sleep_handling(w);
+                    goto normal_point;
+                }
 
-        w = __cilkrts_get_tls_worker();
-        if (!w->g->done) {
-            t = do_what_it_says(w, t);
-        }
-        if (w->g->program->job_finish!=1) {
-            goto normal_point;
+                w = __cilkrts_get_tls_worker();
+                begin_stealing_ts2 = rdtsc();
+                if (w->g->program->running_job==1 && w->g->program->job_finish==0) {
+                    int victim_worker_id = w->g->elastic_core->cpu_state_group[rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque];
+                    if(victim_worker_id != w->self && (w->g->workers[victim_worker_id]->l->elastic_s==ACTIVE||
+                        w->g->workers[victim_worker_id]->l->elastic_s==SLEEP_REQUESTED)) {
+                        w = __cilkrts_get_tls_worker();
+                        t = Closure_steal(w, victim_worker_id);
+                    } else {
+                        //pass
+                    }
+                }
+                w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts2);
+            }
+
+            w = __cilkrts_get_tls_worker();
+            if (!w->g->done) {
+                t = do_what_it_says(w, t);
+            }
         }
     }
 }
