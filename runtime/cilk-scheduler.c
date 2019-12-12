@@ -1098,10 +1098,10 @@ mugging:
                                                         Closure_unlock(w, cl);
                                                         deque_lock_self(w);
                                                         deque_add_bottom(w, cl, w->self);
+                                                        deque_unlock_self(w);
                                                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
                                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
                                                                 printf("p%d, w%d: GIVE UP MUGGING\n", w->g->program->control_uid, w->self);
-                                                                deque_unlock_self(w);
                                                                 elastic_core_unlock(w);
                                                                 longjmp_to_user_code(w, cl);
                                                             }
@@ -1265,9 +1265,9 @@ mugging:
                                                 Closure_unlock(w, cl);
                                                 deque_lock_self(w);
                                                 deque_add_bottom(w, cl, w->self);
+                                                deque_unlock_self(w);
                                                 __sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED);
                                                 w->exc = w->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
-                                                deque_unlock_self(w);
                                                 longjmp_to_user_code(w, cl);
                                             } else {
                                                 Closure_unlock(w, cl);
@@ -1512,8 +1512,8 @@ job_finish_point:
         w = __cilkrts_get_tls_worker();
         if(!t) {
             // try to get work from our local queue
-            //deque_lock_self(w);
-            while(1) {
+            deque_lock_self(w);
+            /*while(1) {
                 if (deque_trylock(w, w->self)==1) {
                     break;
                 } else {
@@ -1525,7 +1525,7 @@ job_finish_point:
                         worker_sleep_handling(w);
                     }
                 }
-            }
+            }*/
             t = deque_xtract_bottom(w, w->self);
             deque_unlock_self(w);
         }
@@ -1547,7 +1547,7 @@ job_finish_point:
             if (w->g->program->running_job==1 && w->g->program->job_finish==0) {
                 int victim_worker_id = w->g->elastic_core->cpu_state_group[rts_rand(w) % w->g->elastic_core->ptr_sleeping_inactive_deque];
                 if(victim_worker_id != w->self && (w->g->workers[victim_worker_id]->l->elastic_s==ACTIVE||
-                w->g->workers[victim_worker_id]->l->elastic_s==SLEEP_REQUESTED)) { //ACTIVE, SLEEP_REQUESTED, TO_SLEEP
+                    w->g->workers[victim_worker_id]->l->elastic_s==SLEEP_REQUESTED)) {
                     w = __cilkrts_get_tls_worker();
                     t = Closure_steal(w, victim_worker_id);
                 } else {
