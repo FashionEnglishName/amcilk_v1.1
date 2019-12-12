@@ -193,13 +193,13 @@ void assert_num_ancestor(int assert_spawn_count, int assert_call_count, int asse
     int count_spawn = 0;
     int count_call = 0;
     while(cl!=NULL) {
-        count_spawn++;
         cl = cl->spawn_parent;
+        count_spawn++;
     }
     cl = deque_peek_bottom(w, w->self);
     while(cl!=NULL) {
-        count_call++;
         cl = cl->call_parent;
+        count_call++;
     }
 
     int count_call_frame = 0;
@@ -207,16 +207,16 @@ void assert_num_ancestor(int assert_spawn_count, int assert_call_count, int asse
     if (cl_top!=NULL) {
         __cilkrts_stack_frame * cl_frame = cl_top->frame;
         while(cl_frame!=NULL) {
-            count_call_frame++;
             cl_frame = cl_frame->call_parent;
+            count_call_frame++;
         }
     }
 
     printf("assert_num_ancestor_bottom: spawn parent: %d, call parent: %d, call frame parent: %d\n", count_spawn, count_call, count_call_frame);
-    /*if (count_spawn!=assert_spawn_count || count_call!=assert_call_count || count_call_frame!=assert_call_frame_count) {
+    if (count_spawn!=assert_spawn_count || count_call!=assert_call_count || count_call_frame!=assert_call_frame_count) {
         printf("ERROR: num of ancestor is wrong! (spawn:%d, call:%d), should be (%d, %d)\n", count_spawn, count_call, assert_spawn_count, assert_call_count);
         abort();
-    }*/
+    }
 }
 
 
