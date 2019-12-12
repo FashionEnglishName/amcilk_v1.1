@@ -1081,6 +1081,7 @@ mugging:
                                         deque_lock_self(w);
                                         Closure *cl;
                                         cl = deque_xtract_bottom(w, w->self);
+                                        deque_unlock_self(w);
                                         if (cl!=NULL) {
                                             if (cl->status==CLOSURE_RETURNING) { //give up mugging
                                                 w = __cilkrts_get_tls_worker();
@@ -1095,6 +1096,7 @@ mugging:
                                                         setup_for_execution(w, cl);
                                                         USE_UNUSED(cl->frame);
                                                         Closure_unlock(w, cl);
+                                                        deque_lock_self(w);
                                                         deque_add_bottom(w, cl, w->self);
                                                         if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_ACTIVE_DEQUE)) {
                                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
@@ -1239,6 +1241,7 @@ mugging:
                                 deque_lock_self(w);
                                 Closure *cl;
                                 cl = deque_xtract_bottom(w, w->self);
+                                deque_unlock_self(w);
                                 if (cl!=NULL) {
                                     if (cl->status==CLOSURE_RETURNING) { //give up
                                         w = __cilkrts_get_tls_worker();
@@ -1254,6 +1257,7 @@ mugging:
                                                 setup_for_execution(w, cl);
                                                 USE_UNUSED(cl->frame);
                                                 Closure_unlock(w, cl);
+                                                deque_lock_self(w);
                                                 deque_add_bottom(w, cl, w->self);
                                                 __sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEP_REQUESTED);
                                                 w->exc = w->tail + DEFAULT_DEQ_DEPTH; //invoke exception handler
