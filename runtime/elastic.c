@@ -212,11 +212,11 @@ void assert_num_ancestor(int assert_spawn_count, int assert_call_count, int asse
         }
     }
 
-    //printf("assert_num_ancestor_bottom: spawn parent: %d, call parent: %d, call frame parent: %d\n", count_spawn, count_call, count_call_frame);
-    if (count_spawn!=assert_spawn_count || count_call!=assert_call_count || count_call_frame!=assert_call_frame_count) {
+    printf("assert_num_ancestor_bottom: spawn parent: %d, call parent: %d, call frame parent: %d\n", count_spawn, count_call, count_call_frame);
+    /*if (count_spawn!=assert_spawn_count || count_call!=assert_call_count || count_call_frame!=assert_call_frame_count) {
         printf("ERROR: num of ancestor is wrong! (spawn:%d, call:%d), should be (%d, %d)\n", count_spawn, count_call, assert_spawn_count, assert_call_count);
         abort();
-    }
+    }*/
 }
 
 
