@@ -1149,7 +1149,7 @@ mugging:
                                     }
                                 }
                             }
-                        } else if (w->head < w->tail) { //the worker is set to sleep and its deque is not empty;    //<=
+                        } else if (w->head <= w->tail) { //the worker is set to sleep and its deque is not empty;    //<=
                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), TO_SLEEP, SLEEPING_ADAPTING_DEQUE)) {
                                 elastic_core_lock(w);
                                 w->g->elastic_core->ptr_sleeping_active_deque++;
