@@ -1512,8 +1512,8 @@ job_finish_point:
         w = __cilkrts_get_tls_worker();
         if(!t) {
             // try to get work from our local queue
-            deque_lock_self(w);
-            /*while(1) {
+            //deque_lock_self(w);
+            while(1) {
                 if (deque_trylock(w, w->self)==1) {
                     break;
                 } else {
@@ -1525,7 +1525,7 @@ job_finish_point:
                         worker_sleep_handling(w);
                     }
                 }
-            }*/
+            }
             t = deque_xtract_bottom(w, w->self);
             deque_unlock_self(w);
         }
