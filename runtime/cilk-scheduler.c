@@ -1256,6 +1256,94 @@ mugging:
                 __cilkrts_bug("BUG in do_what_it_says()\n");
                 break;
         }
+    } else {
+        w = __cilkrts_get_tls_worker();
+                    int victim = -1;
+                    if (elastic_safe(w)) {
+                        if (w->l->elastic_s==ACTIVE) { //steal whole deque if has any, DO_MUGGING
+                            elastic_core_lock(w);
+mugging2:
+                            victim = elastic_get_worker_id_sleeping_active_deque(w);
+                            //elastic_core_unlock(w);
+                            if (w->self!=victim && victim!=-1) {
+                                if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVE, DO_MUGGING)) {
+                                    if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
+                                        w = __cilkrts_get_tls_worker();
+                                        deque_lock(w, victim);
+                                        deque_lock_self(w);
+                                        elastic_mugging(w, victim);
+
+                                        //elastic_core_lock(w);
+                                        w->g->elastic_core->ptr_sleeping_inactive_deque--;
+                                        int tmp_victim_cpu_state_group_pos = w->g->workers[victim]->l->elastic_pos_in_cpu_state_group;
+                                        elastic_do_exchange_state_group(w->g->workers[victim], w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
+                                        elastic_do_exchange_state_group(w->g->workers[w->g->elastic_core->cpu_state_group[tmp_victim_cpu_state_group_pos]], w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_active_deque]]);
+                                        w->g->elastic_core->ptr_sleeping_active_deque--;
+                                        //elastic_core_unlock(w);
+
+                                        if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_MUGGING_DEQUE, SLEEPING_INACTIVE_DEQUE)) {    
+                                            if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
+                                                if (w->current_stack_frame!=NULL) {
+                                                    deque_unlock_self(w);
+                                                    deque_unlock(w, victim);
+                                                    elastic_core_unlock(w);
+                                                    sysdep_longjmp_to_sf_for_preempt(w->current_stack_frame);
+                                                } else {
+                                                    printf("ERROR: current_stack_frame==NULL in MUGGING after entering runtime\n");
+                                                    abort();
+                                                }
+                                            } else {
+                                                printf("ERROR: DO_MUGGING1 is changed by others, recover failed\n");
+                                                abort();
+                                            }
+                                        } else {
+                                            printf("ERROR: SLEEPING_MUGGING_DEQUE2 is changed by others\n");
+                                            abort();
+                                        }
+                                        deque_unlock_self(w);
+                                        deque_unlock(w, victim);
+                                    } else {
+                                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), DO_MUGGING, ACTIVE)) {
+                                            goto mugging2;
+                                        } else {
+                                            printf("ERROR: DO_MUGGING2 is changed by others, recover failed\n");
+                                            abort();
+                                        }
+                                    }
+                                }
+                            }
+                            elastic_core_unlock(w);
+
+                        } else if (w->head > w->tail) { //deque is empty
+                            if (__sync_bool_compare_and_swap(&(w->l->elastic_s), TO_SLEEP, SLEEPING_ADAPTING_DEQUE)) {
+                                if (__sync_bool_compare_and_swap(&(w->l->elastic_s), SLEEPING_ADAPTING_DEQUE, SLEEPING_INACTIVE_DEQUE)) { 
+                                    elastic_core_lock(w);
+                                    w->g->elastic_core->ptr_sleeping_inactive_deque--;
+                                    elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
+                                    elastic_core_unlock(w);
+                                    elastic_do_cond_sleep(w);
+                                    
+                                    //activated
+                                    w = __cilkrts_get_tls_worker();
+                                    if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATE_REQUESTED, ACTIVATING)) {
+                                        elastic_core_lock(w);
+                                        elastic_do_exchange_state_group(w, w->g->workers[w->g->elastic_core->cpu_state_group[w->g->elastic_core->ptr_sleeping_inactive_deque]]);
+                                        w->g->elastic_core->ptr_sleeping_inactive_deque++;
+                                        elastic_core_unlock(w);
+                                        if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
+                                            //res = NULL;
+                                        } else {
+                                            printf("ERROR: ACTIVATING4 is changed by others\n");
+                                            abort();
+                                        }
+                                    } else {
+                                        printf("ERROR: activated without requested4\n");
+                                        abort();
+                                    }
+                                }
+                            }
+                        }
+                    }
     }
 
     return res;
