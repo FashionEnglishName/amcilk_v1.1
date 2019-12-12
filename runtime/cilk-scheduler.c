@@ -1497,6 +1497,11 @@ stop_container_point:
             w = __cilkrts_get_tls_worker();
             if (w->g->program->hint_stop_container==1) {
                 do_exit_blocking_container_handling(w);
+            } else {
+                if (w->l->elastic_s==SLEEP_REQUESTED) {
+                    worker_sleep_handling(w);
+                }
+                goto stop_container_point;
             }
         }
 
