@@ -1073,7 +1073,9 @@ static Closure * do_what_it_says(__cilkrts_worker * w, Closure *t) {
                     if (elastic_safe(w)) {
                         if (w->l->elastic_s==ACTIVE) { //steal whole deque if has any, DO_MUGGING
 mugging:
+                            elastic_core_lock(w);
                             victim = elastic_get_worker_id_sleeping_active_deque(w);
+                            elastic_core_unlock(w);
                             if (w->self!=victim && victim!=-1) {
                                 if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVE, DO_MUGGING)) {
                                     if (__sync_bool_compare_and_swap(&(w->g->workers[victim]->l->elastic_s), SLEEPING_ACTIVE_DEQUE, SLEEPING_MUGGING_DEQUE)) {
@@ -1219,11 +1221,11 @@ mugging:
                                             elastic_core_unlock(w);
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
                                                 //res = NULL;
-                                                /*w = __cilkrts_get_tls_worker();
+                                                w = __cilkrts_get_tls_worker();
                                                 if(w->l->fiber_to_free) { 
                                                     cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
                                                 }
-                                                w->l->fiber_to_free = NULL;*/
+                                                w->l->fiber_to_free = NULL;
                                             } else {
                                                 printf("ERROR: ACTIVATING3 is changed by others\n");
                                                 abort();
@@ -1307,7 +1309,8 @@ mugging:
                                 }
                             }
                         }
-                    }                
+                    }       
+                    w = __cilkrts_get_tls_worker();         
                     CILK_ASSERT(w, w == __cilkrts_get_tls_worker());
                     // CILK_ASSERT(w, t->fiber == w->l->fiber_to_free);
                     if(w->l->fiber_to_free) { 
