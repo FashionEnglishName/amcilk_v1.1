@@ -1483,7 +1483,7 @@ void worker_scheduler(__cilkrts_worker *w, Closure *t) {
     CILK_ASSERT(w, w == __cilkrts_get_tls_worker());
     rts_srand(w, w->self * 162347);  
     w = __cilkrts_get_tls_worker();
-    unsigned long long begin_stealing_ts1, begin_stealing_ts2;
+    unsigned long long begin_stealing_ts2;
     while(!w->g->done) {//!w->g->done, meaningless, just kept for original structure
         //printf("%d %d: w->g->program->done_one = %d\n", w->g->program->done_one, w->g->program->control_uid, w->self);
 
@@ -1491,23 +1491,14 @@ job_finish_point:
         w = __cilkrts_get_tls_worker();
         if (w->g->program->job_finish==1) { //job_finish must compare with 1 since it may set as -1
             //assert_num_ancestor(0, 0, 0);
-            begin_stealing_ts1 = rdtsc();
-            do_exit_switching_for_invariant_handling(w);
+            do_exit_switching_for_invariant_handling(w); //last worker (not inv) comes here
 stop_container_point:
             w = __cilkrts_get_tls_worker();
             if (w->g->program->hint_stop_container==1) {
                 do_exit_blocking_container_handling(w);
             } else {
-                if (w->l->elastic_s==SLEEP_REQUESTED) {
-                    worker_sleep_handling(w);
-                }
                 goto stop_container_point;
             }
-        }
-
-        if (w->g->program->job_finish==1) {
-            w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts1);
-            goto job_finish_point;
         }
 
 //normal part, can not be preempted
@@ -1515,8 +1506,8 @@ normal_point:
         w = __cilkrts_get_tls_worker();
         if(!t) {
             // try to get work from our local queue
-            //deque_lock_self(w);
-            while(1) {
+            deque_lock_self(w);
+            /*while(1) {
                 if (deque_trylock(w, w->self)==1) {
                     break;
                 } else {
@@ -1524,7 +1515,7 @@ normal_point:
                         goto job_finish_point;
                     }
                 }
-            }
+            }*/
             t = deque_xtract_bottom(w, w->self);
             deque_unlock_self(w);
         }
