@@ -447,12 +447,13 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
                 Closure_unlock(w, t);
                 deque_unlock_self(w);
                 longjmp_to_runtime(w);
+            } else {
+                return;
             }
         }
     }
 
     w = __cilkrts_get_tls_worker();
-    Cilk_fence();
     if (w->head > w->tail) {
         w = __cilkrts_get_tls_worker();
         __cilkrts_alert(ALERT_EXCEPT, "[%d]: (Cilk_exception_handler) this is a steal!\n", w->self);
