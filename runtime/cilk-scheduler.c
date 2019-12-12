@@ -1496,18 +1496,19 @@ stop_container_point:
 job_finish_point:
         w = __cilkrts_get_tls_worker();
         if (w->g->program->job_finish==1) { //job_finish must compare with 1 since it may set as -1
-            begin_stealing_ts1 = rdtsc();
+            //begin_stealing_ts1 = rdtsc();
             do_exit_switching_for_invariant_handling(w);
         }
         if (w->l->elastic_s==SLEEP_REQUESTED) {
             worker_sleep_handling(w);
             goto normal_point;
-        } else if (w->g->program->hint_stop_container==1) {
+        }
+        /*if (w->g->program->hint_stop_container==1) {
             goto stop_container_point;
         } else if (w->g->program->job_finish==1) {
             w->l->stealing_cpu_cycles += (rdtsc() - begin_stealing_ts1);
             goto job_finish_point;
-        }
+        }*/
 
 //normal part, can not be preempted
 normal_point:
@@ -1519,11 +1520,15 @@ normal_point:
                 if (deque_trylock(w, w->self)==1) {
                     break;
                 } else {
-                    if (w->g->program->hint_stop_container==1) {
+                    /*if (w->g->program->hint_stop_container==1) {
                         goto stop_container_point;
                     } else if (w->g->program->job_finish==1) {
                         goto job_finish_point;
                     } else if (w->l->elastic_s==SLEEP_REQUESTED) {
+                        worker_sleep_handling(w);
+                        goto normal_point;
+                    }*/
+                    if (w->l->elastic_s==SLEEP_REQUESTED) {
                         worker_sleep_handling(w);
                         goto normal_point;
                     }
@@ -1536,12 +1541,12 @@ normal_point:
         w = __cilkrts_get_tls_worker();
         while(!t && !w->g->done) {
             w = __cilkrts_get_tls_worker();
-            if (w->g->program->hint_stop_container==1) {
+            /*if (w->g->program->hint_stop_container==1) {
                 goto stop_container_point;
             } else if (w->g->program->job_finish==1) {
                 assert_num_ancestor(0, 0, 0);
                 goto job_finish_point;
-            } else if (w->l->elastic_s==SLEEP_REQUESTED) {
+            } else*/ if (w->l->elastic_s==SLEEP_REQUESTED) {
                 worker_sleep_handling(w);
                 goto normal_point;
             }
