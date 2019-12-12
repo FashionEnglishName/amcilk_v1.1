@@ -207,7 +207,7 @@ void assert_num_ancestor(int assert_spawn_count, int assert_call_count, int asse
     if (cl_top!=NULL) {
         __cilkrts_stack_frame * cl_frame = cl_top->frame;
         while(cl_frame!=NULL) {
-            count_call++;
+            count_call_frame++;
             cl_frame = cl_frame->call_parent;
         }
     }
