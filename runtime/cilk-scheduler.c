@@ -451,6 +451,7 @@ void Cilk_exception_handler() { //Zhe: This part is still in user code!
                 //w = __cilkrts_get_tls_worker();
                 //printf("%d jumps at Cilk_exception_handler\n", w->self);
                 //pass
+                return;
             }
         }
     }
