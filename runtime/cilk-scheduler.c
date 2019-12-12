@@ -1273,7 +1273,7 @@ mugging:
                                                 abort();
                                             }
                                         } else {
-                                            res = NULL;
+                                            //res = NULL;
                                         }
                                     } else {
                                         printf("ERROR: wrong cl status at bottom [%d] when deque is empty and go to sleep\n", cl->status);
@@ -1297,7 +1297,7 @@ mugging:
                                         w->g->elastic_core->ptr_sleeping_inactive_deque++;
                                         elastic_core_unlock(w);
                                         if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
-                                            res = NULL;
+                                            //res = NULL;
                                         } else {
                                             printf("ERROR: ACTIVATING4 is changed by others\n");
                                             abort();
