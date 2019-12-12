@@ -163,9 +163,10 @@ run_point:
 
     //a job is completed
     w = __cilkrts_get_tls_worker();
-    Closure *cl = deque_xtract_bottom(w, w->self);
-    while(cl!=NULL) {
-        cl = deque_xtract_bottom(w, w->self);
+    Closure *cl = deque_peek_bottom(w, w->self);
+    if(cl!=NULL) {
+        cl->call_parent = NULL;
+        cl->spawn_parent = NULL;
     }
     assert_num_ancestor(0, 0, 0);
     if (__sync_bool_compare_and_swap(&(w->g->program->job_finish), 0, -1)) {
