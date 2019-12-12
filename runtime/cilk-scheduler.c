@@ -1222,6 +1222,11 @@ mugging:
                                             elastic_core_unlock(w);
                                             if (__sync_bool_compare_and_swap(&(w->l->elastic_s), ACTIVATING, ACTIVE)) {
                                                 res = NULL;
+                                                w = __cilkrts_get_tls_worker();
+                                                if(w->l->fiber_to_free) { 
+                                                    cilk_fiber_deallocate_to_pool(w, w->l->fiber_to_free); 
+                                                }
+                                                w->l->fiber_to_free = NULL;
                                             } else {
                                                 printf("ERROR: ACTIVATING3 is changed by others\n");
                                                 abort();
