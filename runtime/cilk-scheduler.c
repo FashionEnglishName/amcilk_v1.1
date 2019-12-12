@@ -1492,12 +1492,12 @@ void worker_scheduler(__cilkrts_worker *w, Closure *t) {
         if (w->g->program->job_finish==1) { //job_finish must compare with 1 since it may set as -1
 job_finish_point:
             w = __cilkrts_get_tls_worker();
-            assert_num_ancestor(0, 0, 0);
             do_exit_switching_for_invariant_handling(w); //last worker (not inv) comes here
             worker_sleep_handling(w);
 
             w = __cilkrts_get_tls_worker();
             if (w->g->program->hint_stop_container==1) {
+                assert_num_ancestor(0, 0, 0);
                 do_exit_blocking_container_handling(w);
             }
 
